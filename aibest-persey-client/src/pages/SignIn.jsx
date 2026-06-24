@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Mail, Lock } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TextField from "../components/TextField.jsx"
@@ -8,6 +8,7 @@ import GoogleButton from "../components/GoogleButton.jsx"
 import OrDivider from "../components/OrDivider.jsx"
 
 export default function SignIn() {
+  const navigate = useNavigate()
   const [form, setForm] = useState({ email: "", password: "" })
   const [remember, setRemember] = useState(true)
 
@@ -17,6 +18,7 @@ export default function SignIn() {
     e.preventDefault()
     // Auth wiring comes later
     console.log("[v0] sign in", form, { remember })
+    navigate("/home")
   }
 
   return (
