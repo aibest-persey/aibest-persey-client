@@ -7,7 +7,7 @@
   min-height: 100%;
   color: #120d26;
   font-family: "Plus Jakarta Sans", sans-serif;
-  overflow-x: hidden;
+  position: relative;  /* anchors the absolute sidebar inside the phone */
 }
 
 /* Curved header */
@@ -388,3 +388,163 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ─── Sidebar Drawer ────────────────────────────────────────────── */
+
+/* Dim overlay — sits on top of content but below drawer */
+.sidebar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 13, 38, 0);
+  pointer-events: none;
+  transition: background 0.3s ease;
+  z-index: 10;
+}
+
+.sidebar-overlay--visible {
+  background: rgba(18, 13, 38, 0.35);
+  pointer-events: all;
+}
+
+/* The drawer panel itself */
+.sidebar-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 62%;          /* covers left half of the 375px phone */
+  height: 100%;
+  background: #ffffff;
+  border-top-right-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: 8px 0 40px rgba(18, 13, 38, 0.12);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  padding: 52px 24px 40px 24px;
+  transform: translateX(-110%);   /* starts fully off-screen to the left */
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.sidebar-drawer--open {
+  transform: translateX(0);
+}
+
+/* Profile section at top */
+.sidebar-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.sidebar-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e8e9f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-username {
+  font-size: 18px;
+  font-weight: 700;
+  color: #120d26;
+  letter-spacing: -0.01em;
+}
+
+/* Nav list */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 8px;
+  border-radius: 12px;
+  color: #120d26;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+  border-bottom: 1px solid #f1f2f6;
+}
+
+.sidebar-nav-item:last-child {
+  border-bottom: none;
+}
+
+.sidebar-nav-item:hover {
+  background: #f6f7ff;
+  color: #5669ff;
+}
+
+.sidebar-nav-item:hover .sidebar-nav-icon {
+  color: #5669ff;
+}
+
+.sidebar-nav-icon {
+  color: #747688;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+/* Message badge wrapper (icon + orange dot) */
+.sidebar-nav-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sidebar-msg-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #f59762;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Sign Out item — subtle red tint */
+.sidebar-nav-item--signout {
+  color: #f0635a;
+  margin-top: 8px;
+  border-bottom: none;
+}
+
+.sidebar-nav-item--signout .sidebar-nav-icon {
+  color: #f0635a;
+}
+
+.sidebar-nav-item--signout:hover {
+  background: #fff2f1;
+  color: #d94f47;
+}
+
+.sidebar-nav-item--signout:hover .sidebar-nav-icon {
+  color: #d94f47;
+}
+

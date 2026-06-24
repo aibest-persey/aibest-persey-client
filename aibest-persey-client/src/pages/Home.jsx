@@ -1,6 +1,5 @@
 import { useState } from "react"
 import {
-  Menu,
   ChevronDown,
   Bell,
   Search,
@@ -10,6 +9,11 @@ import {
   Palette,
   MapPin,
   Bookmark,
+  User,
+  MessageSquare,
+  Calendar,
+  Mail,
+  LogOut,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import handsHoldingImg from "../assets/hands_holding_event.png"
@@ -39,6 +43,9 @@ function SportsIcon({ size = 18 }) {
 }
 
 export default function Home() {
+  // Sidebar drawer state
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   // Search input state
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -113,12 +120,77 @@ export default function Home() {
   return (
     <PhoneFrame>
       <div className="home-container">
+
+        {/* Sidebar Overlay (dim backdrop) */}
+        <div
+          className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`}
+          onClick={() => setSidebarOpen(false)}
+        />
+
+        {/* Sidebar Drawer */}
+        <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
+          {/* User profile area */}
+          <div className="sidebar-profile">
+            <div className="sidebar-avatar">
+              <User size={32} color="#9a9cae" />
+            </div>
+            <span className="sidebar-username">User</span>
+          </div>
+
+          {/* Nav items */}
+          <nav className="sidebar-nav">
+            <button className="sidebar-nav-item">
+              <User size={20} className="sidebar-nav-icon" />
+              <span>My Profile</span>
+            </button>
+
+            <button className="sidebar-nav-item">
+              <div className="sidebar-nav-icon-wrap">
+                <MessageSquare size={20} className="sidebar-nav-icon" />
+                <span className="sidebar-msg-badge">9</span>
+              </div>
+              <span>Message</span>
+            </button>
+
+            <button className="sidebar-nav-item">
+              <Calendar size={20} className="sidebar-nav-icon" />
+              <span>Calendar</span>
+            </button>
+
+            <button className="sidebar-nav-item">
+              <Bookmark size={20} className="sidebar-nav-icon" />
+              <span>Bookmark</span>
+            </button>
+
+            <button className="sidebar-nav-item">
+              <Mail size={20} className="sidebar-nav-icon" />
+              <span>Contact Us</span>
+            </button>
+
+            <button className="sidebar-nav-item sidebar-nav-item--signout">
+              <LogOut size={20} className="sidebar-nav-icon" />
+              <span>Sign Out</span>
+            </button>
+          </nav>
+        </aside>
         {/* Blue Curved Header */}
         <header className="home-header">
           <div className="home-nav-row">
             {/* Menu icon */}
-            <button className="home-menu-btn" aria-label="Open menu">
-              <Menu size={24} />
+            <button className="home-menu-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="16" y2="12" />
+                <line x1="3" y1="18" x2="10" y2="18" />
+              </svg>
             </button>
 
             {/* Location selector */}
