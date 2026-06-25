@@ -82,10 +82,12 @@
 }
 
 @keyframes bellFloat {
+
   0%,
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -107,11 +109,13 @@
 }
 
 @keyframes rippleFade {
+
   0%,
   100% {
     opacity: 1;
     stroke-dashoffset: 0;
   }
+
   50% {
     opacity: 0.3;
   }

@@ -1,22 +1,85 @@
-import { useState } from "react"
-import { ArrowLeft, PenSquare, Pencil } from "lucide-react"
+import { useState, useRef } from "react"
+import { ArrowLeft, PenSquare, Camera } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Profile.css"
 
-const INTERESTS = [
-  { id: 1, label: "Games Online", color: "#5669ff" },
-  { id: 2, label: "Concert",      color: "#f0635a" },
-  { id: 3, label: "Music",        color: "#f59762" },
-  { id: 4, label: "Art",          color: "#29d697" },
-  { id: 5, label: "Movie",        color: "#29d697" },
-  { id: 6, label: "Others",       color: "#46cdfb" },
-]
-
-const ABOUT_SHORT =
-  "Enjoy your favorite dishe and a lovely your friends and family and have a great time. Food from local food trucks will be available for purchase."
-
-export default function Profile({ onBack }) {
+export default function Profile({ profile, onSave, onBack }) {
   const [expanded, setExpanded] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editForm, setEditForm] = useState({ nickname: "", avatar: "", about: "" })
+
+  const fileInputRef = useRef(null)
+
+  const handleEditClick = () => {
+    setEditForm({
+      nickname: profile.nickname,
+      avatar: profile.avatar,
+      about: profile.about
+    })
+    setIsEditing(true)
+  }
+
+  const handleSave = () => {
+    const updated = {
+      nickname: editForm.nickname.trim() || "User",
+      avatar: editForm.avatar,
+      about: editForm.about.trim()
+    }
+    onSave(updated)
+    setIsEditing(false)
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setEditForm((prev) => ({ ...prev, avatar: reader.result }))
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const triggerFileSelect = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const displayAbout = () => {
+    const text = profile.about || ""
+    if (text.length <= 150) {
+      return text
+    }
+    if (expanded) {
+      return (
+        <>
+          {text}{" "}
+          <button
+            className="profile-read-more"
+            onClick={() => setExpanded(false)}
+          >
+            Show Less ˄
+          </button>
+        </>
+      )
+    }
+    return (
+      <>
+        {text.slice(0, 150)}...{" "}
+        <button
+          className="profile-read-more"
+          onClick={() => setExpanded(true)}
+        >
+          Read More ˅
+        </button>
+      </>
+    )
+  }
 
   return (
     <PhoneFrame>
@@ -31,20 +94,72 @@ export default function Profile({ onBack }) {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="profile-header-title">Profile</h1>
+          <h1 className="profile-header-title">
+            {isEditing ? "Edit Profile" : "Profile"}
+          </h1>
           {/* spacer to keep title centred */}
           <div style={{ width: 36 }} />
         </header>
 
         {/* ── Avatar ─────────────────────────────────── */}
         <div className="profile-avatar-wrap">
-          <div className="profile-avatar">
-            <AvatarIcon />
+          <div
+            className={`profile-avatar ${isEditing ? "profile-avatar--editable" : ""}`}
+            onClick={isEditing ? triggerFileSelect : undefined}
+          >
+            {isEditing ? (
+              editForm.avatar ? (
+                <img
+                  src={editForm.avatar}
+                  alt="Profile Preview"
+                  className="profile-avatar-img"
+                />
+              ) : (
+                <AvatarIcon />
+              )
+            ) : profile.avatar ? (
+              <img
+                src={profile.avatar}
+                alt="Profile"
+                className="profile-avatar-img"
+              />
+            ) : (
+              <AvatarIcon />
+            )}
+            {isEditing && (
+              <div className="profile-avatar-overlay">
+                <Camera size={20} color="#ffffff" />
+              </div>
+            )}
           </div>
+          {isEditing && (
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          )}
         </div>
 
-        {/* ── Name ───────────────────────────────────── */}
-        <p className="profile-name">User</p>
+        {/* ── Name / Edit Name ───────────────────────────────────── */}
+        {isEditing ? (
+          <div className="profile-name-edit-wrap">
+            <input
+              type="text"
+              className="profile-name-input"
+              value={editForm.nickname}
+              onChange={(e) =>
+                setEditForm({ ...editForm, nickname: e.target.value })
+              }
+              placeholder="Nickname"
+              maxLength={25}
+            />
+          </div>
+        ) : (
+          <p className="profile-name">{profile.nickname}</p>
+        )}
 
         {/* ── Stats ──────────────────────────────────── */}
         <div className="profile-stats">
@@ -59,61 +174,40 @@ export default function Profile({ onBack }) {
           </div>
         </div>
 
-        {/* ── Edit Profile button ─────────────────────── */}
-        <button className="profile-edit-btn">
-          <PenSquare size={16} className="profile-edit-icon" />
-          <span>Edit Profile</span>
-        </button>
+        {/* ── Actions ─────────────────────────────────── */}
+        {isEditing ? (
+          <div className="profile-edit-actions">
+            <button className="profile-cancel-btn" onClick={handleCancel}>
+              Cancel
+            </button>
+            <button className="profile-save-btn" onClick={handleSave}>
+              Save
+            </button>
+          </div>
+        ) : (
+          <button className="profile-edit-btn" onClick={handleEditClick}>
+            <PenSquare size={16} className="profile-edit-icon" />
+            <span>Edit Profile</span>
+          </button>
+        )}
 
         {/* ── About Me ───────────────────────────────── */}
         <section className="profile-section">
           <h2 className="profile-section-title">About Me</h2>
-          <p className="profile-about-text">
-            {ABOUT_SHORT}{" "}
-            {!expanded && (
-              <button
-                className="profile-read-more"
-                onClick={() => setExpanded(true)}
-              >
-                Read More ˅
-              </button>
-            )}
-            {expanded && (
-              <>
-                {" "}
-                Whether you're a sports fan, a music lover, or a foodie, there's
-                something here for everyone. Come join us!{" "}
-                <button
-                  className="profile-read-more"
-                  onClick={() => setExpanded(false)}
-                >
-                  Show Less ˄
-                </button>
-              </>
-            )}
-          </p>
-        </section>
-
-        {/* ── Interests ──────────────────────────────── */}
-        <section className="profile-section">
-          <div className="profile-interest-header">
-            <h2 className="profile-section-title">Interest</h2>
-            <button className="profile-change-btn">
-              <Pencil size={11} />
-              <span>CHANGE</span>
-            </button>
-          </div>
-          <div className="profile-interest-pills">
-            {INTERESTS.map((item) => (
-              <span
-                key={item.id}
-                className="profile-interest-pill"
-                style={{ backgroundColor: item.color }}
-              >
-                {item.label}
-              </span>
-            ))}
-          </div>
+          {isEditing ? (
+            <textarea
+              className="profile-about-textarea"
+              value={editForm.about}
+              onChange={(e) =>
+                setEditForm({ ...editForm, about: e.target.value })
+              }
+              placeholder="Write something about yourself..."
+              rows={4}
+              maxLength={500}
+            />
+          ) : (
+            <p className="profile-about-text">{displayAbout()}</p>
+          )}
         </section>
 
       </div>

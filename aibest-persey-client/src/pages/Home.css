@@ -434,9 +434,10 @@
 .sidebar-profile {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   margin-bottom: 36px;
+  width: 100%;
 }
 
 .sidebar-avatar {
@@ -448,6 +449,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .sidebar-username {
@@ -455,6 +463,7 @@
   font-weight: 700;
   color: #120d26;
   letter-spacing: -0.01em;
+  text-align: center;
 }
 
 /* Nav list */

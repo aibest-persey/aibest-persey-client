@@ -61,6 +61,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.profile-avatar--editable {
+  cursor: pointer;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  border-radius: 50%;
+}
+
+.profile-avatar:hover .profile-avatar-overlay {
+  opacity: 1;
 }
 
 .profile-avatar-svg {
@@ -114,7 +145,7 @@
   background: #e4e5ed;
 }
 
-/* ─── Edit Profile button ─────────────────────────────────────────── */
+/* ─── Edit Profile button & Actions ──────────────────────────────── */
 .profile-edit-btn {
   display: flex;
   align-items: center;
@@ -149,6 +180,80 @@
   flex-shrink: 0;
 }
 
+.profile-edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 22px auto 0;
+}
+
+.profile-cancel-btn,
+.profile-save-btn {
+  padding: 11px 28px;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  letter-spacing: 0.01em;
+}
+
+.profile-cancel-btn {
+  background: transparent;
+  border: 2px solid #e4e5ed;
+  color: #747688;
+}
+
+.profile-cancel-btn:hover {
+  background: #f0f1f8;
+  color: #120d26;
+  border-color: #d2d4df;
+}
+
+.profile-save-btn {
+  background: #5669ff;
+  border: 2px solid #5669ff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(86, 105, 255, 0.2);
+}
+
+.profile-save-btn:hover {
+  background: #3d52fc;
+  border-color: #3d52fc;
+  box-shadow: 0 6px 16px rgba(86, 105, 255, 0.3);
+}
+
+/* ─── Name Edit Inputs ───────────────────────────────────────────── */
+.profile-name-edit-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+  padding: 0 20px;
+}
+
+.profile-name-input {
+  width: 100%;
+  max-width: 240px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: center;
+  padding: 8px 12px;
+  border: 1.5px solid #e4e5ed;
+  border-radius: 10px;
+  color: #120d26;
+  background-color: #fcfdfe;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.profile-name-input:focus {
+  border-color: #5669ff;
+  box-shadow: 0 0 0 3px rgba(86, 105, 255, 0.1);
+}
+
 /* ─── Sections ────────────────────────────────────────────────────── */
 .profile-section {
   padding: 22px 22px 0 22px;
@@ -171,6 +276,27 @@
   font-weight: 400;
 }
 
+.profile-about-textarea {
+  width: 100%;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #120d26;
+  background-color: #fcfdfe;
+  font-family: inherit;
+  padding: 12px;
+  border: 1.5px solid #e4e5ed;
+  border-radius: 12px;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.profile-about-textarea:focus {
+  border-color: #5669ff;
+  box-shadow: 0 0 0 3px rgba(86, 105, 255, 0.1);
+}
+
 .profile-read-more {
   background: none;
   border: none;
@@ -185,64 +311,4 @@
 
 .profile-read-more:hover {
   opacity: 0.75;
-}
-
-/* ─── Interests ───────────────────────────────────────────────────── */
-.profile-interest-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-/* Override section-title margin when inside interest-header */
-.profile-interest-header .profile-section-title {
-  margin-bottom: 0;
-}
-
-.profile-change-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: #f0f1f8;
-  border: none;
-  border-radius: 20px;
-  padding: 5px 12px;
-  color: #5669ff;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s ease;
-}
-
-.profile-change-btn:hover {
-  background: #e8eaff;
-}
-
-.profile-interest-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.profile-interest-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 18px;
-  border-radius: 22px;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.13s ease, box-shadow 0.13s ease;
-  cursor: default;
-  user-select: none;
-}
-
-.profile-interest-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.13);
 }

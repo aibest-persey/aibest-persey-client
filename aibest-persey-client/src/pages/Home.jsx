@@ -45,6 +45,13 @@ function SportsIcon({ size = 18 }) {
 }
 
 export default function Home() {
+  // Profile state managed in-memory
+  const [profile, setProfile] = useState({
+    nickname: "User",
+    avatar: "",
+    about: "Enjoy your favorite dishe and a lovely your friends and family and have a great time. Food from local food trucks will be available for purchase."
+  })
+
   // Notifications page visibility
   const [showNotifications, setShowNotifications] = useState(false)
 
@@ -130,7 +137,13 @@ export default function Home() {
   }
 
   if (showProfile) {
-    return <Profile onBack={() => setShowProfile(false)} />
+    return (
+      <Profile
+        profile={profile}
+        onSave={setProfile}
+        onBack={() => setShowProfile(false)}
+      />
+    )
   }
 
   return (
@@ -148,9 +161,17 @@ export default function Home() {
           {/* User profile area */}
           <div className="sidebar-profile">
             <div className="sidebar-avatar">
-              <User size={32} color="#9a9cae" />
+              {profile.avatar ? (
+                <img
+                  src={profile.avatar}
+                  alt="Profile"
+                  className="sidebar-avatar-img"
+                />
+              ) : (
+                <User size={32} color="#9a9cae" />
+              )}
             </div>
-            <span className="sidebar-username">User</span>
+            <span className="sidebar-username">{profile.nickname}</span>
           </div>
 
           {/* Nav items */}
