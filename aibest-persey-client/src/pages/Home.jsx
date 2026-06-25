@@ -1,4 +1,5 @@
 import { useState } from "react"
+import Notifications from "./Notifications.jsx"
 import {
   ChevronDown,
   Bell,
@@ -43,6 +44,9 @@ function SportsIcon({ size = 18 }) {
 }
 
 export default function Home() {
+  // Notifications page visibility
+  const [showNotifications, setShowNotifications] = useState(false)
+
   // Sidebar drawer state
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -115,6 +119,10 @@ export default function Home() {
     } else {
       setNearbyEvents(updateEvents(nearbyEvents))
     }
+  }
+
+  if (showNotifications) {
+    return <Notifications onBack={() => setShowNotifications(false)} />
   }
 
   return (
@@ -203,7 +211,11 @@ export default function Home() {
             </div>
 
             {/* Bell icon with cyan indicator badge */}
-            <button className="home-notification-btn" aria-label="Notifications">
+            <button
+              className="home-notification-btn"
+              aria-label="Notifications"
+              onClick={() => setShowNotifications(true)}
+            >
               <Bell size={20} />
               <div className="home-notification-badge" />
             </button>
