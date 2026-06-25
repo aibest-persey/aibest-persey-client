@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Notifications from "./Notifications.jsx"
+import Profile from "./Profile.jsx"
 import {
   ChevronDown,
   Bell,
@@ -46,6 +47,9 @@ function SportsIcon({ size = 18 }) {
 export default function Home() {
   // Notifications page visibility
   const [showNotifications, setShowNotifications] = useState(false)
+
+  // Profile page visibility
+  const [showProfile, setShowProfile] = useState(false)
 
   // Sidebar drawer state
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -125,6 +129,10 @@ export default function Home() {
     return <Notifications onBack={() => setShowNotifications(false)} />
   }
 
+  if (showProfile) {
+    return <Profile onBack={() => setShowProfile(false)} />
+  }
+
   return (
     <PhoneFrame>
       <div className="home-container">
@@ -147,7 +155,10 @@ export default function Home() {
 
           {/* Nav items */}
           <nav className="sidebar-nav">
-            <button className="sidebar-nav-item">
+            <button
+              className="sidebar-nav-item"
+              onClick={() => { setSidebarOpen(false); setShowProfile(true) }}
+            >
               <User size={20} className="sidebar-nav-icon" />
               <span>My Profile</span>
             </button>
