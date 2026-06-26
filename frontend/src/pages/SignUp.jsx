@@ -1,28 +1,68 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Mail, Lock, User, ArrowLeft } from "lucide-react"
+import { Mail, Lock, User, AtSign, ArrowLeft } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TextField from "../components/TextField.jsx"
 import PrimaryButton from "../components/PrimaryButton.jsx"
 import GoogleButton from "../components/GoogleButton.jsx"
 import OrDivider from "../components/OrDivider.jsx"
+import { registerUser } from "../services/authService.js"
+import { validateSignUp } from "../utils/validation.js"
 
 export default function SignUp() {
   const navigate = useNavigate()
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
   })
 
-  const update = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
+  const [fieldErrors, setFieldErrors] = useState({})
+  const [serverError, setServerError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
-  const handleSubmit = (e) => {
+  const update = (e) => {
+    const { name, value } = e.target
+    setForm((f) => ({ ...f, [name]: value }))
+    // Clear the per-field error as the user types
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: "" }))
+    }
+    if (serverError) setServerError("")
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Auth wiring comes later
-    console.log("[v0] sign up", form)
+    setServerError("")
+
+    const errors = validateSignUp(form)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setLoading(true)
+    try {
+      await registerUser({
+        firstName: form.firstName.trim() || undefined,
+        lastName: form.lastName.trim() || undefined,
+        username: form.username.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      })
+
+      setSuccess(true)
+      setTimeout(() => navigate("/sign-in"), 2000)
+    } catch (err) {
+      setServerError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -39,20 +79,42 @@ export default function SignUp() {
 
         <h1 className="auth-title">Sign up</h1>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        {success ? (
+          <div className="auth-banner auth-banner--success" role="status">
+            🎉 Account created! Redirecting to sign in…
+          </div>
+        ) : null}
+
+        {serverError ? (
+          <div className="auth-banner auth-banner--error" role="alert">
+            {serverError}
+          </div>
+        ) : null}
+
+        <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <TextField
             icon={User}
             name="firstName"
-            placeholder="First name"
+            placeholder="First name (optional)"
             value={form.firstName}
             onChange={update}
+            error={fieldErrors.firstName}
           />
           <TextField
             icon={User}
             name="lastName"
-            placeholder="Last name"
+            placeholder="Last name (optional)"
             value={form.lastName}
             onChange={update}
+            error={fieldErrors.lastName}
+          />
+          <TextField
+            icon={AtSign}
+            name="username"
+            placeholder="Username"
+            value={form.username}
+            onChange={update}
+            error={fieldErrors.username}
           />
           <TextField
             icon={Mail}
@@ -61,6 +123,7 @@ export default function SignUp() {
             placeholder="abc@email.com"
             value={form.email}
             onChange={update}
+            error={fieldErrors.email}
           />
           <TextField
             icon={Lock}
@@ -69,6 +132,7 @@ export default function SignUp() {
             placeholder="Your password"
             value={form.password}
             onChange={update}
+            error={fieldErrors.password}
           />
           <TextField
             icon={Lock}
@@ -77,10 +141,13 @@ export default function SignUp() {
             placeholder="Confirm password"
             value={form.confirmPassword}
             onChange={update}
+            error={fieldErrors.confirmPassword}
           />
 
           <div className="auth-form__action">
-            <PrimaryButton type="submit">Sign up</PrimaryButton>
+            <PrimaryButton type="submit" loading={loading}>
+              Sign up
+            </PrimaryButton>
           </div>
         </form>
 

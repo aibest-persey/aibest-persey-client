@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { Sequelize } from "sequelize";
 
+const useSSL = process.env.PG_SSL === "true";
+
 const sequelize: Sequelize = new Sequelize(
   process.env.PG_DATABASE as string,
   process.env.PG_USER as string,
@@ -10,6 +12,7 @@ const sequelize: Sequelize = new Sequelize(
     port: parseInt(process.env.PG_PORT || "5432", 10),
     dialect: "postgres",
     logging: process.env.NODE_ENV === "development" ? console.log : false,
+    dialectOptions: useSSL ? { ssl: { rejectUnauthorized: false } } : {},
     pool: {
       max: 10,
       min: 0,
