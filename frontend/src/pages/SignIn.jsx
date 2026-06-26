@@ -8,10 +8,11 @@ import GoogleButton from "../components/GoogleButton.jsx"
 import OrDivider from "../components/OrDivider.jsx"
 import { loginUser } from "../services/authService.js"
 import { validateSignIn } from "../utils/validation.js"
-import { saveSession } from "../utils/tokenStorage.js"
+import { useAuth } from "../hooks/useAuth.js"
 
 export default function SignIn() {
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const [form, setForm] = useState({ identifier: "", password: "" })
   const [remember, setRemember] = useState(true)
@@ -43,7 +44,7 @@ export default function SignIn() {
         password: form.password,
       })
 
-      saveSession(token, user, remember)
+      login(token, user, remember)
       navigate("/home", { replace: true })
     } catch (err) {
       setServerError(err.message)

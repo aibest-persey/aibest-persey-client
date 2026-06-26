@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../hooks/useAuth.js"
 import Notifications from "./Notifications.jsx"
 import Profile from "./Profile.jsx"
 import {
@@ -45,9 +47,12 @@ function SportsIcon({ size = 18 }) {
 }
 
 export default function Home() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
   // Profile state managed in-memory
   const [profile, setProfile] = useState({
-    nickname: "User",
+    nickname: user ? (user.username || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User") : "User",
     avatar: "",
     about: "Enjoy your favorite dishe and a lovely your friends and family and have a great time. Food from local food trucks will be available for purchase."
   })
@@ -207,7 +212,13 @@ export default function Home() {
               <span>Contact Us</span>
             </button>
 
-            <button className="sidebar-nav-item sidebar-nav-item--signout">
+            <button
+              className="sidebar-nav-item sidebar-nav-item--signout"
+              onClick={() => {
+                logout()
+                navigate("/sign-in", { replace: true })
+              }}
+            >
               <LogOut size={20} className="sidebar-nav-icon" />
               <span>Sign Out</span>
             </button>
