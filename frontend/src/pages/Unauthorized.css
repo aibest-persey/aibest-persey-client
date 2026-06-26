@@ -1,0 +1,121 @@
+/* Unauthorized Screen */
+.unauth-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+}
+
+/* Header */
+.unauth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.unauth-back-btn {
+  background: none;
+  border: none;
+  color: #121420;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.unauth-back-btn:hover {
+  background-color: #f0f2f5;
+}
+
+.unauth-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #121420;
+  margin: 0;
+  text-align: center;
+}
+
+/* Body Content */
+.unauth-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.unauth-icon-wrap {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(240, 99, 90, 0.12);
+  animation: shake 1.5s ease-in-out infinite;
+}
+
+.unauth-icon {
+  color: #f0635a;
+}
+
+.unauth-heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #121420;
+  margin: 0 0 12px 0;
+}
+
+.unauth-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #747688;
+  margin: 0 0 32px 0;
+  max-width: 280px;
+}
+
+.unauth-action-btn {
+  width: 100%;
+  max-width: 280px;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #5669ff 0%, #3d56f0 100%);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(86, 105, 255, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.unauth-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(86, 105, 255, 0.35);
+}
+
+.unauth-action-btn:active {
+  transform: translateY(0);
+}
+
+/* Micro-animations */
+@keyframes shake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: rotate(-3deg);
+  }
+  20%, 40%, 60%, 80% {
+    transform: rotate(3deg);
+  }
+}

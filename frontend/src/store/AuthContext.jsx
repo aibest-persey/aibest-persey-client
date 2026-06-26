@@ -4,14 +4,46 @@ import { getToken, getUser, saveSession, clearSession } from "../utils/tokenStor
 
 export const AuthContext = createContext(null)
 
+function decodeToken(token) {
+  if (!token) return null
+  try {
+    const base64Url = token.split(".")[1]
+    if (!base64Url) return null
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+    const jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    )
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    console.error("Token decoding failed:", e)
+    return null
+  }
+}
+
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => getToken())
-  const [user, setUser] = useState(() => getUser())
+  const [user, setUser] = useState(() => {
+    const u = getUser()
+    const t = getToken()
+    if (u && t) {
+      const decoded = decodeToken(t)
+      if (decoded?.role) {
+        return { ...u, role: decoded.role }
+      }
+    }
+    return u
+  })
 
   const login = (newToken, newUser, remember = true) => {
-    saveSession(newToken, newUser, remember)
+    const decoded = decodeToken(newToken)
+    const userWithRole = { ...newUser, role: decoded?.role || "student" }
+    saveSession(newToken, userWithRole, remember)
     setToken(newToken)
-    setUser(newUser)
+    setUser(userWithRole)
   }
 
   const logout = () => {
@@ -28,3 +60,4 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   )
 }
+

@@ -1,8 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
-import Notifications from "./Notifications.jsx"
-import Profile from "./Profile.jsx"
 import {
   ChevronDown,
   Bell,
@@ -50,18 +48,22 @@ export default function Home() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  // Profile state managed in-memory
-  const [profile, setProfile] = useState({
-    nickname: user ? (user.username || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User") : "User",
-    avatar: "",
-    about: "Enjoy your favorite dishe and a lovely your friends and family and have a great time. Food from local food trucks will be available for purchase."
+  // Profile state managed in localStorage or defaults
+  const [profile] = useState(() => {
+    const saved = localStorage.getItem("persey_user_profile")
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch {
+        // Fall back to default
+      }
+    }
+    return {
+      nickname: user ? (user.username || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User") : "User",
+      avatar: "",
+      about: "Enjoy your favorite dishe and a lovely your friends and family and have a great time. Food from local food trucks will be available for purchase."
+    }
   })
-
-  // Notifications page visibility
-  const [showNotifications, setShowNotifications] = useState(false)
-
-  // Profile page visibility
-  const [showProfile, setShowProfile] = useState(false)
 
   // Sidebar drawer state
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -137,20 +139,6 @@ export default function Home() {
     }
   }
 
-  if (showNotifications) {
-    return <Notifications onBack={() => setShowNotifications(false)} />
-  }
-
-  if (showProfile) {
-    return (
-      <Profile
-        profile={profile}
-        onSave={setProfile}
-        onBack={() => setShowProfile(false)}
-      />
-    )
-  }
-
   return (
     <PhoneFrame>
       <div className="home-container">
@@ -183,11 +171,21 @@ export default function Home() {
           <nav className="sidebar-nav">
             <button
               className="sidebar-nav-item"
-              onClick={() => { setSidebarOpen(false); setShowProfile(true) }}
+              onClick={() => { setSidebarOpen(false); navigate("/profile") }}
             >
               <User size={20} className="sidebar-nav-icon" />
               <span>My Profile</span>
             </button>
+
+            {user?.role === "organiser" && (
+              <button
+                className="sidebar-nav-item"
+                onClick={() => { setSidebarOpen(false); navigate("/organiser-dashboard") }}
+              >
+                <SlidersHorizontal size={20} className="sidebar-nav-icon" />
+                <span>Organiser Dashboard</span>
+              </button>
+            )}
 
             <button className="sidebar-nav-item">
               <div className="sidebar-nav-icon-wrap">
@@ -257,7 +255,7 @@ export default function Home() {
             <button
               className="home-notification-btn"
               aria-label="Notifications"
-              onClick={() => setShowNotifications(true)}
+              onClick={() => navigate("/notifications")}
             >
               <Bell size={20} />
               <div className="home-notification-badge" />

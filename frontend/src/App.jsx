@@ -2,11 +2,24 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import SignIn from "./pages/SignIn.jsx"
 import SignUp from "./pages/SignUp.jsx"
 import Home from "./pages/Home.jsx"
+import Profile from "./pages/Profile.jsx"
+import Notifications from "./pages/Notifications.jsx"
+import OrganiserDashboard from "./pages/OrganiserDashboard.jsx"
+import Unauthorized from "./pages/Unauthorized.jsx"
 import { useAuth } from "./hooks/useAuth.js"
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth()
-  return isAuthenticated ? children : <Navigate to="/sign-in" replace />
+function ProtectedRoute({ children, allowedRoles }) {
+  const { isAuthenticated, user } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" replace />
+  }
+
+  if (allowedRoles && (!user || !allowedRoles.includes(user.role))) {
+    return <Navigate to="/unauthorized" replace />
+  }
+
+  return children
 }
 
 function PublicRoute({ children }) {
@@ -54,6 +67,38 @@ export default function App() {
         }
       />
       <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/organiser-dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["organiser"]}>
+            <OrganiserDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/unauthorized"
+        element={
+          <ProtectedRoute>
+            <Unauthorized />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="*"
         element={
           isAuthenticated ? (
@@ -66,3 +111,4 @@ export default function App() {
     </Routes>
   )
 }
+

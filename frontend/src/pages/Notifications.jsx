@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { ArrowLeft, MoreVertical } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Notifications.css"
 
@@ -7,7 +8,9 @@ import "./Notifications.css"
 const SAMPLE_NOTIFICATIONS = []
 
 export default function Notifications({ onBack }) {
+  const navigate = useNavigate()
   const [notifications] = useState(SAMPLE_NOTIFICATIONS)
+  const handleBack = onBack || (() => navigate("/home"))
 
   return (
     <PhoneFrame>
@@ -17,8 +20,9 @@ export default function Notifications({ onBack }) {
           <button
             className="notif-back-btn"
             aria-label="Go back"
-            onClick={onBack}
+            onClick={handleBack}
           >
+
             <ArrowLeft size={20} />
           </button>
           <h1 className="notif-title">Notification</h1>

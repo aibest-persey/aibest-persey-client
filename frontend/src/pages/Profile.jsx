@@ -1,9 +1,39 @@
 import { useState, useRef } from "react"
 import { ArrowLeft, PenSquare, Camera } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../hooks/useAuth.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Profile.css"
 
-export default function Profile({ profile, onSave, onBack }) {
+const PROFILE_KEY = "persey_user_profile"
+
+export default function Profile({ profile: propProfile, onSave, onBack }) {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+
+  // Initialize profile state from props or localStorage fallback
+  const [localProfile, setLocalProfile] = useState(() => {
+    if (propProfile) return propProfile
+
+    const saved = localStorage.getItem(PROFILE_KEY)
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch {
+        // Fall back to default
+      }
+    }
+
+    return {
+      nickname: user ? (user.username || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User") : "User",
+      avatar: "",
+      about: "Enjoy your favorite dishe and a lovely your friends and family and have a great time. Food from local food trucks will be available for purchase."
+    }
+  })
+
+  // Use the active profile object (prop-supplied or locally managed)
+  const activeProfile = propProfile || localProfile
+
   const [expanded, setExpanded] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({ nickname: "", avatar: "", about: "" })
@@ -12,9 +42,9 @@ export default function Profile({ profile, onSave, onBack }) {
 
   const handleEditClick = () => {
     setEditForm({
-      nickname: profile.nickname,
-      avatar: profile.avatar,
-      about: profile.about
+      nickname: activeProfile.nickname,
+      avatar: activeProfile.avatar,
+      about: activeProfile.about
     })
     setIsEditing(true)
   }
@@ -25,7 +55,14 @@ export default function Profile({ profile, onSave, onBack }) {
       avatar: editForm.avatar,
       about: editForm.about.trim()
     }
-    onSave(updated)
+
+    if (onSave) {
+      onSave(updated)
+    } else {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(updated))
+      setLocalProfile(updated)
+    }
+
     setIsEditing(false)
   }
 
@@ -51,7 +88,7 @@ export default function Profile({ profile, onSave, onBack }) {
   }
 
   const displayAbout = () => {
-    const text = profile.about || ""
+    const text = activeProfile.about || ""
     if (text.length <= 150) {
       return text
     }
@@ -81,6 +118,8 @@ export default function Profile({ profile, onSave, onBack }) {
     )
   }
 
+  const handleBack = onBack || (() => navigate("/home"))
+
   return (
     <PhoneFrame>
       <div className="profile-container">
@@ -90,7 +129,7 @@ export default function Profile({ profile, onSave, onBack }) {
           <button
             className="profile-back-btn"
             aria-label="Go back"
-            onClick={onBack}
+            onClick={handleBack}
           >
             <ArrowLeft size={20} />
           </button>
@@ -117,9 +156,9 @@ export default function Profile({ profile, onSave, onBack }) {
               ) : (
                 <AvatarIcon />
               )
-            ) : profile.avatar ? (
+            ) : activeProfile.avatar ? (
               <img
-                src={profile.avatar}
+                src={activeProfile.avatar}
                 alt="Profile"
                 className="profile-avatar-img"
               />
@@ -158,7 +197,7 @@ export default function Profile({ profile, onSave, onBack }) {
             />
           </div>
         ) : (
-          <p className="profile-name">{profile.nickname}</p>
+          <p className="profile-name">{activeProfile.nickname}</p>
         )}
 
         {/* ── Stats ──────────────────────────────────── */}
@@ -232,3 +271,4 @@ function AvatarIcon() {
     </svg>
   )
 }
+
