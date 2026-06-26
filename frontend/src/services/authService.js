@@ -46,3 +46,30 @@ export async function loginUser(data) {
 
   return json
 }
+
+/**
+ * Retrieve the current authenticated user's details.
+ * @param {string} token JWT token
+ * @returns {Promise<object>}
+ * @throws {Error}
+ */
+export async function fetchCurrentUser(token) {
+  const response = await fetch(`${API_BASE}/api/auth/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  const json = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    const error = new Error(json.message ?? "Failed to fetch user session.")
+    error.status = response.status
+    throw error
+  }
+
+  return json
+}
+

@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useState } from "react"
+import { createContext, useState, useEffect, useCallback } from "react"
 import { getToken, getUser, saveSession, clearSession } from "../utils/tokenStorage.js"
+import { fetchCurrentUser } from "../services/authService.js"
 
 export const AuthContext = createContext(null)
 
@@ -38,6 +39,9 @@ export function AuthProvider({ children }) {
     return u
   })
 
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
   const login = (newToken, newUser, remember = true) => {
     const decoded = decodeToken(newToken)
     const userWithRole = { ...newUser, role: decoded?.role || "student" }
@@ -46,18 +50,45 @@ export function AuthProvider({ children }) {
     setUser(userWithRole)
   }
 
-  const logout = () => {
+  const logout = useCallback(() => {
     clearSession()
     setToken(null)
     setUser(null)
-  }
+  }, [])
+
+  useEffect(() => {
+    const syncUserSession = async () => {
+      if (!token) return
+      setLoading(true)
+      setError(null)
+      try {
+        const userData = await fetchCurrentUser(token)
+        const decoded = decodeToken(token)
+        const userWithRole = { ...userData, role: decoded?.role || "student" }
+        saveSession(token, userWithRole)
+        setUser(userWithRole)
+      } catch (err) {
+        console.error("Sync user session failed:", err)
+        setError(err.message || "Failed to retrieve user profile.")
+        if (err.status === 401 || err.status === 403) {
+          logout()
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    syncUserSession()
+  }, [token, logout])
 
   const isAuthenticated = Boolean(token)
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated, loading, error }}>
       {children}
     </AuthContext.Provider>
   )
 }
+
+
 

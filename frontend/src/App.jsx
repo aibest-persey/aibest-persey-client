@@ -28,7 +28,38 @@ function PublicRoute({ children }) {
 }
 
 export default function App() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#f8f9fc",
+        fontFamily: "sans-serif",
+        color: "#747688"
+      }}>
+        <div style={{
+          width: "32px",
+          height: "32px",
+          border: "3.5px solid #e2e5f1",
+          borderTopColor: "#5669ff",
+          borderRadius: "50%",
+          animation: "spin 0.8s linear infinite",
+          marginBottom: "12px"
+        }} />
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+        <span>Verifying session...</span>
+      </div>
+    )
+  }
 
   return (
     <Routes>
