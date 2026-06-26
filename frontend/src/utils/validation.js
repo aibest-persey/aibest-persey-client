@@ -48,3 +48,25 @@ export function validateSignUp(fields) {
 
   return errors
 }
+
+/**
+ * Validate the sign-in form fields.
+ *
+ * @param {{ identifier: string, password: string }} fields
+ * @returns {{ [field: string]: string }}
+ */
+export function validateSignIn(fields) {
+  const errors = {}
+
+  const { identifier, password } = fields
+
+  if (!identifier || !identifier.trim()) {
+    errors.identifier = "Email or username is required."
+  }
+
+  if (!password) {
+    errors.password = "Password is required."
+  }
+
+  return errors
+}
