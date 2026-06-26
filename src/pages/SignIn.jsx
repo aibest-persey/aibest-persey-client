@@ -1,22 +1,56 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Mail, Lock } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TextField from "../components/TextField.jsx"
 import PrimaryButton from "../components/PrimaryButton.jsx"
 import GoogleButton from "../components/GoogleButton.jsx"
 import OrDivider from "../components/OrDivider.jsx"
+import { loginUser } from "../services/authService.js"
+import { validateSignIn } from "../utils/validation.js"
+import { useAuth } from "../hooks/useAuth.js"
 
 export default function SignIn() {
-  const [form, setForm] = useState({ email: "", password: "" })
+  const navigate = useNavigate()
+  const { login } = useAuth()
+
+  const [form, setForm] = useState({ identifier: "", password: "" })
   const [remember, setRemember] = useState(true)
+  const [fieldErrors, setFieldErrors] = useState({})
+  const [serverError, setServerError] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const update = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
+  const update = (e) => {
+    const { name, value } = e.target
+    setForm((f) => ({ ...f, [name]: value }))
+    if (fieldErrors[name]) setFieldErrors((prev) => ({ ...prev, [name]: "" }))
+    if (serverError) setServerError("")
+  }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Auth wiring comes later
-    console.log("[v0] sign in", form, { remember })
+    setServerError("")
+
+    const errors = validateSignIn(form)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const { token, user } = await loginUser({
+        identifier: form.identifier.trim(),
+        password: form.password,
+      })
+
+      login(token, user, remember)
+      navigate("/home", { replace: true })
+    } catch (err) {
+      setServerError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -24,14 +58,21 @@ export default function SignIn() {
       <div className="auth-body auth-body--signin">
         <h1 className="auth-title">Sign in</h1>
 
-        <form onSubmit={handleSubmit} className="auth-form auth-form--signin">
+        {serverError ? (
+          <div className="auth-banner auth-banner--error" role="alert">
+            {serverError}
+          </div>
+        ) : null}
+
+        <form onSubmit={handleSubmit} className="auth-form auth-form--signin" noValidate>
           <TextField
             icon={Mail}
-            name="email"
-            type="email"
-            placeholder="abc@email.com"
-            value={form.email}
+            name="identifier"
+            type="text"
+            placeholder="Email or username"
+            value={form.identifier}
             onChange={update}
+            error={fieldErrors.identifier}
           />
           <TextField
             icon={Lock}
@@ -40,6 +81,7 @@ export default function SignIn() {
             placeholder="Your password"
             value={form.password}
             onChange={update}
+            error={fieldErrors.password}
           />
 
           <div className="auth-row">
@@ -59,7 +101,9 @@ export default function SignIn() {
           </div>
 
           <div className="auth-form__action">
-            <PrimaryButton type="submit">Sign in</PrimaryButton>
+            <PrimaryButton type="submit" loading={loading}>
+              Sign in
+            </PrimaryButton>
           </div>
         </form>
 

@@ -1,0 +1,223 @@
+/* Notifications Page */
+
+.notif-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f6fa;
+  min-height: 100%;
+  color: #120d26;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────── */
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 20px 18px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f1f6;
+}
+
+.notif-back-btn,
+.notif-more-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #120d26;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: background 0.18s ease;
+  padding: 0;
+}
+
+.notif-back-btn:hover,
+.notif-more-btn:hover {
+  background: #f0f1f8;
+}
+
+.notif-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #120d26;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Body ───────────────────────────────────────────────────────── */
+.notif-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Empty State ────────────────────────────────────────────────── */
+.notif-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px 60px;
+  gap: 24px;
+}
+
+/* Bell + count badge wrapper */
+.notif-bell-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-bell-svg {
+  width: 130px;
+  height: 150px;
+  /* subtle float animation */
+  animation: bellFloat 3s ease-in-out infinite;
+}
+
+@keyframes bellFloat {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Ripple arcs animation */
+.notif-ripple {
+  animation: rippleFade 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.notif-ripple--1 {
+  animation-delay: 0s;
+}
+
+.notif-ripple--2 {
+  animation-delay: 0.4s;
+  opacity: 0.7;
+}
+
+@keyframes rippleFade {
+
+  0%,
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Count badge pill */
+.notif-count-badge {
+  position: absolute;
+  bottom: 18px;
+  right: -4px;
+  background: #5669ff;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(86, 105, 255, 0.4);
+  border: 2px solid #ffffff;
+}
+
+.notif-empty-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #120d26;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Notification List (when populated) ─────────────────────────── */
+.notif-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(80, 80, 120, 0.04);
+  border: 1px solid #f0f1f6;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.notif-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(80, 80, 120, 0.08);
+}
+
+.notif-item--unread {
+  border-color: #e8eaff;
+  background: #f7f8ff;
+}
+
+.notif-item-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #eef0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.notif-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notif-item-msg {
+  font-size: 13px;
+  font-weight: 500;
+  color: #120d26;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notif-item-time {
+  font-size: 11px;
+  color: #9a9cae;
+  font-weight: 400;
+}
+
+.notif-item-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5669ff;
+  flex-shrink: 0;
+}
