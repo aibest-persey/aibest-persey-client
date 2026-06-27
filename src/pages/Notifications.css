@@ -221,3 +221,28 @@
   background: #5669ff;
   flex-shrink: 0;
 }
+
+/* ─── Desktop Layout ─────────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+  .notif-container {
+    min-height: 100vh;
+    background: #f0f1f8;
+  }
+
+  .notif-header {
+    padding: 28px 40px 20px 40px;
+  }
+
+  .notif-body {
+    max-width: 680px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 8px 40px 40px 40px;
+    box-sizing: border-box;
+  }
+
+  .notif-list {
+    padding: 12px 0;
+  }
+}

@@ -6,6 +6,13 @@
   background-color: #ffffff;
 }
 
+@media (min-width: 1024px) {
+  .unauth-container {
+    min-height: 100vh;
+    height: auto;
+  }
+}
+
 /* Header */
 .unauth-header {
   display: flex;

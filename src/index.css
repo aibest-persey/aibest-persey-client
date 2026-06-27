@@ -28,3 +28,9 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+@media (min-width: 1024px) {
+  body {
+    background-color: #f0f1f8;
+  }
+}

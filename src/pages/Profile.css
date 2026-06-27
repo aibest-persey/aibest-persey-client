@@ -312,3 +312,53 @@
 .profile-read-more:hover {
   opacity: 0.75;
 }
+
+/* ─── Desktop Layout ─────────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+  .profile-container {
+    min-height: 100vh;
+    background: #f0f1f8;
+    align-items: stretch;
+  }
+
+  .profile-header {
+    background: #ffffff;
+    border-bottom: 1px solid #ebedf5;
+    padding: 28px 40px 20px 40px;
+  }
+
+  .profile-avatar-wrap {
+    margin-top: 32px;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-name {
+    font-size: 24px;
+    margin-top: 18px;
+  }
+
+  .profile-stats {
+    margin-top: 20px;
+  }
+
+  .profile-stat {
+    padding: 0 40px;
+  }
+
+  .profile-edit-btn {
+    margin-top: 24px;
+  }
+
+  .profile-section {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 40px 0 40px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

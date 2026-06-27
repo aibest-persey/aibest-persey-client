@@ -343,3 +343,39 @@
   font-weight: 600;
   text-align: center;
 }
+
+/* ─── Desktop Layout ─────────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+  .evtd-container {
+    background: #f0f1f8;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .evtd-banner {
+    height: 260px;
+    border-radius: 0;
+  }
+
+  .evtd-content {
+    max-width: 820px;
+    margin: -20px auto 0 auto;
+    border-radius: 28px;
+    padding: 32px 40px 48px 40px;
+  }
+
+  .evtd-title {
+    font-size: 28px;
+  }
+
+  .evtd-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .evtd-register-btn {
+    max-width: 360px;
+  }
+}

@@ -580,3 +580,138 @@
   color: #d94f47;
 }
 
+/* ─── Desktop Layout ─────────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+  .home-container {
+    background: #f0f1f8;
+    min-height: 100vh;
+  }
+
+  /* Desktop topbar */
+  .home-desktop-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px 24px 32px;
+    background: #ffffff;
+    border-bottom: 1px solid #ebedf5;
+    gap: 24px;
+  }
+
+  .home-desktop-topbar-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .home-desktop-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #120d26;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .home-desktop-location {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: #747688;
+    font-weight: 500;
+  }
+
+  .home-desktop-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .home-desktop-searchbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f6f7fb;
+    border: 1px solid #ebedf5;
+    border-radius: 12px;
+    padding: 10px 16px;
+    width: 280px;
+  }
+
+  .home-desktop-search-icon {
+    color: #9a9cae;
+    flex-shrink: 0;
+  }
+
+  .home-desktop-search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #120d26;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .home-desktop-search-input::placeholder {
+    color: #9a9cae;
+  }
+
+  /* notification badge on desktop topbar */
+  .home-desktop-topbar .home-notification-btn {
+    background: #f6f7fb;
+    border: 1px solid #ebedf5;
+    color: #120d26;
+    width: 42px;
+    height: 42px;
+  }
+
+  .home-desktop-topbar .home-notification-btn:hover {
+    background: #eef0ff;
+    color: #5669ff;
+  }
+
+  .home-desktop-topbar .home-notification-badge {
+    top: 10px;
+    right: 10px;
+    border-color: #f6f7fb;
+  }
+
+  /* Categories on desktop */
+  .home-interests-container {
+    margin-top: 0;
+    padding: 20px 32px 0 32px;
+  }
+
+  .home-interests-scroll {
+    padding: 0 0 12px 0;
+    gap: 10px;
+  }
+
+  /* Sections */
+  .home-section {
+    padding: 20px 32px 8px 32px;
+  }
+
+  .home-section-title {
+    font-size: 20px;
+  }
+
+  /* Desktop event grid */
+  .home-events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    padding-bottom: 24px;
+  }
+
+  .home-events-grid .event-card {
+    width: 100%;
+  }
+
+  .home-events-grid .event-card-img-wrapper {
+    height: 140px;
+  }
+}
+
