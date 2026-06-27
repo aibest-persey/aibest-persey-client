@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import SignIn from "./pages/SignIn.jsx"
 import SignUp from "./pages/SignUp.jsx"
 import Home from "./pages/Home.jsx"
+import EventDetails from "./pages/EventDetails.jsx"
 import Profile from "./pages/Profile.jsx"
 import Notifications from "./pages/Notifications.jsx"
 import OrganiserDashboard from "./pages/OrganiserDashboard.jsx"
@@ -94,6 +95,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/events/:id"
+        element={
+          <ProtectedRoute>
+            <EventDetails />
           </ProtectedRoute>
         }
       />

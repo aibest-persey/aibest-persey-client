@@ -391,6 +391,139 @@
   margin-top: 10px;
 }
 
+/* Event card header row */
+.org-event-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.org-event-card-title-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #121420;
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.3;
+  flex: 1;
+  transition: color 0.15s;
+}
+
+.org-event-card-title-btn:hover {
+  color: #5669ff;
+}
+
+/* Status badges */
+.org-status-badge {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.org-status-badge--draft {
+  background: #f0f2f7;
+  color: #747688;
+}
+
+.org-status-badge--published {
+  background: #edfcf2;
+  color: #24b25a;
+}
+
+.org-status-badge--cancelled {
+  background: #fff5f5;
+  color: #f0635a;
+}
+
+/* Action button row */
+.org-event-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f4f6fa;
+}
+
+.org-action-btn {
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.org-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.org-action-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.org-action-btn--publish {
+  background: #edfcf2;
+  color: #24b25a;
+}
+
+.org-action-btn--publish:hover:not(:disabled) {
+  background: #d1f7de;
+}
+
+.org-action-btn--secondary {
+  background: #f0f2f7;
+  color: #747688;
+}
+
+.org-action-btn--secondary:hover:not(:disabled) {
+  background: #e4e7f0;
+}
+
+.org-action-btn--danger {
+  background: #fff5f5;
+  color: #f0635a;
+}
+
+.org-action-btn--danger:hover:not(:disabled) {
+  background: #ffe3e3;
+}
+
+.org-action-btn--ghost {
+  background: none;
+  color: #b2b4c7;
+}
+
+.org-action-btn--ghost:hover:not(:disabled) {
+  color: #f0635a;
+}
+
+/* Delete confirm row */
+.org-delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.org-delete-confirm span {
+  font-size: 13px;
+  color: #747688;
+}
+
 /* Success & Error Banners */
 .org-banner {
   padding: 12px 16px;

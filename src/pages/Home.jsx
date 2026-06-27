@@ -1,6 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
+import { listEvents } from "../services/eventService.js"
 import {
   ChevronDown,
   Bell,
@@ -18,23 +19,11 @@ import {
   LogOut,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
-import handsHoldingImg from "../assets/hands_holding_event.png"
-import blueSneakersImg from "../assets/blue_sneakers_event.png"
 import "./Home.css"
 
-// Custom Sports (Basketball) icon SVG
 function SportsIcon({ size = 18 }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" />
       <path d="M6.2 6.2a8.8 8.8 0 0 0 0 11.6" />
       <path d="M17.8 6.2a8.8 8.8 0 0 1 0 11.6" />
@@ -44,122 +33,154 @@ function SportsIcon({ size = 18 }) {
   )
 }
 
+const CARD_GRADIENTS = [
+  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+  "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+  "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+  "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+  "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+]
+
+function getGradient(id) {
+  if (!id) return CARD_GRADIENTS[0]
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffff
+  return CARD_GRADIENTS[hash % CARD_GRADIENTS.length]
+}
+
+function formatCardDate(isoStr) {
+  try {
+    const d = new Date(isoStr)
+    return {
+      day: String(d.getDate()).padStart(2, "0"),
+      month: d.toLocaleString("en-US", { month: "short" }).toUpperCase(),
+    }
+  } catch {
+    return { day: "--", month: "---" }
+  }
+}
+
 export default function Home() {
-  const { user, logout } = useAuth()
+  const { user, token, logout } = useAuth()
   const navigate = useNavigate()
 
-  // Profile state managed in localStorage or defaults
   const [profile] = useState(() => {
     const saved = localStorage.getItem("persey_user_profile")
-    if (saved) {
-      try {
-        return JSON.parse(saved)
-      } catch {
-        // Fall back to default
-      }
-    }
+    if (saved) { try { return JSON.parse(saved) } catch { /* fall through */ } }
     return {
       nickname: user ? (user.username || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User") : "User",
       avatar: "",
-      about: "Enjoy your favorite dishe and a lovely your friends and family and have a great time. Food from local food trucks will be available for purchase."
     }
   })
 
-  // Sidebar drawer state
   const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  // Search input state
   const [searchQuery, setSearchQuery] = useState("")
 
-  // Dynamic categories
   const [categories] = useState([
     { id: "sports", name: "Sports", icon: SportsIcon, color: "#f0635a" },
     { id: "music", name: "Music", icon: Music, color: "#f59762" },
     { id: "food", name: "Food", icon: Utensils, color: "#29d697" },
     { id: "art", name: "Art", icon: Palette, color: "#46cdfb" },
   ])
-
-  // Active category selection
   const [activeCategory, setActiveCategory] = useState("sports")
 
-  // Event cards state
-  const [trendingEvents, setTrendingEvents] = useState([
-    {
-      id: 1,
-      title: "International Band Music Show",
-      displayTitle: "International Band Mu...",
-      date: { day: "10", month: "JUNE" },
-      location: "36 Guild Street London, UK",
-      image: handsHoldingImg,
-      bookmarked: true,
-    },
-    {
-      id: 2,
-      title: "Jo Malone",
-      displayTitle: "Jo Malone...",
-      date: { day: "10", month: "JUNE" },
-      location: "Radius Gallery, London",
-      image: blueSneakersImg,
-      bookmarked: false,
-    },
-  ])
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [bookmarked, setBookmarked] = useState({})
 
-  const [nearbyEvents, setNearbyEvents] = useState([
-    {
-      id: 1,
-      title: "International Band Music Show",
-      displayTitle: "International Band Mu...",
-      date: { day: "10", month: "JUNE" },
-      location: "36 Guild Street London, UK",
-      image: handsHoldingImg,
-      bookmarked: true,
-    },
-    {
-      id: 2,
-      title: "Jo Malone",
-      displayTitle: "Jo Malone...",
-      date: { day: "10", month: "JUNE" },
-      location: "Radius Gallery, London",
-      image: blueSneakersImg,
-      bookmarked: false,
-    },
-  ])
+  useEffect(() => {
+    if (!token) return
+    setLoading(true)
+    listEvents(token)
+      .then(setEvents)
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [token])
 
-  // Handle bookmark click
-  const toggleBookmark = (eventId, section) => {
-    const updateEvents = (list) =>
-      list.map((evt) =>
-        evt.id === eventId ? { ...evt, bookmarked: !evt.bookmarked } : evt
-      )
+  const filteredEvents = events.filter((evt) => {
+    if (!searchQuery) return true
+    const q = searchQuery.toLowerCase()
+    return (
+      evt.title.toLowerCase().includes(q) ||
+      (evt.location ?? "").toLowerCase().includes(q)
+    )
+  })
 
-    if (section === "trending") {
-      setTrendingEvents(updateEvents(trendingEvents))
-    } else {
-      setNearbyEvents(updateEvents(nearbyEvents))
-    }
+  const trendingEvents = [...filteredEvents].sort(
+    (a, b) => (b.registrationCount ?? 0) - (a.registrationCount ?? 0)
+  )
+
+  const nearbyEvents = [...filteredEvents].sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  )
+
+  const toggleBookmark = (id) =>
+    setBookmarked((prev) => ({ ...prev, [id]: !prev[id] }))
+
+  const renderEventCard = (evt) => {
+    const { day, month } = formatCardDate(evt.date)
+    const isBookmarked = bookmarked[evt.id] ?? false
+    return (
+      <div
+        key={evt.id}
+        className="event-card"
+        onClick={() => navigate(`/events/${evt.id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        <div
+          className="event-card-img-wrapper"
+          style={{ background: getGradient(evt.id) }}
+        >
+          <div className="card-date-badge">
+            <span className="card-date-day">{day}</span>
+            <span className="card-date-month">{month}</span>
+          </div>
+          <button
+            className="card-bookmark-btn"
+            onClick={(e) => { e.stopPropagation(); toggleBookmark(evt.id) }}
+            aria-label="Bookmark event"
+          >
+            <Bookmark
+              size={14}
+              className="card-bookmark-icon"
+              style={{ fill: isBookmarked ? "#f0635a" : "none", color: "#f0635a" }}
+            />
+          </button>
+        </div>
+        <div className="event-card-info">
+          <h3 className="event-card-title">{evt.title}</h3>
+          <div className="event-card-location">
+            <MapPin size={14} className="event-card-location-icon" />
+            <span className="event-card-location-text">
+              {evt.location || "Location TBA"}
+            </span>
+          </div>
+        </div>
+      </div>
+    )
   }
+
+  const emptyCard = (
+    <div className="event-card-empty">
+      <p>No events found.</p>
+    </div>
+  )
 
   return (
     <PhoneFrame>
       <div className="home-container">
 
-        {/* Sidebar Overlay (dim backdrop) */}
         <div
           className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`}
           onClick={() => setSidebarOpen(false)}
         />
 
-        {/* Sidebar Drawer */}
         <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
-          {/* User profile area */}
           <div className="sidebar-profile">
             <div className="sidebar-avatar">
               {profile.avatar ? (
-                <img
-                  src={profile.avatar}
-                  alt="Profile"
-                  className="sidebar-avatar-img"
-                />
+                <img src={profile.avatar} alt="Profile" className="sidebar-avatar-img" />
               ) : (
                 <User size={32} color="#9a9cae" />
               )}
@@ -167,21 +188,14 @@ export default function Home() {
             <span className="sidebar-username">{profile.nickname}</span>
           </div>
 
-          {/* Nav items */}
           <nav className="sidebar-nav">
-            <button
-              className="sidebar-nav-item"
-              onClick={() => { setSidebarOpen(false); navigate("/profile") }}
-            >
+            <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/profile") }}>
               <User size={20} className="sidebar-nav-icon" />
               <span>My Profile</span>
             </button>
 
             {user?.role === "organiser" && (
-              <button
-                className="sidebar-nav-item"
-                onClick={() => { setSidebarOpen(false); navigate("/organiser-dashboard") }}
-              >
+              <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/organiser-dashboard") }}>
                 <SlidersHorizontal size={20} className="sidebar-nav-icon" />
                 <span>Organiser Dashboard</span>
               </button>
@@ -212,37 +226,24 @@ export default function Home() {
 
             <button
               className="sidebar-nav-item sidebar-nav-item--signout"
-              onClick={() => {
-                logout()
-                navigate("/sign-in", { replace: true })
-              }}
+              onClick={() => { logout(); navigate("/sign-in", { replace: true }) }}
             >
               <LogOut size={20} className="sidebar-nav-icon" />
               <span>Sign Out</span>
             </button>
           </nav>
         </aside>
-        {/* Blue Curved Header */}
+
         <header className="home-header">
           <div className="home-nav-row">
-            {/* Menu icon */}
             <button className="home-menu-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <line x1="3" y1="12" x2="16" y2="12" />
                 <line x1="3" y1="18" x2="10" y2="18" />
               </svg>
             </button>
 
-            {/* Location selector */}
             <div className="home-location-selector">
               <div className="home-location-label">
                 <span>Current Location</span>
@@ -251,7 +252,6 @@ export default function Home() {
               <span className="home-location-value">Burgas, Bulgaria</span>
             </div>
 
-            {/* Bell icon with cyan indicator badge */}
             <button
               className="home-notification-btn"
               aria-label="Notifications"
@@ -262,7 +262,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Search and Filters Row */}
           <div className="home-search-row">
             <div className="home-search-wrapper">
               <Search size={22} className="home-search-icon" />
@@ -270,21 +269,18 @@ export default function Home() {
               <input
                 type="text"
                 className="home-search-input"
-                placeholder="Search..."
+                placeholder="Search events..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <button className="home-filter-btn">
-              <span className="home-filter-icon">
-                <SlidersHorizontal size={12} />
-              </span>
+              <span className="home-filter-icon"><SlidersHorizontal size={12} /></span>
               <span>Filters</span>
             </button>
           </div>
         </header>
 
-        {/* Interests Bar (overlapping the header) */}
         <section className="home-interests-container">
           <div className="home-interests-scroll">
             {categories.map((cat) => {
@@ -309,115 +305,44 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Trending Events Section */}
-        <section className="home-section">
-          <div className="home-section-header">
-            <h2 className="home-section-title">Trending Events</h2>
-            <button className="home-see-all-btn">
-              <span>See All</span>
-              <span className="home-see-all-arrow">▶</span>
-            </button>
+        {loading ? (
+          <div className="home-loading">
+            <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </div>
-
-          <div className="home-events-scroll">
-            {trendingEvents.map((evt) => (
-              <div key={evt.id} className="event-card">
-                <div className="event-card-img-wrapper">
-                  <img
-                    src={evt.image}
-                    alt={evt.title}
-                    className="event-card-img"
-                  />
-                  {/* Date badge */}
-                  <div className="card-date-badge">
-                    <span className="card-date-day">{evt.date.day}</span>
-                    <span className="card-date-month">{evt.date.month}</span>
-                  </div>
-                  {/* Bookmark badge */}
-                  <button
-                    className="card-bookmark-btn"
-                    onClick={() => toggleBookmark(evt.id, "trending")}
-                    aria-label="Bookmark event"
-                  >
-                    <Bookmark
-                      size={14}
-                      className="card-bookmark-icon"
-                      style={{
-                        fill: evt.bookmarked ? "#f0635a" : "none",
-                        color: "#f0635a",
-                      }}
-                    />
-                  </button>
-                </div>
-
-                <div className="event-card-info">
-                  <h3 className="event-card-title">{evt.displayTitle}</h3>
-                  <div className="event-card-location">
-                    <MapPin size={14} className="event-card-location-icon" />
-                    <span className="event-card-location-text">
-                      {evt.location}
-                    </span>
-                  </div>
-                </div>
+        ) : (
+          <>
+            <section className="home-section">
+              <div className="home-section-header">
+                <h2 className="home-section-title">Trending Events</h2>
+                <button className="home-see-all-btn">
+                  <span>See All</span>
+                  <span className="home-see-all-arrow">▶</span>
+                </button>
               </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Nearby You Section */}
-        <section className="home-section">
-          <div className="home-section-header">
-            <h2 className="home-section-title">Nearby You</h2>
-            <button className="home-see-all-btn">
-              <span>See All</span>
-              <span className="home-see-all-arrow">▶</span>
-            </button>
-          </div>
-
-          <div className="home-events-scroll">
-            {nearbyEvents.map((evt) => (
-              <div key={evt.id} className="event-card">
-                <div className="event-card-img-wrapper">
-                  <img
-                    src={evt.image}
-                    alt={evt.title}
-                    className="event-card-img"
-                  />
-                  {/* Date badge */}
-                  <div className="card-date-badge">
-                    <span className="card-date-day">{evt.date.day}</span>
-                    <span className="card-date-month">{evt.date.month}</span>
-                  </div>
-                  {/* Bookmark badge */}
-                  <button
-                    className="card-bookmark-btn"
-                    onClick={() => toggleBookmark(evt.id, "nearby")}
-                    aria-label="Bookmark event"
-                  >
-                    <Bookmark
-                      size={14}
-                      className="card-bookmark-icon"
-                      style={{
-                        fill: evt.bookmarked ? "#f0635a" : "none",
-                        color: "#f0635a",
-                      }}
-                    />
-                  </button>
-                </div>
-
-                <div className="event-card-info">
-                  <h3 className="event-card-title">{evt.displayTitle}</h3>
-                  <div className="event-card-location">
-                    <MapPin size={14} className="event-card-location-icon" />
-                    <span className="event-card-location-text">
-                      {evt.location}
-                    </span>
-                  </div>
-                </div>
+              <div className="home-events-scroll">
+                {trendingEvents.length > 0
+                  ? trendingEvents.map(renderEventCard)
+                  : emptyCard}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
+
+            <section className="home-section">
+              <div className="home-section-header">
+                <h2 className="home-section-title">Upcoming Near You</h2>
+                <button className="home-see-all-btn">
+                  <span>See All</span>
+                  <span className="home-see-all-arrow">▶</span>
+                </button>
+              </div>
+              <div className="home-events-scroll">
+                {nearbyEvents.length > 0
+                  ? nearbyEvents.map(renderEventCard)
+                  : emptyCard}
+              </div>
+            </section>
+          </>
+        )}
       </div>
     </PhoneFrame>
   )
