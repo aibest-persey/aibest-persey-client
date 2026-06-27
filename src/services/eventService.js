@@ -74,5 +74,8 @@ export const cancelRegistration = (token, id) =>
     headers: authHeaders(token),
   }))
 
+export const getMyRegistrations = (token) =>
+  handle(fetch(`${API_BASE}/api/events/my-registrations`, { headers: authHeaders(token) }))
+
 export const getParticipants = (token, id) =>
   handle(fetch(`${API_BASE}/api/events/${id}/participants`, { headers: authHeaders(token) }))

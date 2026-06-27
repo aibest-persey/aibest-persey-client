@@ -6,7 +6,7 @@ import { listEvents } from "../services/eventService.js"
 import {
   ChevronDown, Bell, Search, SlidersHorizontal,
   Music, Utensils, Palette, MapPin, Bookmark,
-  User, MessageSquare, Calendar, Mail, LogOut,
+  User, MessageSquare, Calendar, Mail, LogOut, CalendarCheck,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Home.css"
@@ -244,6 +244,11 @@ export default function Home() {
               </div>
               <span>Message</span>
             </button>
+            {user?.role !== "organiser" && (
+              <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/my-registrations") }}>
+                <CalendarCheck size={20} className="sidebar-nav-icon" /><span>My Registrations</span>
+              </button>
+            )}
             <button className="sidebar-nav-item"><Calendar size={20} className="sidebar-nav-icon" /><span>Calendar</span></button>
             <button className="sidebar-nav-item"><Bookmark size={20} className="sidebar-nav-icon" /><span>Bookmark</span></button>
             <button className="sidebar-nav-item"><Mail size={20} className="sidebar-nav-icon" /><span>Contact Us</span></button>
