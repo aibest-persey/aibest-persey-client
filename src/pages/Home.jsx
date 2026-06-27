@@ -69,12 +69,17 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState("sports")
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [bookmarked, setBookmarked] = useState({})
 
   useEffect(() => {
     if (!token) return
     setLoading(true)
-    listEvents(token).then(setEvents).catch(console.error).finally(() => setLoading(false))
+    setError("")
+    listEvents(token)
+      .then(setEvents)
+      .catch((err) => setError(err.message ?? "Failed to load events."))
+      .finally(() => setLoading(false))
   }, [token])
 
   const filteredEvents = events.filter((evt) => {
@@ -144,6 +149,8 @@ export default function Home() {
       <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
+  ) : error ? (
+    <div className="home-error">{error}</div>
   ) : (
     <>
       <section className="home-section">

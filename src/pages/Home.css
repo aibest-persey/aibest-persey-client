@@ -398,6 +398,17 @@
   padding: 40px;
 }
 
+.home-error {
+  margin: 32px 20px;
+  padding: 16px 20px;
+  background: #fff0f0;
+  border: 1px solid #ffd0d0;
+  border-radius: 12px;
+  color: #c0392b;
+  font-size: 14px;
+  text-align: center;
+}
+
 /* Empty card placeholder */
 .event-card-empty {
   display: flex;
