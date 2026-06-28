@@ -4,7 +4,8 @@ function authHeaders(token) {
   return { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
 }
 
-async function handle(res) {
+async function handle(promise) {
+  const res = await promise
   const json = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(json.message ?? "Something went wrong.")
   return json

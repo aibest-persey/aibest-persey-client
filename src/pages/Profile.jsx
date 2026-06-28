@@ -9,7 +9,7 @@ import "./Profile.css"
 const PROFILE_KEY = "persey_user_profile"
 
 export default function Profile({ profile: propProfile, onSave, onBack }) {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const navigate = useNavigate()
 
   // Initialize profile state from props or localStorage fallback

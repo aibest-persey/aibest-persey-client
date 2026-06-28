@@ -7,7 +7,8 @@ function authHeaders(token) {
   }
 }
 
-async function handle(response) {
+async function handle(promise) {
+  const response = await promise
   const json = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(json.message ?? "Something went wrong.")
   return json
