@@ -131,7 +131,8 @@
   overflow: hidden;
 }
 
-.dsk-user-avatar img {
+.dsk-user-avatar img,
+.dsk-user-avatar svg {
   width: 100%;
   height: 100%;
   object-fit: cover;

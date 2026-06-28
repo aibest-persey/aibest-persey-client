@@ -83,6 +83,7 @@ export default function Home() {
   }, [token])
 
   const filteredEvents = events.filter((evt) => {
+    if (evt.status === "draft") return false
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
     return evt.title.toLowerCase().includes(q) || (evt.location ?? "").toLowerCase().includes(q)
@@ -205,7 +206,6 @@ export default function Home() {
             </div>
           </div>
 
-          {categoriesRow}
           {eventSections}
         </div>
       </PhoneFrame>
@@ -291,7 +291,6 @@ export default function Home() {
           </div>
         </header>
 
-        {categoriesRow}
         {eventSections}
       </div>
     </PhoneFrame>

@@ -76,6 +76,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
       localStorage.setItem(PROFILE_KEY, JSON.stringify(updated))
       setLocalProfile(updated)
     }
+    window.dispatchEvent(new Event("profileUpdated"))
 
     setIsEditing(false)
   }
@@ -318,7 +319,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
 }
 
 /* ── Inline placeholder avatar SVG ─────────────────────────────────── */
-function AvatarIcon() {
+export function AvatarIcon() {
   return (
     <svg
       viewBox="0 0 80 80"

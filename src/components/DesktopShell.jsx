@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react"
 import { Outlet, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck } from "lucide-react"
+import { AvatarIcon } from "../pages/Profile.jsx"
 import "./DesktopShell.css"
 
 const NAV_ITEMS = [
@@ -27,7 +29,7 @@ export default function DesktopShell() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const profile = (() => {
+  const [profile, setProfile] = useState(() => {
     try {
       const saved = localStorage.getItem("persey_user_profile")
       if (saved) return JSON.parse(saved)
@@ -38,7 +40,22 @@ export default function DesktopShell() {
         : "User",
       avatar: "",
     }
-  })()
+  })
+
+  useEffect(() => {
+    const handleStorage = () => {
+      try {
+        const saved = localStorage.getItem("persey_user_profile")
+        if (saved) setProfile(JSON.parse(saved))
+      } catch { /* ignore */ }
+    }
+    window.addEventListener("storage", handleStorage)
+    window.addEventListener("profileUpdated", handleStorage)
+    return () => {
+      window.removeEventListener("storage", handleStorage)
+      window.removeEventListener("profileUpdated", handleStorage)
+    }
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -110,7 +127,7 @@ export default function DesktopShell() {
               {profile.avatar ? (
                 <img src={profile.avatar} alt="Profile" />
               ) : (
-                <span>{(profile.nickname || "U").charAt(0).toUpperCase()}</span>
+                <AvatarIcon />
               )}
             </div>
             <div className="dsk-user-details">
