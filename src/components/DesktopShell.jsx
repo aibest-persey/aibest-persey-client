@@ -56,7 +56,7 @@ export default function DesktopShell() {
         </div>
 
         <nav className="dsk-nav">
-          {NAV_ITEMS.map(({ icon: Icon, label, path }) => (
+          {NAV_ITEMS.filter((item) => user?.role !== "admin" || item.path === "/profile").map(({ icon: Icon, label, path }) => (
             <button
               key={path}
               className={`dsk-nav-item ${isActive(path) ? "dsk-nav-item--active" : ""}`}
@@ -67,7 +67,7 @@ export default function DesktopShell() {
             </button>
           ))}
 
-          {user?.role !== "organiser" &&
+          {user?.role === "student" &&
             STUDENT_NAV_ITEMS.map(({ icon: Icon, label, path }) => (
               <button
                 key={path}

@@ -41,7 +41,8 @@ export default function SignIn() {
         password: form.password,
       })
       login(token, user, remember)
-      navigate("/home", { replace: true })
+      const targetPath = user.role === "admin" ? "/admin" : "/home"
+      navigate(targetPath, { replace: true })
     } catch (err) {
       setServerError(err.message)
     } finally {

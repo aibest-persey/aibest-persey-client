@@ -22,8 +22,9 @@ function ProtectedRoute({ children, allowedRoles }) {
 }
 
 function PublicRoute({ children }) {
-  const { isAuthenticated } = useAuth()
-  return !isAuthenticated ? children : <Navigate to="/home" replace />
+  const { isAuthenticated, user } = useAuth()
+  if (!isAuthenticated) return children
+  return user?.role === "admin" ? <Navigate to="/admin" replace /> : <Navigate to="/home" replace />
 }
 
 function AppShell() {
@@ -33,7 +34,7 @@ function AppShell() {
 }
 
 export default function App() {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading, user } = useAuth()
 
   if (loading) {
     return (
@@ -66,7 +67,17 @@ export default function App() {
     <Routes>
       <Route
         path="/"
-        element={isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/sign-in" replace />}
+        element={
+          isAuthenticated ? (
+            user?.role === "admin" ? (
+              <Navigate to="/admin" replace />
+            ) : (
+              <Navigate to="/home" replace />
+            )
+          ) : (
+            <Navigate to="/sign-in" replace />
+          )
+        }
       />
 
       <Route path="/sign-in" element={<PublicRoute><SignIn /></PublicRoute>} />
@@ -74,12 +85,12 @@ export default function App() {
 
       {/* Authenticated routes: DesktopShell on desktop, bare Outlet on mobile */}
       <Route element={<AppShell />}>
-        <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/events/:id" element={<ProtectedRoute><EventDetails /></ProtectedRoute>} />
+        <Route path="/home" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Home /></ProtectedRoute>} />
+        <Route path="/events/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><EventDetails /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Notifications /></ProtectedRoute>} />
         <Route path="/my-registrations" element={<ProtectedRoute allowedRoles={["student"]}><MyRegistrations /></ProtectedRoute>} />
-        <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
+        <Route path="/inbox" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Inbox /></ProtectedRoute>} />
         <Route
           path="/organiser-dashboard"
           element={<ProtectedRoute allowedRoles={["organiser"]}><OrganiserDashboard /></ProtectedRoute>}
