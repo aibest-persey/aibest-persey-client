@@ -9,20 +9,26 @@ import {
   cancelEvent,
   deleteEvent,
 } from "../services/eventService.js"
-import { ArrowLeft, Calendar, MapPin, Plus, X, ListTodo, FileText, Users } from "lucide-react"
+import { ArrowLeft, Calendar, MapPin, Plus, X, ListTodo, FileText, Users, ClipboardList, Check } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TextField from "../components/TextField.jsx"
 import PrimaryButton from "../components/PrimaryButton.jsx"
+import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../services/roleRequestService.js"
 import "./OrganiserDashboard.css"
 
 export default function OrganiserDashboard() {
   const navigate = useNavigate()
   const { token, user } = useAuth()
 
+  const [activeTab, setActiveTab] = useState("events")
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const [roleRequests, setRoleRequests] = useState([])
+  const [reqLoading, setReqLoading] = useState(false)
+  const [reqMsg, setReqMsg] = useState("")
 
   // Per-card action state
   const [actionLoadingId, setActionLoadingId] = useState(null)
@@ -49,6 +55,29 @@ export default function OrganiserDashboard() {
   }, [token])
 
   useEffect(() => { loadEvents() }, [loadEvents])
+
+  const loadRoleRequests = useCallback(async () => {
+    setReqLoading(true)
+    try { setRoleRequests(await listAllRoleRequests(token)) }
+    catch (e) { setReqMsg(e.message) }
+    finally { setReqLoading(false) }
+  }, [token])
+
+  useEffect(() => { if (activeTab === "requests") loadRoleRequests() }, [activeTab])
+
+  const handleApprove = async (id) => {
+    try {
+      await approveRoleRequest(token, id)
+      setRoleRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "approved" } : r))
+    } catch (e) { setReqMsg(e.message) }
+  }
+
+  const handleReject = async (id) => {
+    try {
+      await rejectRoleRequest(token, id)
+      setRoleRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "rejected" } : r))
+    } catch (e) { setReqMsg(e.message) }
+  }
 
   const updateForm = (e) => {
     const { name, value } = e.target
@@ -141,7 +170,50 @@ export default function OrganiserDashboard() {
           </button>
         </header>
 
+        {/* Tab bar */}
+        <div className="org-tabs">
+          <button className={`org-tab ${activeTab === "events" ? "org-tab--active" : ""}`} onClick={() => setActiveTab("events")}>
+            <ListTodo size={15} /> My Events
+          </button>
+          <button className={`org-tab ${activeTab === "requests" ? "org-tab--active" : ""}`} onClick={() => setActiveTab("requests")}>
+            <ClipboardList size={15} /> Role Requests
+            {roleRequests.filter((r) => r.status === "pending").length > 0 && (
+              <span className="org-tab-badge">{roleRequests.filter((r) => r.status === "pending").length}</span>
+            )}
+          </button>
+        </div>
+
         <div className="org-body">
+          {activeTab === "requests" && (
+            <div className="org-req-list">
+              {reqLoading && <div className="org-loading-state"><div className="spinner" /></div>}
+              {reqMsg && <div className="org-banner org-banner--error">{reqMsg}</div>}
+              {!reqLoading && roleRequests.length === 0 && (
+                <div className="org-empty-state"><p>No role change requests.</p></div>
+              )}
+              {roleRequests.map((r) => (
+                <div key={r.id} className="org-req-card">
+                  <div className="org-req-avatar" style={{ background: r.student?.color || "#5669ff" }}>
+                    {(r.student?.username || "?").charAt(0).toUpperCase()}
+                  </div>
+                  <div className="org-req-body">
+                    <div className="org-req-name">{r.student?.firstName ? `${r.student.firstName} ${r.student.lastName || ""}`.trim() : r.student?.username}</div>
+                    <div className="org-req-sub">Requesting: <strong>{r.requestedRole}</strong></div>
+                    {r.reason && <div className="org-req-reason">"{r.reason}"</div>}
+                    <span className={`org-req-status org-req-status--${r.status}`}>{r.status}</span>
+                  </div>
+                  {r.status === "pending" && (
+                    <div className="org-req-actions">
+                      <button className="org-req-btn org-req-btn--approve" onClick={() => handleApprove(r.id)}><Check size={14} /></button>
+                      <button className="org-req-btn org-req-btn--reject" onClick={() => handleReject(r.id)}><X size={14} /></button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === "events" && <>
           <div className="org-welcome">
             <p className="org-welcome-sub">Logged in as {user?.username} · Organiser</p>
             <h2 className="org-welcome-title">Manage Your Events</h2>
@@ -274,6 +346,7 @@ export default function OrganiserDashboard() {
               })}
             </div>
           )}
+          </>}
         </div>
 
         {/* Create Event modal */}

@@ -1,0 +1,236 @@
+.adm-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #f6f7fb;
+}
+
+.adm-header {
+  padding: 20px 20px 8px;
+  background: #fff;
+  border-bottom: 1px solid #eff0f6;
+}
+
+.adm-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #120d26;
+  margin: 0;
+}
+
+.adm-flash {
+  margin: 12px 16px 0;
+  padding: 10px 16px;
+  background: #eaf1ff;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #3a5bd4;
+  font-weight: 600;
+  text-align: center;
+}
+
+.adm-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #eff0f6;
+  overflow-x: auto;
+}
+
+.adm-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: #f0f1f8;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #747688;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.adm-tab--active {
+  background: #5669ff;
+  color: #fff;
+}
+
+.adm-badge-count {
+  background: #f0635a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 1px 6px;
+  margin-left: 2px;
+}
+
+.adm-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+
+.adm-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e2e5f1;
+  border-top-color: #5669ff;
+  border-radius: 50%;
+  animation: adm-spin 0.8s linear infinite;
+}
+
+@keyframes adm-spin { to { transform: rotate(360deg); } }
+
+.adm-error {
+  margin: 20px;
+  padding: 14px 18px;
+  background: #fff0f0;
+  border: 1px solid #ffd0d0;
+  border-radius: 12px;
+  color: #c0392b;
+  font-size: 14px;
+  text-align: center;
+}
+
+.adm-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #9a9cae;
+  font-size: 14px;
+}
+
+.adm-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.adm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 32px;
+}
+
+.adm-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(18, 13, 38, 0.05);
+}
+
+.adm-card--request {
+  align-items: flex-start;
+}
+
+.adm-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.adm-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.adm-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #120d26;
+}
+
+.adm-card-sub {
+  font-size: 12px;
+  color: #747688;
+}
+
+.adm-request-reason {
+  font-size: 12px;
+  color: #9a9cae;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.adm-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+
+.adm-card-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.adm-action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: #f0f1f8;
+  color: #747688;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.adm-action-btn--warn {
+  background: #fff7e6;
+  color: #d97706;
+}
+
+.adm-action-btn--danger {
+  background: #fff0f0;
+  color: #f0635a;
+}
+
+.adm-action-btn--approve {
+  background: #e6f9f0;
+  color: #1a9e5c;
+}
+
+.adm-role-select {
+  padding: 6px 10px;
+  border: 1.5px solid #e2e5f1;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3a3a4e;
+  background: #f6f7fb;
+  cursor: pointer;
+  outline: none;
+}
+
+@media (min-width: 1024px) {
+  .adm-container { background: #f0f1f8; min-height: 100vh; }
+  .adm-header { background: transparent; border-bottom: none; padding: 28px 32px 8px; }
+  .adm-tabs { background: transparent; border-bottom: none; padding: 0 32px 12px; }
+  .adm-list { padding: 0 32px 40px; max-width: 900px; }
+  .adm-flash { margin: 8px 32px 0; }
+}

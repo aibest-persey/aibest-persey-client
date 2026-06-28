@@ -7,6 +7,8 @@ import Profile from "./pages/Profile.jsx"
 import Notifications from "./pages/Notifications.jsx"
 import OrganiserDashboard from "./pages/OrganiserDashboard.jsx"
 import MyRegistrations from "./pages/MyRegistrations.jsx"
+import AdminDashboard from "./pages/AdminDashboard.jsx"
+import Inbox from "./pages/Inbox.jsx"
 import Unauthorized from "./pages/Unauthorized.jsx"
 import DesktopShell from "./components/DesktopShell.jsx"
 import { useAuth } from "./hooks/useAuth.js"
@@ -77,9 +79,14 @@ export default function App() {
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
         <Route path="/my-registrations" element={<ProtectedRoute allowedRoles={["student"]}><MyRegistrations /></ProtectedRoute>} />
+        <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
         <Route
           path="/organiser-dashboard"
           element={<ProtectedRoute allowedRoles={["organiser"]}><OrganiserDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="/admin"
+          element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>}
         />
         <Route path="/unauthorized" element={<ProtectedRoute><Unauthorized /></ProtectedRoute>} />
       </Route>

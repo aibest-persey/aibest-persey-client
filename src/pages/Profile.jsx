@@ -1,7 +1,8 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { ArrowLeft, PenSquare, Camera } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
+import { submitRoleRequest, getMyRoleRequests } from "../services/roleRequestService.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Profile.css"
 
@@ -37,6 +38,19 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
   const [expanded, setExpanded] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({ nickname: "", avatar: "", about: "" })
+
+  const [roleRequest, setRoleRequest] = useState(null)
+  const [roleReason, setRoleReason] = useState("")
+  const [roleSubmitting, setRoleSubmitting] = useState(false)
+  const [roleMsg, setRoleMsg] = useState("")
+
+  useEffect(() => {
+    if (user?.role === "student") {
+      getMyRoleRequests(token)
+        .then((reqs) => setRoleRequest(reqs[0] ?? null))
+        .catch(() => {})
+    }
+  }, [user, token])
 
   const fileInputRef = useRef(null)
 
@@ -116,6 +130,21 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
         </button>
       </>
     )
+  }
+
+  const handleRoleRequest = async () => {
+    setRoleSubmitting(true)
+    setRoleMsg("")
+    try {
+      const req = await submitRoleRequest(token, roleReason.trim() || undefined)
+      setRoleRequest(req)
+      setRoleMsg("Request submitted! An admin or organiser will review it.")
+      setRoleReason("")
+    } catch (err) {
+      setRoleMsg(err.message)
+    } finally {
+      setRoleSubmitting(false)
+    }
   }
 
   const handleBack = onBack || (() => navigate("/home"))
@@ -248,6 +277,40 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
             <p className="profile-about-text">{displayAbout()}</p>
           )}
         </section>
+
+        {/* ── Become an Organiser (students only) ────── */}
+        {user?.role === "student" && (
+          <section className="profile-section profile-role-section">
+            <h2 className="profile-section-title">Become an Organiser</h2>
+            {roleRequest ? (
+              <div className={`profile-role-status profile-role-status--${roleRequest.status}`}>
+                {roleRequest.status === "pending" && "Your request is pending review."}
+                {roleRequest.status === "approved" && "Your request was approved! Please log out and back in."}
+                {roleRequest.status === "rejected" && "Your request was rejected. You may contact an admin."}
+              </div>
+            ) : (
+              <>
+                <p className="profile-role-desc">Request to be promoted to an organiser so you can create and manage events.</p>
+                <textarea
+                  className="profile-role-textarea"
+                  placeholder="Tell us why you'd like to become an organiser (optional)..."
+                  rows={3}
+                  value={roleReason}
+                  onChange={(e) => setRoleReason(e.target.value)}
+                  maxLength={500}
+                />
+                {roleMsg && <p className="profile-role-msg">{roleMsg}</p>}
+                <button
+                  className="profile-role-btn"
+                  onClick={handleRoleRequest}
+                  disabled={roleSubmitting}
+                >
+                  {roleSubmitting ? "Submitting..." : "Submit Request"}
+                </button>
+              </>
+            )}
+          </section>
+        )}
 
       </div>
     </PhoneFrame>

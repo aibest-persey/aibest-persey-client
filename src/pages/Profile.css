@@ -297,6 +297,18 @@
   box-shadow: 0 0 0 3px rgba(86, 105, 255, 0.1);
 }
 
+.profile-role-section { padding-bottom: 32px; }
+.profile-role-desc { font-size: 13px; color: #747688; margin: 0 0 12px; line-height: 1.5; }
+.profile-role-textarea { width: 100%; font-size: 13px; line-height: 1.5; padding: 10px 14px; border: 1.5px solid #e2e5f1; border-radius: 12px; outline: none; resize: none; font-family: inherit; box-sizing: border-box; color: #120d26; }
+.profile-role-textarea:focus { border-color: #5669ff; }
+.profile-role-msg { font-size: 12px; color: #3a5bd4; margin: 6px 0 0; }
+.profile-role-btn { margin-top: 12px; width: 100%; padding: 12px; background: #5669ff; color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.profile-role-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.profile-role-status { padding: 12px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; }
+.profile-role-status--pending  { background: #fff7e6; color: #d97706; }
+.profile-role-status--approved { background: #e6f9f0; color: #1a9e5c; }
+.profile-role-status--rejected { background: #fff0f0; color: #c0392b; }
+
 .profile-read-more {
   background: none;
   border: none;

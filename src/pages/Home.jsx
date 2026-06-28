@@ -6,7 +6,7 @@ import { listEvents } from "../services/eventService.js"
 import {
   ChevronDown, Bell, Search, SlidersHorizontal,
   Music, Utensils, Palette, MapPin, Bookmark,
-  User, MessageSquare, Calendar, Mail, LogOut, CalendarCheck,
+  User, MessageSquare, Calendar, Mail, LogOut, CalendarCheck, ShieldCheck,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Home.css"
@@ -237,13 +237,14 @@ export default function Home() {
                 <SlidersHorizontal size={20} className="sidebar-nav-icon" /><span>Organiser Dashboard</span>
               </button>
             )}
-            <button className="sidebar-nav-item">
-              <div className="sidebar-nav-icon-wrap">
-                <MessageSquare size={20} className="sidebar-nav-icon" />
-                <span className="sidebar-msg-badge">9</span>
-              </div>
-              <span>Message</span>
+            <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/inbox") }}>
+              <Mail size={20} className="sidebar-nav-icon" /><span>Inbox</span>
             </button>
+            {user?.role === "admin" && (
+              <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/admin") }}>
+                <ShieldCheck size={20} className="sidebar-nav-icon" /><span>Admin Dashboard</span>
+              </button>
+            )}
             {user?.role !== "organiser" && (
               <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/my-registrations") }}>
                 <CalendarCheck size={20} className="sidebar-nav-icon" /><span>My Registrations</span>

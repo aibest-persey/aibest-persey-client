@@ -2,7 +2,8 @@ import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { getEvent, registerForEvent, cancelRegistration } from "../services/eventService.js"
-import { ArrowLeft, Calendar, MapPin, Users } from "lucide-react"
+import { sendMessage } from "../services/messageService.js"
+import { ArrowLeft, Calendar, MapPin, Users, MessageSquare } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./EventDetails.css"
 
@@ -52,6 +53,10 @@ export default function EventDetails() {
   const [error, setError] = useState("")
   const [actionLoading, setActionLoading] = useState(false)
   const [actionMsg, setActionMsg] = useState({ text: "", type: "" })
+  const [showMsgForm, setShowMsgForm] = useState(false)
+  const [msgContent, setMsgContent] = useState("")
+  const [msgSubject, setMsgSubject] = useState("")
+  const [msgSending, setMsgSending] = useState(false)
 
   useEffect(() => {
     if (!token) return
@@ -95,6 +100,22 @@ export default function EventDetails() {
       setActionMsg({ text: err.message, type: "error" })
     } finally {
       setActionLoading(false)
+    }
+  }
+
+  const handleSendMsg = async () => {
+    if (!msgContent.trim() || !event?.organiser?.id) return
+    setMsgSending(true)
+    try {
+      await sendMessage(token, { receiverId: event.organiser.id, subject: msgSubject.trim() || null, content: msgContent.trim() })
+      setShowMsgForm(false)
+      setMsgContent("")
+      setMsgSubject("")
+      setActionMsg({ text: "Message sent to organiser!", type: "success" })
+    } catch (err) {
+      setActionMsg({ text: err.message, type: "error" })
+    } finally {
+      setMsgSending(false)
     }
   }
 
@@ -200,9 +221,40 @@ export default function EventDetails() {
                   <span className="evtd-organiser-role">Organiser</span>
                 </div>
                 {isStudent && (
-                  <button className="evtd-follow-btn">Follow</button>
+                  <button
+                    className="evtd-msg-btn"
+                    onClick={() => setShowMsgForm((v) => !v)}
+                    title="Message Organiser"
+                  >
+                    <MessageSquare size={15} /> Message
+                  </button>
                 )}
               </div>
+
+              {/* Inline message compose — students only */}
+              {isStudent && showMsgForm && (
+                <div className="evtd-msg-form">
+                  <input
+                    className="evtd-msg-input"
+                    placeholder="Subject (optional)"
+                    value={msgSubject}
+                    onChange={(e) => setMsgSubject(e.target.value)}
+                  />
+                  <textarea
+                    className="evtd-msg-textarea"
+                    placeholder="Write your message..."
+                    rows={4}
+                    value={msgContent}
+                    onChange={(e) => setMsgContent(e.target.value)}
+                  />
+                  <div className="evtd-msg-form-actions">
+                    <button className="evtd-msg-cancel" onClick={() => setShowMsgForm(false)}>Cancel</button>
+                    <button className="evtd-msg-send" onClick={handleSendMsg} disabled={msgSending || !msgContent.trim()}>
+                      {msgSending ? "Sending..." : "Send"}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* About */}
               {event.description && (
