@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react"
 import { Outlet, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
-import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck } from "lucide-react"
+import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck, Users, Calendar } from "lucide-react"
 import { AvatarIcon } from "../pages/Profile.jsx"
 import "./DesktopShell.css"
 
 const NAV_ITEMS = [
   { icon: Home, label: "Home", path: "/home" },
+  { icon: Users, label: "Clubs", path: "/clubs" },
+  { icon: Calendar, label: "Schedule", path: "/schedule" },
   { icon: Bell, label: "Notifications", path: "/notifications" },
   { icon: Mail, label: "Inbox", path: "/inbox" },
   { icon: User, label: "Profile", path: "/profile" },
@@ -66,12 +68,7 @@ export default function DesktopShell() {
 
   return (
     <div className="dsk-layout">
-      <aside className="dsk-sidebar">
-        <div className="dsk-brand">
-          <div className="dsk-brand-icon">P</div>
-          <span className="dsk-brand-name">Persey</span>
-        </div>
-
+      <header className="dsk-top-navbar">
         <nav className="dsk-nav">
           {NAV_ITEMS.filter((item) => user?.role !== "admin" || item.path === "/profile").map(({ icon: Icon, label, path }) => (
             <button
@@ -79,7 +76,7 @@ export default function DesktopShell() {
               className={`dsk-nav-item ${isActive(path) ? "dsk-nav-item--active" : ""}`}
               onClick={() => navigate(path)}
             >
-              <Icon size={20} />
+              <Icon size={18} />
               <span>{label}</span>
             </button>
           ))}
@@ -91,7 +88,7 @@ export default function DesktopShell() {
                 className={`dsk-nav-item ${isActive(path) ? "dsk-nav-item--active" : ""}`}
                 onClick={() => navigate(path)}
               >
-                <Icon size={20} />
+                <Icon size={18} />
                 <span>{label}</span>
               </button>
             ))}
@@ -103,7 +100,7 @@ export default function DesktopShell() {
                 className={`dsk-nav-item ${isActive(path) ? "dsk-nav-item--active" : ""}`}
                 onClick={() => navigate(path)}
               >
-                <Icon size={20} />
+                <Icon size={18} />
                 <span>{label}</span>
               </button>
             ))}
@@ -115,7 +112,7 @@ export default function DesktopShell() {
                 className={`dsk-nav-item ${isActive(path) ? "dsk-nav-item--active" : ""}`}
                 onClick={() => navigate(path)}
               >
-                <Icon size={20} />
+                <Icon size={18} />
                 <span>{label}</span>
               </button>
             ))}
@@ -139,7 +136,7 @@ export default function DesktopShell() {
             <LogOut size={18} />
           </button>
         </div>
-      </aside>
+      </header>
 
       <main className="dsk-main">
         <Outlet />

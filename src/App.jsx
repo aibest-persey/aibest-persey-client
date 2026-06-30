@@ -9,6 +9,7 @@ import OrganiserDashboard from "./pages/OrganiserDashboard.jsx"
 import MyRegistrations from "./pages/MyRegistrations.jsx"
 import AdminDashboard from "./pages/AdminDashboard.jsx"
 import Inbox from "./pages/Inbox.jsx"
+import Clubs from "./pages/Clubs.jsx"
 import Unauthorized from "./pages/Unauthorized.jsx"
 import DesktopShell from "./components/DesktopShell.jsx"
 import { useAuth } from "./hooks/useAuth.js"
@@ -86,6 +87,7 @@ export default function App() {
       {/* Authenticated routes: DesktopShell on desktop, bare Outlet on mobile */}
       <Route element={<AppShell />}>
         <Route path="/home" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Home /></ProtectedRoute>} />
+        <Route path="/clubs" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Clubs /></ProtectedRoute>} />
         <Route path="/events/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><EventDetails /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Notifications /></ProtectedRoute>} />
