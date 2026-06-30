@@ -2,26 +2,16 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
-import { listEvents } from "../services/eventService.js"
+import { listEvents, registerForEvent } from "../services/eventService.js"
+import { listClubs } from "../services/clubService.js"
+import { listOrganisations } from "../services/organisationService.js"
+import { listNews } from "../services/newsService.js"
 import {
-  ChevronDown, Bell, Search, SlidersHorizontal,
-  Music, Utensils, Palette, MapPin, Bookmark,
-  User, MessageSquare, Calendar, Mail, LogOut, CalendarCheck, ShieldCheck,
+  Bell, Search, SlidersHorizontal, MapPin, Bookmark, Plus, Heart, Clock, ArrowRight,
+  User, Calendar, Mail, LogOut, CalendarCheck, ShieldCheck,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Home.css"
-
-function SportsIcon({ size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M6.2 6.2a8.8 8.8 0 0 0 0 11.6" />
-      <path d="M17.8 6.2a8.8 8.8 0 0 1 0 11.6" />
-      <path d="M2 12h20" />
-      <path d="M12 2v20" />
-    </svg>
-  )
-}
 
 const CARD_GRADIENTS = [
   "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -32,11 +22,27 @@ const CARD_GRADIENTS = [
   "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
 ]
 
-function getGradient(id) {
-  if (!id) return CARD_GRADIENTS[0]
+const TILE_COLORS = ["#5669FF", "#F0635A", "#F59762", "#29D697", "#46CDFB", "#7F77DD", "#1D9E75"]
+
+function hashId(id) {
+  if (!id) return 0
   let hash = 0
   for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffff
-  return CARD_GRADIENTS[hash % CARD_GRADIENTS.length]
+  return hash
+}
+
+function getGradient(id) {
+  return CARD_GRADIENTS[hashId(id) % CARD_GRADIENTS.length]
+}
+
+function getTileColor(id) {
+  return TILE_COLORS[hashId(id) % TILE_COLORS.length]
+}
+
+function getInitials(name) {
+  if (!name) return "?"
+  const words = name.trim().split(/\s+/)
+  return words.slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "?"
 }
 
 function formatCardDate(isoStr) {
@@ -44,6 +50,45 @@ function formatCardDate(isoStr) {
     const d = new Date(isoStr)
     return { day: String(d.getDate()).padStart(2, "0"), month: d.toLocaleString("en-US", { month: "short" }).toUpperCase() }
   } catch { return { day: "--", month: "---" } }
+}
+
+function formatEventDateTime(isoStr) {
+  try {
+    const d = new Date(isoStr)
+    const dateStr = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`
+    const timeStr = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).replace(" ", "")
+    return { dateStr, timeStr }
+  } catch { return { dateStr: "--/--/----", timeStr: "--:--" } }
+}
+
+function useCountdown(targetDate) {
+  const [label, setLabel] = useState("")
+  const [isLive, setIsLive] = useState(false)
+
+  useEffect(() => {
+    if (!targetDate) return
+    const target = new Date(targetDate).getTime()
+    const tick = () => {
+      const diff = target - Date.now()
+      const live = diff <= 0 && diff > -2 * 60 * 60 * 1000
+      setIsLive(live)
+      if (live) { setLabel("LIVE"); return }
+      if (diff <= 0) { setLabel("Ended"); return }
+      const totalMin = Math.floor(diff / 60000)
+      const days = Math.floor(totalMin / 1440)
+      const hours = Math.floor((totalMin % 1440) / 60)
+      const minutes = totalMin % 60
+      const seconds = Math.floor((diff % 60000) / 1000)
+      if (days > 0) setLabel(`${days}d ${hours}h`)
+      else if (hours > 0) setLabel(`${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`)
+      else setLabel(`${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`)
+    }
+    tick()
+    const interval = setInterval(tick, 1000)
+    return () => clearInterval(interval)
+  }, [targetDate])
+
+  return { label, isLive }
 }
 
 export default function Home() {
@@ -60,17 +105,23 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
-  const [categories] = useState([
-    { id: "sports", name: "Sports", icon: SportsIcon, color: "#f0635a" },
-    { id: "music", name: "Music", icon: Music, color: "#f59762" },
-    { id: "food", name: "Food", icon: Utensils, color: "#29d697" },
-    { id: "art", name: "Art", icon: Palette, color: "#46cdfb" },
-  ])
-  const [activeCategory, setActiveCategory] = useState("sports")
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [bookmarked, setBookmarked] = useState({})
+
+  const [clubs, setClubs] = useState([])
+  const [organisations, setOrganisations] = useState([])
+  const [newsItems, setNewsItems] = useState([])
+
+  const [registering, setRegistering] = useState({})
+  const [registerError, setRegisterError] = useState("")
+
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     if (!token) return
@@ -80,6 +131,13 @@ export default function Home() {
       .then(setEvents)
       .catch((err) => setError(err.message ?? "Failed to load events."))
       .finally(() => setLoading(false))
+  }, [token])
+
+  useEffect(() => {
+    if (!token) return
+    listClubs(token).then(setClubs).catch(() => setClubs([]))
+    listOrganisations(token).then(setOrganisations).catch(() => setOrganisations([]))
+    listNews(token, { scope: "public" }).then(setNewsItems).catch(() => setNewsItems([]))
   }, [token])
 
   const filteredEvents = events.filter((evt) => {
@@ -92,7 +150,36 @@ export default function Home() {
   const trendingEvents = [...filteredEvents].sort((a, b) => (b.registrationCount ?? 0) - (a.registrationCount ?? 0))
   const nearbyEvents = [...filteredEvents].sort((a, b) => new Date(a.date) - new Date(b.date))
 
+  const publishedUpcoming = [...events]
+    .filter((evt) => evt.status === "published" && new Date(evt.date).getTime() >= now - 2 * 60 * 60 * 1000)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+
+  const heroEvent = publishedUpcoming[0] ?? null
+  const weekEnd = now + 7 * 24 * 60 * 60 * 1000
+  const weekEvents = publishedUpcoming
+    .filter((evt) => evt.id !== heroEvent?.id && new Date(evt.date).getTime() <= weekEnd)
+
+  const heroCountdown = useCountdown(heroEvent?.date)
+
+  const orgName = organisations[0]?.name ?? "Persey"
+
   const toggleBookmark = (id) => setBookmarked((prev) => ({ ...prev, [id]: !prev[id] }))
+
+  const handleRegister = async (id) => {
+    if (registering[id]) return
+    setRegistering((prev) => ({ ...prev, [id]: true }))
+    try {
+      await registerForEvent(token, id)
+      setEvents((prev) => prev.map((e) => (
+        e.id === id ? { ...e, isRegistered: true, registrationCount: (e.registrationCount ?? 0) + 1 } : e
+      )))
+    } catch (err) {
+      setRegisterError(err.message ?? "Could not register.")
+      setTimeout(() => setRegisterError(""), 3000)
+    } finally {
+      setRegistering((prev) => ({ ...prev, [id]: false }))
+    }
+  }
 
   const renderEventCard = (evt) => {
     const { day, month } = formatCardDate(evt.date)
@@ -121,28 +208,6 @@ export default function Home() {
 
   const emptyCard = (
     <div className="event-card-empty"><p>No events found.</p></div>
-  )
-
-  const categoriesRow = (
-    <section className="home-interests-container">
-      <div className="home-interests-scroll">
-        {categories.map((cat) => {
-          const IconComp = cat.icon
-          const isActive = cat.id === activeCategory
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className="interest-pill"
-              style={{ backgroundColor: cat.color, opacity: isActive ? 1 : 0.7, transform: isActive ? "scale(1.03)" : "scale(1)" }}
-            >
-              <IconComp size={18} />
-              <span>{cat.name}</span>
-            </button>
-          )
-        })}
-      </div>
-    </section>
   )
 
   const eventSections = loading ? (
@@ -214,8 +279,8 @@ export default function Home() {
 
   return (
     <PhoneFrame>
-      <div className="home-container">
-        {/* Mobile sidebar overlay + drawer */}
+      <div className="home-container home-container--m2">
+        {/* Mobile sidebar overlay + drawer (avatar in header opens this) */}
         <div className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`} onClick={() => setSidebarOpen(false)} />
         <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
           <div className="sidebar-profile">
@@ -259,39 +324,148 @@ export default function Home() {
           </nav>
         </aside>
 
-        {/* Mobile header */}
-        <header className="home-header">
-          <div className="home-nav-row">
-            <button className="home-menu-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="16" y2="12" />
-                <line x1="3" y1="18" x2="10" y2="18" />
-              </svg>
-            </button>
-            <div className="home-location-selector">
-              <div className="home-location-label"><span>Current Location</span><ChevronDown size={14} /></div>
-              <span className="home-location-value">Burgas, Bulgaria</span>
-            </div>
-            <button className="home-notification-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
-              <Bell size={20} />
-              <div className="home-notification-badge" />
-            </button>
-          </div>
-          <div className="home-search-row">
-            <div className="home-search-wrapper">
-              <Search size={22} className="home-search-icon" />
-              <div className="home-search-divider" />
-              <input type="text" className="home-search-input" placeholder="Search events..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-            </div>
-            <button className="home-filter-btn">
-              <span className="home-filter-icon"><SlidersHorizontal size={12} /></span>
-              <span>Filters</span>
-            </button>
-          </div>
+        {/* Header: avatar opens sidebar, org name, notifications */}
+        <header className="m2-header">
+          <button className="m2-avatar-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
+            {profile.avatar ? (
+              <img src={profile.avatar} alt="" className="m2-avatar-img" />
+            ) : (
+              <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
+            )}
+          </button>
+          <h1 className="m2-org-name">&ldquo;{orgName}&rdquo;</h1>
+          <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
+            <Bell size={18} />
+            <div className="home-notification-badge" />
+          </button>
         </header>
 
-        {eventSections}
+        {/* Clubs rail */}
+        <section className="m2-clubs-section">
+          <h2 className="m2-section-title">Clubs</h2>
+          <div className="m2-clubs-scroll">
+            <button className="m2-club-add" onClick={() => navigate("/clubs")} aria-label="Browse clubs">
+              <Plus size={22} />
+            </button>
+            {clubs.map((club) => (
+              <button
+                key={club.id}
+                className="m2-club-avatar"
+                title={club.name}
+                style={{ background: getTileColor(club.id) }}
+                onClick={() => navigate("/clubs")}
+              >
+                {getInitials(club.name)}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Featured/hero event */}
+        {heroEvent && (
+          <section className="m2-hero-wrap">
+            <div
+              className="m2-hero-card"
+              style={{ background: getGradient(heroEvent.id) }}
+              onClick={() => navigate(`/events/${heroEvent.id}`)}
+            >
+              <div className="m2-hero-top">
+                {heroCountdown.isLive ? (
+                  <span className="m2-live-pill"><span className="m2-live-dot" />Live</span>
+                ) : <span />}
+                <span className="m2-hero-timer"><Clock size={12} />{heroCountdown.label}</span>
+              </div>
+              <h3 className="m2-hero-title">{heroEvent.title}</h3>
+              <p className="m2-hero-desc">
+                Join us on <strong>{formatEventDateTime(heroEvent.date).dateStr}</strong>
+                {heroEvent.location ? ` at ${heroEvent.location}` : ""}.
+              </p>
+              <button
+                className="m2-hero-join"
+                onClick={(e) => { e.stopPropagation(); navigate(`/events/${heroEvent.id}`) }}
+              >
+                Join
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Events this week */}
+        <section className="m2-section">
+          <div className="m2-section-header">
+            <h2 className="m2-section-title">Events this week</h2>
+            <button className="m2-see-more">See more</button>
+          </div>
+          {loading ? (
+            <div className="home-loading">
+              <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          ) : error ? (
+            <div className="home-error">{error}</div>
+          ) : weekEvents.length === 0 ? (
+            <div className="event-card-empty"><p>No events this week.</p></div>
+          ) : (
+            <div className="m2-week-scroll">
+              {weekEvents.map((evt) => {
+                const { dateStr, timeStr } = formatEventDateTime(evt.date)
+                const isBookmarked = bookmarked[evt.id] ?? false
+                const capacityLabel = evt.maxCapacity ? `${evt.registrationCount ?? 0}/${evt.maxCapacity}` : "Open"
+                return (
+                  <div key={evt.id} className="m2-week-card" onClick={() => navigate(`/events/${evt.id}`)}>
+                    <div className="m2-week-card-img" style={{ background: getGradient(evt.id) }}>
+                      <button
+                        className="m2-week-heart"
+                        onClick={(e) => { e.stopPropagation(); toggleBookmark(evt.id) }}
+                        aria-label="Save event"
+                      >
+                        <Heart size={14} style={{ fill: isBookmarked ? "#ffffff" : "none" }} />
+                      </button>
+                      <div className="m2-week-actions">
+                        <span className="m2-week-capacity">{capacityLabel}</span>
+                        {user?.role === "student" && (
+                          <button
+                            className="m2-week-register"
+                            disabled={evt.isRegistered || registering[evt.id]}
+                            onClick={(e) => { e.stopPropagation(); handleRegister(evt.id) }}
+                          >
+                            {evt.isRegistered ? "Registered" : registering[evt.id] ? "..." : "Register"}
+                            {!evt.isRegistered && <ArrowRight size={12} />}
+                          </button>
+                        )}
+                      </div>
+                      <div className="m2-week-footer">
+                        <span className="m2-week-name">{evt.title}</span>
+                        <span className="m2-week-datetime">{dateStr}&nbsp;&nbsp;{timeStr}</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {registerError && <div className="home-error" style={{ margin: "8px 20px" }}>{registerError}</div>}
+        </section>
+
+        {/* Latest news */}
+        <section className="m2-section">
+          <div className="m2-section-header">
+            <h2 className="m2-section-title">Latest News</h2>
+            <button className="m2-see-more">See all</button>
+          </div>
+          {newsItems.length === 0 ? (
+            <div className="event-card-empty"><p>No news yet.</p></div>
+          ) : (
+            <div className="m2-news-grid">
+              {newsItems.slice(0, 4).map((item) => (
+                <div key={item.id} className="m2-news-card" style={{ background: getTileColor(item.id) }}>
+                  <span className="m2-news-tag">See more →</span>
+                  <span className="m2-news-title">{item.title}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </PhoneFrame>
   )
