@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react"
-import { ArrowLeft, Camera, Globe, Bell, Settings, ChevronRight, GraduationCap, Phone, Mail, Check, X, Users, Calendar, Edit2 } from "lucide-react"
+import { ArrowLeft, Camera, Globe, Bell, Settings, ChevronRight, GraduationCap, Mail, Check, X, Users, Calendar, Edit2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
 import { submitRoleRequest, getMyRoleRequests } from "../services/roleRequestService.js"
+import { updateUserProfile } from "../services/authService.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Profile.css"
 
@@ -28,12 +29,11 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
     }
 
     return {
-      nickname: user ? (`${user.firstName || ""} ${user.lastName || ""}`.trim() || user.username || "") : "",
-      avatar: "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      avatar: user?.logoUrl || "",
       email: user?.email || "",
-      phone: "",
-      roleLine: user?.role === "student" ? "Student" : (user?.role === "organiser" ? "Organiser" : "Admin"),
-      about: "",
+      about: user?.bio || "",
       followers: 0,
       following: 0,
       eventsCount: 0
@@ -43,13 +43,19 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
   const activeProfile = propProfile || localProfile
 
   const [isEditing, setIsEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [editForm, setEditForm] = useState({
-    nickname: "",
+    firstName: "",
+    lastName: "",
     avatar: "",
     about: "",
-    email: "",
-    phone: "",
-    roleLine: ""
+    email: ""
+  })
+
+  const [validationErrors, setValidationErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: ""
   })
 
   const [roleRequest, setRoleRequest] = useState(null)
@@ -71,35 +77,100 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
 
   const handleEditClick = () => {
     setEditForm({
-      nickname: activeProfile.nickname || "",
+      firstName: activeProfile.firstName || "",
+      lastName: activeProfile.lastName || "",
       avatar: activeProfile.avatar || "",
       about: activeProfile.about || "",
-      email: activeProfile.email || "",
-      phone: activeProfile.phone || "",
-      roleLine: activeProfile.roleLine || ""
+      email: activeProfile.email || ""
+    })
+    setValidationErrors({
+      firstName: "",
+      lastName: "",
+      email: ""
     })
     setIsEditing(true)
   }
 
-  const handleSave = () => {
+  const validateForm = () => {
+    const errors = { firstName: "", lastName: "", email: "" }
+    let hasErrors = false
+
+    if (!editForm.firstName.trim()) {
+      errors.firstName = "First name is required."
+      hasErrors = true
+    }
+
+    if (!editForm.lastName.trim()) {
+      errors.lastName = "Last name (surname) is required."
+      hasErrors = true
+    }
+
+    if (editForm.email && !/\S+@\S+\.\S+/.test(editForm.email)) {
+      errors.email = "Please enter a valid email address."
+      hasErrors = true
+    }
+
+    setValidationErrors(errors)
+    return !hasErrors
+  }
+
+  const handleSave = async () => {
+    if (!validateForm()) return
+
+    setSaving(true)
+
     const updated = {
       ...activeProfile,
-      nickname: editForm.nickname.trim(),
+      firstName: editForm.firstName.trim(),
+      lastName: editForm.lastName.trim(),
       avatar: editForm.avatar,
       about: editForm.about.trim(),
       email: editForm.email.trim(),
-      phone: editForm.phone.trim(),
-      roleLine: editForm.roleLine.trim(),
     }
 
-    if (onSave) {
-      onSave(updated)
-    } else {
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(updated))
-      setLocalProfile(updated)
+    try {
+      if (token && user) {
+        // Attempt update to the backend
+        const result = await updateUserProfile(token, {
+          firstName: updated.firstName,
+          lastName: updated.lastName,
+          bio: updated.about,
+          logoUrl: updated.avatar
+        })
+        
+        if (result) {
+          if (result.firstName) updated.firstName = result.firstName
+          if (result.lastName) updated.lastName = result.lastName
+          if (result.bio) updated.about = result.bio
+          if (result.logoUrl) updated.avatar = result.logoUrl
+        }
+      }
+
+      if (onSave) {
+        onSave(updated)
+      } else {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(updated))
+        setLocalProfile(updated)
+      }
+      window.dispatchEvent(new Event("profileUpdated"))
+      showToast("Profile saved successfully!")
+      setIsEditing(false)
+    } catch (err) {
+      console.warn("Backend save failed, falling back to local storage:", err)
+      
+      // Fallback local save for Student/non-organiser accounts
+      if (onSave) {
+        onSave(updated)
+      } else {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(updated))
+        setLocalProfile(updated)
+      }
+      window.dispatchEvent(new Event("profileUpdated"))
+      showToast("Profile updated (saved locally).")
+      setIsEditing(false)
+    } finally {
+      setSaving(false)
     }
-    window.dispatchEvent(new Event("profileUpdated"))
-    setIsEditing(false)
   }
 
   const handleCancel = () => {
@@ -147,6 +218,9 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
 
   const handleBack = onBack || (() => navigate("/home"))
 
+  const fullName = `${activeProfile.firstName || ""} ${activeProfile.lastName || ""}`.trim() || "Enter Name"
+  const dbRole = user?.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Student"
+
   // Shared inner content to be rendered inside / outside of PhoneFrame
   const profileContent = (
     <div className={`profile-container ${isDesktop ? "profile-container--desktop" : ""}`}>
@@ -185,6 +259,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
             className="profile-edit-circle-btn profile-edit-circle-btn--cancel" 
             aria-label="Cancel Editing"
             onClick={handleCancel}
+            disabled={saving}
           >
             <X size={20} color="#ffffff" />
           </button>
@@ -237,25 +312,30 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                 <div className="profile-desktop-edit-info">
                   <div className="profile-input-row">
                     <div className="profile-input-group">
-                      <label className="profile-input-label">Full Name</label>
+                      <label className="profile-input-label">First Name</label>
                       <input
                         type="text"
                         className="profile-name-input"
-                        value={editForm.nickname}
-                        onChange={(e) => setEditForm({ ...editForm, nickname: e.target.value })}
-                        placeholder="Katniss Everdine"
-                        maxLength={40}
+                        value={editForm.firstName}
+                        onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                        placeholder="First Name"
+                        maxLength={25}
+                        disabled={saving}
                       />
+                      {validationErrors.firstName && <span className="profile-input-error">{validationErrors.firstName}</span>}
                     </div>
                     <div className="profile-input-group">
-                      <label className="profile-input-label">Role / Affiliation</label>
+                      <label className="profile-input-label">Last Name (Surname)</label>
                       <input
                         type="text"
                         className="profile-input-text"
-                        value={editForm.roleLine}
-                        onChange={(e) => setEditForm({ ...editForm, roleLine: e.target.value })}
-                        placeholder="Student, Admin of Book club"
+                        value={editForm.lastName}
+                        onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                        placeholder="Last Name"
+                        maxLength={25}
+                        disabled={saving}
                       />
+                      {validationErrors.lastName && <span className="profile-input-error">{validationErrors.lastName}</span>}
                     </div>
                   </div>
                   <div className="profile-input-row">
@@ -267,41 +347,24 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                         value={editForm.email}
                         onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                         placeholder="name@domain.com"
+                        disabled={saving}
                       />
-                    </div>
-                    <div className="profile-input-group">
-                      <label className="profile-input-label">Phone Number</label>
-                      <input
-                        type="text"
-                        className="profile-input-text"
-                        value={editForm.phone}
-                        onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                        placeholder="+1(408) 785-9959"
-                      />
+                      {validationErrors.email && <span className="profile-input-error">{validationErrors.email}</span>}
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="profile-desktop-info">
-                  <h2 className="profile-name">{activeProfile.nickname || "Enter Name"}</h2>
+                  <h2 className="profile-name">{fullName}</h2>
                   
-                  {activeProfile.roleLine && (
-                    <div className="profile-badge-pill">
-                      <GraduationCap size={16} className="profile-badge-icon" />
-                      <span className="profile-badge-text">{activeProfile.roleLine}</span>
-                    </div>
-                  )}
+                  <div className="profile-badge-pill">
+                    <GraduationCap size={16} className="profile-badge-icon" />
+                    <span className="profile-badge-text">{dbRole}</span>
+                  </div>
 
                   <p className="profile-contact">
                     <Mail size={14} className="profile-contact-icon" />
                     <span>{activeProfile.email || "No email"}</span>
-                    {activeProfile.phone && (
-                      <>
-                        <span className="profile-contact-sep">|</span>
-                        <Phone size={14} className="profile-contact-icon" />
-                        <span>{activeProfile.phone}</span>
-                      </>
-                    )}
                   </p>
                 </div>
               )}
@@ -342,6 +405,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                     placeholder="Write something about yourself..."
                     rows={6}
                     maxLength={500}
+                    disabled={saving}
                   />
                 ) : (
                   <p className="profile-about-text">
@@ -352,11 +416,11 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
 
               {isEditing && (
                 <div className="profile-edit-actions">
-                  <button className="profile-cancel-btn" onClick={handleCancel}>
+                  <button className="profile-cancel-btn" onClick={handleCancel} disabled={saving}>
                     Cancel
                   </button>
-                  <button className="profile-save-btn" onClick={handleSave}>
-                    Save Changes
+                  <button className="profile-save-btn" onClick={handleSave} disabled={saving}>
+                    {saving ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
               )}
@@ -486,15 +550,30 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
           {isEditing ? (
             <div className="profile-edit-fields">
               <div className="profile-input-group">
-                <label className="profile-input-label">Full Name</label>
+                <label className="profile-input-label">First Name</label>
                 <input
                   type="text"
                   className="profile-name-input"
-                  value={editForm.nickname}
-                  onChange={(e) => setEditForm({ ...editForm, nickname: e.target.value })}
-                  placeholder="Enter name"
-                  maxLength={40}
+                  value={editForm.firstName}
+                  onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                  placeholder="First name"
+                  maxLength={25}
+                  disabled={saving}
                 />
+                {validationErrors.firstName && <span className="profile-input-error">{validationErrors.firstName}</span>}
+              </div>
+              <div className="profile-input-group">
+                <label className="profile-input-label">Last Name (Surname)</label>
+                <input
+                  type="text"
+                  className="profile-input-text"
+                  value={editForm.lastName}
+                  onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                  placeholder="Last name"
+                  maxLength={25}
+                  disabled={saving}
+                />
+                {validationErrors.lastName && <span className="profile-input-error">{validationErrors.lastName}</span>}
               </div>
               <div className="profile-input-group">
                 <label className="profile-input-label">Email</label>
@@ -504,41 +583,21 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                   placeholder="name@domain.com"
+                  disabled={saving}
                 />
-              </div>
-              <div className="profile-input-group">
-                <label className="profile-input-label">Phone Number</label>
-                <input
-                  type="text"
-                  className="profile-input-text"
-                  value={editForm.phone}
-                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                  placeholder="+1(xxx) xxx-xxxx"
-                />
-              </div>
-              <div className="profile-input-group">
-                <label className="profile-input-label">Affiliation / Role</label>
-                <input
-                  type="text"
-                  className="profile-input-text"
-                  value={editForm.roleLine}
-                  onChange={(e) => setEditForm({ ...editForm, roleLine: e.target.value })}
-                  placeholder="Student, Admin of Book club"
-                />
+                {validationErrors.email && <span className="profile-input-error">{validationErrors.email}</span>}
               </div>
             </div>
           ) : (
             <div className="profile-info-group">
-              <h2 className="profile-name">{activeProfile.nickname || "Enter Name"}</h2>
+              <h2 className="profile-name">{fullName}</h2>
               <p className="profile-contact">
-                {activeProfile.email || "No email"} {activeProfile.phone ? ` | ${activeProfile.phone}` : ""}
+                {activeProfile.email || "No email"}
               </p>
-              {activeProfile.roleLine && (
-                <div className="profile-badge-pill">
-                  <GraduationCap size={16} className="profile-badge-icon" />
-                  <span className="profile-badge-text">{activeProfile.roleLine}</span>
-                </div>
-              )}
+              <div className="profile-badge-pill">
+                <GraduationCap size={16} className="profile-badge-icon" />
+                <span className="profile-badge-text">{dbRole}</span>
+              </div>
             </div>
           )}
 
@@ -571,6 +630,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                 placeholder="Write something about yourself..."
                 rows={4}
                 maxLength={500}
+                disabled={saving}
               />
             ) : (
               <p className="profile-about-text">
@@ -581,8 +641,10 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
 
           {isEditing && (
             <div className="profile-edit-actions">
-              <button className="profile-cancel-btn" onClick={handleCancel}>Cancel</button>
-              <button className="profile-save-btn" onClick={handleSave}>Save Changes</button>
+              <button className="profile-cancel-btn" onClick={handleCancel} disabled={saving}>Cancel</button>
+              <button className="profile-save-btn" onClick={handleSave} disabled={saving}>
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
             </div>
           )}
 

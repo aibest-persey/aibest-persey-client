@@ -73,3 +73,29 @@ export async function fetchCurrentUser(token) {
   return json
 }
 
+/**
+ * Update the current user's profile details on the backend.
+ * @param {string} token JWT token
+ * @param {{ firstName?: string, lastName?: string, bio?: string, logoUrl?: string }} data
+ * @returns {Promise<object>}
+ */
+export async function updateUserProfile(token, data) {
+  const response = await fetch(`${API_BASE}/api/organisers/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  })
+
+  const json = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(json.message ?? "Failed to update profile.")
+  }
+
+  return json
+}
+
+

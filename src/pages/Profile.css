@@ -691,3 +691,12 @@
     padding: 16px 20px;
   }
 }
+
+.profile-input-error {
+  color: #f0635a;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+  text-align: left;
+}
+
