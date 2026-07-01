@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
 import SignIn from "./pages/SignIn.jsx"
 import SignUp from "./pages/SignUp.jsx"
+import ForgotPassword from "./pages/ForgotPassword.jsx"
+import ResetPassword from "./pages/ResetPassword.jsx"
 import Home from "./pages/Home.jsx"
 import EventDetails from "./pages/EventDetails.jsx"
 import Profile from "./pages/Profile.jsx"
@@ -14,11 +16,19 @@ import Unauthorized from "./pages/Unauthorized.jsx"
 import DesktopShell from "./components/DesktopShell.jsx"
 import { useAuth } from "./hooks/useAuth.js"
 import { useIsDesktop } from "./hooks/useIsDesktop.js"
+import { useHasOrganisation } from "./hooks/useHasOrganisation.js"
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user } = useAuth()
   if (!isAuthenticated) return <Navigate to="/sign-in" replace />
   if (allowedRoles && (!user || !allowedRoles.includes(user.role))) return <Navigate to="/unauthorized" replace />
+  return children
+}
+
+function OrgMemberRoute({ children }) {
+  const { hasOrganisation, loading } = useHasOrganisation()
+  if (loading) return null
+  if (!hasOrganisation) return <Navigate to="/home" replace />
   return children
 }
 
@@ -83,11 +93,13 @@ export default function App() {
 
       <Route path="/sign-in" element={<PublicRoute><SignIn /></PublicRoute>} />
       <Route path="/sign-up" element={<PublicRoute><SignUp /></PublicRoute>} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Authenticated routes: DesktopShell on desktop, bare Outlet on mobile */}
       <Route element={<AppShell />}>
         <Route path="/home" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Home /></ProtectedRoute>} />
-        <Route path="/clubs" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Clubs /></ProtectedRoute>} />
+        <Route path="/clubs" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><OrgMemberRoute><Clubs /></OrgMemberRoute></ProtectedRoute>} />
         <Route path="/events/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><EventDetails /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Notifications /></ProtectedRoute>} />

@@ -16,3 +16,15 @@ async function handle(promise) {
 
 export const listClubs = (token) =>
   handle(fetch(`${API_BASE}/api/clubs`, { headers: authHeaders(token) }))
+
+export const joinClub = (token, id) =>
+  handle(fetch(`${API_BASE}/api/clubs/${id}/join`, {
+    method: "POST",
+    headers: authHeaders(token),
+  }))
+
+export const leaveClub = (token, id) =>
+  handle(fetch(`${API_BASE}/api/clubs/${id}/join`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  }))

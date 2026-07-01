@@ -48,6 +48,72 @@ export async function loginUser(data) {
 }
 
 /**
+ * Confirm a signup verification code.
+ * @param {{ email: string, code: string }} data
+ * @returns {Promise<{ message: string }>}
+ * @throws {Error}
+ */
+export async function verifyEmailCode(data) {
+  const response = await fetch(`${API_BASE}/api/auth/verify-email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+
+  const json = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(json.message ?? "Something went wrong. Please try again.")
+  }
+
+  return json
+}
+
+/**
+ * Request a password reset email.
+ * @param {{ email: string }} data
+ * @returns {Promise<{ message: string }>}
+ * @throws {Error}
+ */
+export async function forgotPassword(data) {
+  const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+
+  const json = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(json.message ?? "Something went wrong. Please try again.")
+  }
+
+  return json
+}
+
+/**
+ * Set a new password using a reset token.
+ * @param {{ token: string, id: string, password: string }} data
+ * @returns {Promise<{ message: string }>}
+ * @throws {Error}
+ */
+export async function resetPassword(data) {
+  const response = await fetch(`${API_BASE}/api/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+
+  const json = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(json.message ?? "Something went wrong. Please try again.")
+  }
+
+  return json
+}
+
+/**
  * Retrieve the current authenticated user's details.
  * @param {string} token JWT token
  * @returns {Promise<object>}

@@ -455,3 +455,247 @@
   color: #120d26;
   letter-spacing: -0.03em;
 }
+
+/* ─── Auth v2 — Log In / Sign Up mockup redesign ─── */
+/* Scoped to new classnames only; existing .field/.btn-primary/.btn-google
+   are shared with other pages (e.g. OrganiserDashboard) and stay untouched. */
+
+.auth-body--v2 {
+  padding: 40px 24px 32px 24px;
+  text-align: center;
+}
+
+.auth-welcome {
+  font-size: 16px;
+  font-weight: 600;
+  color: #26215c;
+  margin: 0;
+}
+
+.auth-title-v2 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #26215c;
+  letter-spacing: -0.02em;
+  margin: 2px 0 28px 0;
+}
+
+.auth-subtext {
+  font-size: 14px;
+  color: #747688;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.auth-form-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: left;
+}
+
+.auth-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Underline field variant */
+.field-v2-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.field-v2-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #120d26;
+}
+
+.field-v2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border-bottom: 1px solid #d8d9e3;
+  padding-bottom: 8px;
+  transition: border-color 0.15s ease;
+}
+
+.field-v2:focus-within {
+  border-color: #26215c;
+}
+
+.field-v2--error {
+  border-color: #ef4444;
+}
+
+.field-v2--disabled {
+  opacity: 0.55;
+}
+
+.field-v2__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  color: #120d26;
+  padding: 0;
+}
+
+.field-v2__input::placeholder {
+  color: #9a9cae;
+}
+
+.field-v2__toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #9a9cae;
+  cursor: pointer;
+  padding: 0;
+}
+
+.field-v2__error {
+  font-size: 12px;
+  font-weight: 500;
+  color: #ef4444;
+  line-height: 1.4;
+}
+
+.auth-row-v2 {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.auth-link-v2 {
+  font-size: 13px;
+  font-weight: 500;
+  color: #747688;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-link-v2--strong {
+  color: #26215c;
+  font-weight: 700;
+}
+
+/* Same specificity issue as .btn-flat: .auth-screen a{color:inherit} outranks
+   these single-class rules inside the phone frame — restate to win there. */
+.auth-screen .auth-link-v2 {
+  color: #747688;
+}
+
+.auth-screen .auth-link-v2--strong {
+  color: #26215c;
+}
+
+.auth-footer-v2 {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #747688;
+}
+
+/* Flat primary button (mockup style — solid, no arrow) */
+.btn-flat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: #1c1750;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+
+.btn-flat:active {
+  transform: scale(0.98);
+}
+
+.btn-flat:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* .auth-screen button{color:inherit} (global reset for the phone frame) outranks
+   .btn-flat{color:#fff} on specificity — restate it here to win inside the frame. */
+.auth-screen .btn-flat {
+  color: #ffffff;
+}
+
+/* OAuth icon row */
+.oauth-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.oauth-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #e4e6ef;
+  background: #ffffff;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.oauth-btn:hover {
+  opacity: 1;
+}
+
+.oauth-btn:active {
+  transform: scale(0.94);
+}
+
+.oauth-toast {
+  font-size: 12px;
+  font-weight: 500;
+  color: #747688;
+  background: #f4f4f8;
+  border-radius: 999px;
+  padding: 6px 14px;
+}
+
+.auth-banner--info {
+  background: #eef0ff;
+  border: 1px solid #c7ccff;
+  color: #26215c;
+}
+
+.auth-desktop-card {
+  text-align: center;
+}

@@ -9,11 +9,14 @@ import {
   cancelEvent,
   deleteEvent,
 } from "../services/eventService.js"
-import { ArrowLeft, Calendar, MapPin, Plus, X, ListTodo, FileText, Users, ClipboardList, Check } from "lucide-react"
+import { ArrowLeft, Calendar, MapPin, Plus, X, ListTodo, FileText, Users, ClipboardList, Check, Building2 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TextField from "../components/TextField.jsx"
 import PrimaryButton from "../components/PrimaryButton.jsx"
 import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../services/roleRequestService.js"
+import {
+  listOrganisations, createOrganisation, listOrgJoinRequests, approveJoinRequest, rejectJoinRequest,
+} from "../services/organisationService.js"
 import "./OrganiserDashboard.css"
 
 export default function OrganiserDashboard() {
@@ -29,6 +32,16 @@ export default function OrganiserDashboard() {
   const [roleRequests, setRoleRequests] = useState([])
   const [reqLoading, setReqLoading] = useState(false)
   const [reqMsg, setReqMsg] = useState("")
+
+  // Organisations tab
+  const [myOrgs, setMyOrgs] = useState([])
+  const [orgsLoading, setOrgsLoading] = useState(false)
+  const [orgJoinRequests, setOrgJoinRequests] = useState({})
+  const [orgActionId, setOrgActionId] = useState(null)
+  const [orgForm, setOrgForm] = useState({ name: "", description: "" })
+  const [orgFieldErrors, setOrgFieldErrors] = useState({})
+  const [orgCreateLoading, setOrgCreateLoading] = useState(false)
+  const [orgMsg, setOrgMsg] = useState("")
 
   // Per-card action state
   const [actionLoadingId, setActionLoadingId] = useState(null)
@@ -77,6 +90,75 @@ export default function OrganiserDashboard() {
       await rejectRoleRequest(token, id)
       setRoleRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "rejected" } : r))
     } catch (e) { setReqMsg(e.message) }
+  }
+
+  const loadOrganisations = useCallback(async () => {
+    setOrgsLoading(true)
+    setOrgMsg("")
+    try {
+      const orgs = await listOrganisations(token)
+      const mine = orgs.filter((o) => o.isMember)
+      setMyOrgs(mine)
+      const requestsByOrg = {}
+      await Promise.all(mine.map(async (org) => {
+        try { requestsByOrg[org.id] = await listOrgJoinRequests(token, org.id) }
+        catch { requestsByOrg[org.id] = [] }
+      }))
+      setOrgJoinRequests(requestsByOrg)
+    } catch (e) {
+      setOrgMsg(e.message)
+    } finally {
+      setOrgsLoading(false)
+    }
+  }, [token])
+
+  useEffect(() => { if (activeTab === "organisations") loadOrganisations() }, [activeTab])
+
+  const handleCreateOrganisation = async (e) => {
+    e.preventDefault()
+    setOrgMsg("")
+    const errors = {}
+    if (!orgForm.name.trim()) errors.name = "Name is required"
+    if (Object.keys(errors).length > 0) { setOrgFieldErrors(errors); return }
+    setOrgCreateLoading(true)
+    try {
+      await createOrganisation(token, {
+        name: orgForm.name.trim(),
+        description: orgForm.description.trim() || undefined,
+      })
+      setOrgMsg("Organisation created — pending admin verification.")
+      setOrgForm({ name: "", description: "" })
+      setOrgFieldErrors({})
+      loadOrganisations()
+    } catch (err) {
+      setOrgMsg(err.message)
+    } finally {
+      setOrgCreateLoading(false)
+    }
+  }
+
+  const handleApproveJoin = async (orgId, reqId) => {
+    setOrgActionId(reqId)
+    try {
+      await approveJoinRequest(token, orgId, reqId)
+      setOrgJoinRequests((prev) => ({
+        ...prev,
+        [orgId]: prev[orgId].filter((r) => r.id !== reqId),
+      }))
+    } catch (e) { setOrgMsg(e.message) }
+    setOrgActionId(null)
+  }
+
+  const handleRejectJoin = async (orgId, reqId) => {
+    setOrgActionId(reqId)
+    try {
+      await rejectJoinRequest(token, orgId, reqId)
+      setOrgJoinRequests((prev) => ({
+        ...prev,
+        [orgId]: prev[orgId].filter((r) => r.id !== reqId),
+      }))
+    } catch (e) { setOrgMsg(e.message) }
+    setOrgActionId(null)
   }
 
   const updateForm = (e) => {
@@ -181,6 +263,12 @@ export default function OrganiserDashboard() {
               <span className="org-tab-badge">{roleRequests.filter((r) => r.status === "pending").length}</span>
             )}
           </button>
+          <button className={`org-tab ${activeTab === "organisations" ? "org-tab--active" : ""}`} onClick={() => setActiveTab("organisations")}>
+            <Building2 size={15} /> Organisations
+            {Object.values(orgJoinRequests).flat().length > 0 && (
+              <span className="org-tab-badge">{Object.values(orgJoinRequests).flat().length}</span>
+            )}
+          </button>
         </div>
 
         <div className="org-body">
@@ -208,6 +296,64 @@ export default function OrganiserDashboard() {
                       <button className="org-req-btn org-req-btn--reject" onClick={() => handleReject(r.id)}><X size={14} /></button>
                     </div>
                   )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === "organisations" && (
+            <div className="org-req-list">
+              {orgMsg && <div className="org-banner" style={{ marginBottom: 16 }}>{orgMsg}</div>}
+
+              <form onSubmit={handleCreateOrganisation} className="org-modal-form" noValidate style={{ marginBottom: 24 }}>
+                <h3 style={{ margin: "0 0 4px 0", fontSize: 15, fontWeight: 700, color: "#111638" }}>Create an organisation</h3>
+                <TextField icon={Building2} name="name" placeholder="Organisation name" value={orgForm.name}
+                  onChange={(e) => { setOrgForm((f) => ({ ...f, name: e.target.value })); setOrgFieldErrors({}) }}
+                  error={orgFieldErrors.name} />
+                <div className="org-form-field">
+                  <textarea
+                    className="org-textarea"
+                    placeholder="Description (optional)"
+                    rows={2}
+                    value={orgForm.description}
+                    onChange={(e) => setOrgForm((f) => ({ ...f, description: e.target.value }))}
+                  />
+                </div>
+                <div className="org-form-action">
+                  <PrimaryButton type="submit" loading={orgCreateLoading}>Create Organisation</PrimaryButton>
+                </div>
+              </form>
+
+              {orgsLoading && <div className="org-loading-state"><div className="spinner" /></div>}
+              {!orgsLoading && myOrgs.length === 0 && (
+                <div className="org-empty-state"><p>You're not part of any organisation yet.</p></div>
+              )}
+              {myOrgs.map((org) => (
+                <div key={org.id} style={{ marginBottom: 16 }}>
+                  <div className="org-req-card" style={{ marginBottom: (orgJoinRequests[org.id]?.length ?? 0) > 0 ? 8 : 0 }}>
+                    <div className="org-req-avatar" style={{ background: "#5669ff" }}>
+                      {org.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="org-req-body">
+                      <div className="org-req-name">{org.name}</div>
+                      <span className={`org-req-status org-req-status--${org.status === "verified" ? "approved" : "pending"}`}>{org.status}</span>
+                    </div>
+                  </div>
+                  {(orgJoinRequests[org.id] ?? []).map((r) => (
+                    <div key={r.id} className="org-req-card" style={{ marginLeft: 20 }}>
+                      <div className="org-req-avatar" style={{ background: r.student?.color || "#5669ff" }}>
+                        {(r.student?.username || "?").charAt(0).toUpperCase()}
+                      </div>
+                      <div className="org-req-body">
+                        <div className="org-req-name">{r.student?.firstName ? `${r.student.firstName} ${r.student.lastName || ""}`.trim() : r.student?.username}</div>
+                        <div className="org-req-sub">Wants to join <strong>{org.name}</strong></div>
+                      </div>
+                      <div className="org-req-actions">
+                        <button className="org-req-btn org-req-btn--approve" disabled={orgActionId === r.id} onClick={() => handleApproveJoin(org.id, r.id)}><Check size={14} /></button>
+                        <button className="org-req-btn org-req-btn--reject" disabled={orgActionId === r.id} onClick={() => handleRejectJoin(org.id, r.id)}><X size={14} /></button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>

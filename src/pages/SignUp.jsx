@@ -1,21 +1,29 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Mail, Lock, User, AtSign, ArrowLeft } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TextField from "../components/TextField.jsx"
 import PrimaryButton from "../components/PrimaryButton.jsx"
-import GoogleButton from "../components/GoogleButton.jsx"
+import OAuthButtons from "../components/OAuthButtons.jsx"
 import OrDivider from "../components/OrDivider.jsx"
 import { registerUser } from "../services/authService.js"
 import { validateSignUp } from "../utils/validation.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
+
+// The mockup has no username field — derive one from name + surname so the
+// backend's unique-username requirement stays invisible to the user.
+function generateUsername(firstName, lastName) {
+  const base = `${firstName}${lastName}`.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 14) || "user"
+  const suffix = Math.floor(1000 + Math.random() * 9000)
+  return `${base}${suffix}`
+}
 
 export default function SignUp() {
   const navigate = useNavigate()
   const isDesktop = useIsDesktop()
 
   const [form, setForm] = useState({
-    firstName: "", lastName: "", username: "",
+    firstName: "", lastName: "",
     email: "", password: "", confirmPassword: "",
   })
   const [fieldErrors, setFieldErrors] = useState({})
@@ -38,9 +46,9 @@ export default function SignUp() {
     setLoading(true)
     try {
       await registerUser({
-        firstName: form.firstName.trim() || undefined,
-        lastName: form.lastName.trim() || undefined,
-        username: form.username.trim(),
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        username: generateUsername(form.firstName.trim(), form.lastName.trim()),
         email: form.email.trim(),
         password: form.password,
       })
@@ -55,32 +63,56 @@ export default function SignUp() {
 
   const formContent = (
     <>
+      <p className="auth-welcome">Welcome</p>
+      <h1 className="auth-title-v2">Sign Up</h1>
+
       {success ? (
         <div className="auth-banner auth-banner--success" role="status">
-          Account created! Redirecting to sign in…
+          Account created! Redirecting to log in…
         </div>
       ) : null}
       {serverError ? (
         <div className="auth-banner auth-banner--error" role="alert">{serverError}</div>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="auth-form" noValidate>
-        <TextField icon={User} name="firstName" placeholder="First name (optional)" value={form.firstName} onChange={update} error={fieldErrors.firstName} />
-        <TextField icon={User} name="lastName" placeholder="Last name (optional)" value={form.lastName} onChange={update} error={fieldErrors.lastName} />
-        <TextField icon={AtSign} name="username" placeholder="Username" value={form.username} onChange={update} error={fieldErrors.username} />
-        <TextField icon={Mail} name="email" type="email" placeholder="abc@email.com" value={form.email} onChange={update} error={fieldErrors.email} />
-        <TextField icon={Lock} name="password" type="password" placeholder="Your password" value={form.password} onChange={update} error={fieldErrors.password} />
-        <TextField icon={Lock} name="confirmPassword" type="password" placeholder="Confirm password" value={form.confirmPassword} onChange={update} error={fieldErrors.confirmPassword} />
+      <form onSubmit={handleSubmit} className="auth-form-v2" noValidate>
+        <div className="auth-name-row">
+          <TextField
+            variant="underline" label="Name" name="firstName"
+            placeholder="Your Name" value={form.firstName}
+            onChange={update} error={fieldErrors.firstName}
+          />
+          <TextField
+            variant="underline" label="Surname" name="lastName"
+            placeholder="Your Surname" value={form.lastName}
+            onChange={update} error={fieldErrors.lastName}
+          />
+        </div>
+        <TextField
+          variant="underline" label="Email" name="email" type="email"
+          placeholder="example@codingamerica.uea" value={form.email}
+          onChange={update} error={fieldErrors.email}
+        />
+        <TextField
+          variant="underline" label="Password" name="password" type="password"
+          placeholder="Enter password" value={form.password}
+          onChange={update} error={fieldErrors.password}
+        />
+        <TextField
+          variant="underline" label="Confirm Password" name="confirmPassword" type="password"
+          placeholder="Enter password" value={form.confirmPassword}
+          onChange={update} error={fieldErrors.confirmPassword}
+        />
         <div className="auth-form__action">
-          <PrimaryButton type="submit" loading={loading}>Sign up</PrimaryButton>
+          <PrimaryButton variant="flat" type="submit" loading={loading}>Sign Up</PrimaryButton>
         </div>
       </form>
 
-      <div className="auth-section--tight"><OrDivider /></div>
-      <div className="auth-section--tight"><GoogleButton label="Login with Google" /></div>
-      <p className="auth-footer">
+      <div className="auth-section"><OrDivider /></div>
+      <OAuthButtons />
+      <p className="auth-footer-v2">
         Already have an account?{" "}
-        <Link to="/sign-in" className="auth-link">Sign in</Link>
+        <Link to="/sign-in" className="auth-link-v2 auth-link-v2--strong">Log In</Link>
       </p>
     </>
   )
@@ -89,11 +121,6 @@ export default function SignUp() {
     return (
       <div className="auth-desktop-center">
         <div className="auth-desktop-card">
-          <div className="auth-desktop-brand">
-            <div className="auth-brand-dot">P</div>
-            <span className="auth-brand-text">Persey</span>
-          </div>
-          <h1 className="auth-title">Sign up</h1>
           {formContent}
         </div>
       </div>
@@ -102,11 +129,10 @@ export default function SignUp() {
 
   return (
     <PhoneFrame>
-      <div className="auth-body auth-body--signup">
+      <div className="auth-body auth-body--v2">
         <button type="button" onClick={() => navigate(-1)} aria-label="Go back" className="auth-back">
           <ArrowLeft size={24} strokeWidth={2} />
         </button>
-        <h1 className="auth-title">Sign up</h1>
         {formContent}
       </div>
     </PhoneFrame>

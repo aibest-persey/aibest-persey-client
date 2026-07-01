@@ -1,10 +1,9 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Mail, Lock } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TextField from "../components/TextField.jsx"
 import PrimaryButton from "../components/PrimaryButton.jsx"
-import GoogleButton from "../components/GoogleButton.jsx"
+import OAuthButtons from "../components/OAuthButtons.jsx"
 import OrDivider from "../components/OrDivider.jsx"
 import { loginUser } from "../services/authService.js"
 import { validateSignIn } from "../utils/validation.js"
@@ -17,7 +16,6 @@ export default function SignIn() {
   const isDesktop = useIsDesktop()
 
   const [form, setForm] = useState({ identifier: "", password: "" })
-  const [remember, setRemember] = useState(true)
   const [fieldErrors, setFieldErrors] = useState({})
   const [serverError, setServerError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -40,7 +38,7 @@ export default function SignIn() {
         identifier: form.identifier.trim(),
         password: form.password,
       })
-      login(token, user, remember)
+      login(token, user, true)
       const targetPath = user.role === "admin" ? "/admin" : "/home"
       navigate(targetPath, { replace: true })
     } catch (err) {
@@ -52,40 +50,41 @@ export default function SignIn() {
 
   const formContent = (
     <>
+      <p className="auth-welcome">Welcome</p>
+      <h1 className="auth-title-v2">Log In</h1>
+
       {serverError ? (
         <div className="auth-banner auth-banner--error" role="alert">{serverError}</div>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="auth-form auth-form--signin" noValidate>
+      <form onSubmit={handleSubmit} className="auth-form-v2" noValidate>
         <TextField
-          icon={Mail} name="identifier" type="text"
-          placeholder="Email or username" value={form.identifier}
+          variant="underline" label="Email"
+          name="identifier" type="text"
+          placeholder="example@codingamerica.uea" value={form.identifier}
           onChange={update} error={fieldErrors.identifier}
         />
-        <TextField
-          icon={Lock} name="password" type="password"
-          placeholder="Your password" value={form.password}
-          onChange={update} error={fieldErrors.password}
-        />
-        <div className="auth-row">
-          <button type="button" onClick={() => setRemember((r) => !r)} className="auth-inline-btn">
-            <span className={`toggle ${remember ? "toggle--on" : ""}`}>
-              <span className="toggle__knob" />
-            </span>
-            <span>Remember Me</span>
-          </button>
-          <button type="button" className="auth-inline-btn">Forgot Password?</button>
+        <div>
+          <TextField
+            variant="underline" label="Password"
+            name="password" type="password"
+            placeholder="Enter password" value={form.password}
+            onChange={update} error={fieldErrors.password}
+          />
+          <div className="auth-row-v2">
+            <Link to="/forgot-password" className="auth-link-v2">Forgot password?</Link>
+          </div>
         </div>
         <div className="auth-form__action">
-          <PrimaryButton type="submit" loading={loading}>Sign in</PrimaryButton>
+          <PrimaryButton variant="flat" type="submit" loading={loading}>Log In</PrimaryButton>
         </div>
       </form>
 
       <div className="auth-section"><OrDivider /></div>
-      <div className="auth-section"><GoogleButton label="Login with Google" /></div>
-      <p className="auth-footer">
-        Don&apos;t have an account?{" "}
-        <Link to="/sign-up" className="auth-link">Sign up</Link>
+      <OAuthButtons />
+      <p className="auth-footer-v2">
+        Need to create an account?{" "}
+        <Link to="/sign-up" className="auth-link-v2 auth-link-v2--strong">Sign Up</Link>
       </p>
     </>
   )
@@ -94,11 +93,6 @@ export default function SignIn() {
     return (
       <div className="auth-desktop-center">
         <div className="auth-desktop-card">
-          <div className="auth-desktop-brand">
-            <div className="auth-brand-dot">P</div>
-            <span className="auth-brand-text">Persey</span>
-          </div>
-          <h1 className="auth-title">Sign in</h1>
           {formContent}
         </div>
       </div>
@@ -107,8 +101,7 @@ export default function SignIn() {
 
   return (
     <PhoneFrame>
-      <div className="auth-body auth-body--signin">
-        <h1 className="auth-title">Sign in</h1>
+      <div className="auth-body auth-body--v2">
         {formContent}
       </div>
     </PhoneFrame>

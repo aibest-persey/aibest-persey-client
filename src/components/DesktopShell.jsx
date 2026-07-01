@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Outlet, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
+import { useHasOrganisation } from "../hooks/useHasOrganisation.js"
 import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck, Users, Calendar } from "lucide-react"
 import { AvatarIcon } from "../pages/Profile.jsx"
 import "./DesktopShell.css"
@@ -28,6 +29,7 @@ const ADMIN_NAV_ITEMS = [
 
 export default function DesktopShell() {
   const { user, logout } = useAuth()
+  const { hasOrganisation } = useHasOrganisation()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -70,7 +72,10 @@ export default function DesktopShell() {
     <div className="dsk-layout">
       <header className="dsk-top-navbar">
         <nav className="dsk-nav">
-          {NAV_ITEMS.filter((item) => user?.role !== "admin" || item.path === "/profile").map(({ icon: Icon, label, path }) => (
+          {NAV_ITEMS
+            .filter((item) => user?.role !== "admin" || item.path === "/profile")
+            .filter((item) => item.path !== "/clubs" || hasOrganisation)
+            .map(({ icon: Icon, label, path }) => (
             <button
               key={path}
               className={`dsk-nav-item ${isActive(path) ? "dsk-nav-item--active" : ""}`}
