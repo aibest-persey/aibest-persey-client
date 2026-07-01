@@ -114,6 +114,16 @@ export async function resetPassword(data) {
 }
 
 /**
+ * Build the URL that starts a provider's OAuth redirect flow. Not a fetch — the caller
+ * navigates the browser here directly (e.g. `window.location.assign(getOAuthUrl("google"))`).
+ * @param {"google" | "microsoft" | "apple"} provider
+ * @returns {string}
+ */
+export function getOAuthUrl(provider) {
+  return `${API_BASE}/api/auth/oauth/${provider}`
+}
+
+/**
  * Retrieve the current authenticated user's details.
  * @param {string} token JWT token
  * @returns {Promise<object>}

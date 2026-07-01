@@ -3,6 +3,7 @@ import SignIn from "./pages/SignIn.jsx"
 import SignUp from "./pages/SignUp.jsx"
 import ForgotPassword from "./pages/ForgotPassword.jsx"
 import ResetPassword from "./pages/ResetPassword.jsx"
+import OAuthCallback from "./pages/OAuthCallback.jsx"
 import Home from "./pages/Home.jsx"
 import EventDetails from "./pages/EventDetails.jsx"
 import Profile from "./pages/Profile.jsx"
@@ -97,6 +98,7 @@ export default function App() {
       <Route path="/sign-up" element={<PublicRoute><SignUp /></PublicRoute>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/oauth-callback" element={<OAuthCallback />} />
 
       {/* Authenticated routes: DesktopShell on desktop, bare Outlet on mobile */}
       <Route element={<AppShell />}>

@@ -1,13 +1,34 @@
 import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
+import { getOAuthUrl } from "../services/authService.js"
 
 const PROVIDERS = [
-  { id: "google", label: "Google", icon: GoogleIcon },
-  { id: "microsoft", label: "Microsoft", icon: MicrosoftIcon },
-  { id: "apple", label: "Apple", icon: AppleIcon },
+  { id: "google", label: "Google", icon: GoogleIcon, enabled: true },
+  { id: "microsoft", label: "Microsoft", icon: MicrosoftIcon, enabled: false },
+  { id: "apple", label: "Apple", icon: AppleIcon, enabled: false },
 ]
+
+const OAUTH_ERROR_MESSAGES = {
+  access_denied: "Sign-in was cancelled.",
+  not_configured: "That sign-in option isn't available yet.",
+  invalid_state: "Something went wrong, please try again.",
+  oauth_failed: "Something went wrong, please try again.",
+}
 
 export default function OAuthButtons() {
   const [message, setMessage] = useState("")
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    const oauthError = searchParams.get("oauthError")
+    if (!oauthError) return
+    setMessage(OAUTH_ERROR_MESSAGES[oauthError] ?? "Something went wrong, please try again.")
+    const next = new URLSearchParams(searchParams)
+    next.delete("oauthError")
+    next.delete("provider")
+    setSearchParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (!message) return
@@ -15,16 +36,24 @@ export default function OAuthButtons() {
     return () => clearTimeout(timer)
   }, [message])
 
+  const handleClick = (id, label, enabled) => {
+    if (enabled) {
+      window.location.assign(getOAuthUrl(id))
+      return
+    }
+    setMessage(`${label} sign-in is coming soon.`)
+  }
+
   return (
     <div className="oauth-wrap">
       <div className="oauth-row">
-        {PROVIDERS.map(({ id, label, icon: Icon }) => (
+        {PROVIDERS.map(({ id, label, icon: Icon, enabled }) => (
           <button
             key={id}
             type="button"
             className="oauth-btn"
-            aria-label={`Continue with ${label} (coming soon)`}
-            onClick={() => setMessage(`${label} sign-in is coming soon.`)}
+            aria-label={enabled ? `Continue with ${label}` : `Continue with ${label} (coming soon)`}
+            onClick={() => handleClick(id, label, enabled)}
           >
             <Icon />
           </button>
