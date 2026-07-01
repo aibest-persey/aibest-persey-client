@@ -1,16 +1,46 @@
-# React + Vite
+# Bellboard — Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React frontend for **Bellboard**, a campus events, clubs, and organisations platform. Built by **Team Persey** for AIBEST.
 
-Currently, two official plugins are available:
+This is the client half of a two-repo system — the API lives in [`aibest-persey-service`](../aibest-persey-service), which is also where the full technical documentation lives (architecture, API reference, data model, setup instructions).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+- React 19 + Vite
+- React Router 7
+- React Context for auth/session state (`src/store/AuthContext.jsx`)
+- `qrcode.react` for rendering event ticket QR codes
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Running locally
 
-## Expanding the ESLint configuration
+```sh
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The dev server proxies `/api/*` to `http://localhost:3000` (see `vite.config.js`), so the API from `aibest-persey-service` must be running on port 3000 for the app to work. See [`../aibest-persey-service/docs/SETUP.md`](../aibest-persey-service/docs/SETUP.md) for full local setup of both repos.
+
+## Project structure
+
+```
+src/
+├── pages/        route-level screens (Home, EventDetails, Schedule, Ticket, Clubs, Inbox, Profile,
+│                 OrganiserDashboard, AdminDashboard, auth screens, ...)
+├── components/   shared UI (DesktopShell, PhoneFrame, form controls)
+├── services/     one file per API domain (authService, eventService, clubService, ...)
+├── store/        AuthContext — the only app-wide state
+├── hooks/        useAuth, useIsDesktop, useHasOrganisation
+└── utils/        tokenStorage, validation, etc.
+```
+
+## Other scripts
+
+| Script | Purpose |
+|---|---|
+| `npm run build` | production build to `dist/` |
+| `npm run preview` | preview the production build locally |
+| `npm run lint` | ESLint |
+
+## Full documentation
+
+See [`aibest-persey-service/docs/README.md`](../aibest-persey-service/docs/README.md) for architecture, the full API reference, data model, and setup guide covering both repos.

@@ -1,0 +1,183 @@
+.sched-calendar {
+  padding-top: 4px;
+}
+
+.sched-month-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.sched-month-nav {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #ebedf5;
+  background: #ffffff;
+  color: #111638;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.sched-month-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111638;
+  min-width: 140px;
+  text-align: center;
+}
+
+.sched-weekday-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8px;
+}
+
+.sched-weekday-label {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #9da0b5;
+}
+
+.sched-day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 8px;
+}
+
+.sched-day-cell {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: none;
+  background: #ebedf5;
+  color: #111638;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sched-day-cell--muted {
+  background: transparent;
+  color: #c7c9d6;
+}
+
+.sched-day-cell--has-ticket {
+  background: #ffffff;
+  border: 2px solid #111638;
+  color: #111638;
+}
+
+.sched-day-cell--selected {
+  background: #111638;
+  color: #ffffff;
+}
+
+.sched-list-section {
+  padding-top: 24px;
+}
+
+.sched-list-date {
+  font-size: 13px;
+  font-weight: 700;
+  color: #5669ff;
+  margin: 0 0 14px 0;
+}
+
+.sched-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sched-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ebedf5;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.sched-item--has-ticket {
+  cursor: pointer;
+  border: 1.5px solid #111638;
+}
+
+.sched-item--static {
+  cursor: default;
+}
+
+.sched-item-time {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111638;
+  min-width: 76px;
+  flex-shrink: 0;
+}
+
+.sched-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sched-item-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111638;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sched-item-sub {
+  font-size: 11px;
+  color: #747688;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sched-ticket-pill {
+  flex-shrink: 0;
+  background: #ffffff;
+  color: #111638;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Desktop */
+.sched-desktop-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .sched-desktop-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Specificity fix (same phone-frame reset issue as Home/Clubs) ─── */
+.auth-screen .sched-ticket-pill {
+  color: #111638;
+}

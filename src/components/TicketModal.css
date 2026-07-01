@@ -1,0 +1,92 @@
+.ticket-modal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(17, 22, 56, 0.45);
+  animation: ticket-overlay-in 0.25s ease;
+}
+
+.ticket-modal-overlay--desktop {
+  position: fixed;
+  align-items: center;
+  padding: 24px;
+}
+
+@keyframes ticket-overlay-in {
+  from { background: rgba(17, 22, 56, 0); }
+  to { background: rgba(17, 22, 56, 0.45); }
+}
+
+.ticket-modal-sheet {
+  position: relative;
+  width: 100%;
+  max-height: 88%;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -12px 40px rgba(18, 13, 38, 0.18);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: ticket-sheet-in 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ticket-modal-overlay--desktop .ticket-modal-sheet {
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  border-radius: 24px;
+  animation: ticket-sheet-in-desktop 0.22s ease;
+}
+
+@keyframes ticket-sheet-in {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes ticket-sheet-in-desktop {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.ticket-modal-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e2e5f1;
+  margin: 10px auto 0 auto;
+  flex-shrink: 0;
+}
+
+.ticket-modal-overlay--desktop .ticket-modal-handle {
+  display: none;
+}
+
+.ticket-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #111638;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.ticket-modal-scroll {
+  overflow-y: auto;
+  padding: 16px 20px 28px 20px;
+}
+
+.ticket-modal-scroll .ticket-banner {
+  margin-top: 4px;
+}

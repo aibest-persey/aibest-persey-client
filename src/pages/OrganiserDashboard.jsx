@@ -48,7 +48,7 @@ export default function OrganiserDashboard() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   // Event creation form
-  const [form, setForm] = useState({ title: "", description: "", location: "", date: "", maxCapacity: "" })
+  const [form, setForm] = useState({ title: "", description: "", agenda: "", location: "", date: "", maxCapacity: "" })
   const [fieldErrors, setFieldErrors] = useState({})
   const [createLoading, setCreateLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
@@ -188,12 +188,13 @@ export default function OrganiserDashboard() {
       await createEvent(token, {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
+        agenda: form.agenda.trim() || undefined,
         location: form.location.trim(),
         date: new Date(form.date).toISOString(),
         maxCapacity: form.maxCapacity ? parseInt(form.maxCapacity, 10) : undefined,
       })
       setSuccessMsg("Event created!")
-      setForm({ title: "", description: "", location: "", date: "", maxCapacity: "" })
+      setForm({ title: "", description: "", agenda: "", location: "", date: "", maxCapacity: "" })
       loadEvents()
       setTimeout(() => { setIsModalOpen(false); setSuccessMsg("") }, 1400)
     } catch (err) {
@@ -522,6 +523,17 @@ export default function OrganiserDashboard() {
                     className="org-textarea"
                     placeholder="Description (optional)"
                     value={form.description}
+                    onChange={updateForm}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="org-form-field">
+                  <textarea
+                    name="agenda"
+                    className="org-textarea"
+                    placeholder={"Agenda (optional) — one item per line, e.g.\n11:00 – 11:30 – Opening"}
+                    value={form.agenda}
                     onChange={updateForm}
                     rows={3}
                   />

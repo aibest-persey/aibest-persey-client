@@ -1,0 +1,146 @@
+.ticket-page {
+  max-width: 480px;
+}
+
+.ticket-banner {
+  height: 170px;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.ticket-banner-shape {
+  position: absolute;
+  bottom: -30px;
+  left: -30px;
+  width: 140px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(45deg);
+}
+
+.ticket-organiser-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ticket-organiser-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ebedf5;
+  color: #5669ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ticket-organiser-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111638;
+}
+
+.ticket-organiser-label {
+  font-size: 11px;
+  color: #9da0b5;
+}
+
+.ticket-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.ticket-info-icon {
+  color: #111638;
+  flex-shrink: 0;
+}
+
+.ticket-info-label {
+  color: #747688;
+  font-weight: 600;
+}
+
+.ticket-info-value {
+  color: #111638;
+  font-weight: 700;
+}
+
+.ticket-event-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #111638;
+  margin: 18px 0 10px 0;
+}
+
+.ticket-event-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #747688;
+  margin: 0 0 20px 0;
+}
+
+.ticket-agenda {
+  margin-bottom: 24px;
+}
+
+.ticket-agenda-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111638;
+  margin: 0 0 10px 0;
+}
+
+.ticket-agenda-line {
+  font-size: 12px;
+  color: #747688;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.ticket-code-heading {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111638;
+  margin: 8px 0 20px 0;
+}
+
+.ticket-qr-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #ebedf5;
+  border-radius: 16px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.ticket-holder-name {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111638;
+  margin: 16px 0 2px 0;
+}
+
+.ticket-code-value {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9da0b5;
+  letter-spacing: 0.05em;
+  margin: 0 0 24px 0;
+  word-break: break-all;
+}
