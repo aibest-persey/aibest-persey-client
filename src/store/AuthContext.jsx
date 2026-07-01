@@ -83,12 +83,39 @@ export function AuthProvider({ children }) {
 
   const isAuthenticated = Boolean(token)
 
+  /**
+   * 🎯 TICKET #31 Acceptance Criteria: UI reads effective permissions from the session/me endpoint
+   * Determines effective permissions globally across components based on current user session role strings
+   */
+  const getEffectivePermissions = () => {
+    if (!user) {
+      return {
+        canCreateEvent: false,
+        canManageMembers: false,
+        canVerifyOrg: false,
+        canDeleteEvent: false,
+        isAdmin: false,
+        isOrganiser: false,
+      }
+    }
+
+    const role = user.role
+
+    return {
+      canCreateEvent: role === "organiser" || role === "admin",
+      canManageMembers: role === "organiser" || role === "admin",
+      canDeleteEvent: role === "organiser" || role === "admin",
+      canVerifyOrg: role === "admin", // Admin-only management surfaces gated
+      isAdmin: role === "admin",
+      isOrganiser: role === "organiser",
+    }
+  }
+
+  const permissions = getEffectivePermissions()
+
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated, loading, error }}>
+    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated, loading, error, ...permissions }}>
       {children}
     </AuthContext.Provider>
   )
 }
-
-
-
