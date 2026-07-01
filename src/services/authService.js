@@ -98,4 +98,29 @@ export async function updateUserProfile(token, data) {
   return json
 }
 
+/**
+ * 🎯 TICKET #34 Acceptance Criteria: Language switcher persists choice to user profile (User.locale)
+ * Update the current user's locale and notification toggle configurations on the backend.
+ * @param {string} token JWT token
+ * @param {string} locale e.g., 'en' or 'bg'
+ * @param {{ emailAlerts: boolean, pushAlerts: boolean }} preferences
+ * @returns {Promise<object>}
+ */
+export async function updateUserProfilePreferences(token, locale, preferences) {
+  const response = await fetch(`${API_BASE}/api/auth/profile/preferences`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ locale, preferences }),
+  })
 
+  const json = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(json.message ?? "Failed to synchronize profile preferences.")
+  }
+
+  return json
+}
