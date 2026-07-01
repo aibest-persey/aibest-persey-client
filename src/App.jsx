@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard.jsx"
 import Inbox from "./pages/Inbox.jsx"
 import Clubs from "./pages/Clubs.jsx"
 import Schedule from "./pages/Schedule.jsx"
+import ClubDetail from "./pages/ClubDetail.jsx"
 import Ticket from "./pages/Ticket.jsx"
 import Unauthorized from "./pages/Unauthorized.jsx"
 import DesktopShell from "./components/DesktopShell.jsx"
@@ -104,6 +105,7 @@ export default function App() {
       <Route element={<AppShell />}>
         <Route path="/home" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Home /></ProtectedRoute>} />
         <Route path="/clubs" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><OrgMemberRoute><Clubs /></OrgMemberRoute></ProtectedRoute>} />
+        <Route path="/clubs/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><OrgMemberRoute><ClubDetail /></OrgMemberRoute></ProtectedRoute>} />
         <Route path="/schedule" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Schedule /></ProtectedRoute>} />
         <Route path="/events/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><EventDetails /></ProtectedRoute>} />
         <Route path="/events/:id/ticket" element={<ProtectedRoute allowedRoles={["student"]}><Ticket /></ProtectedRoute>} />

@@ -18,6 +18,7 @@ export const listEvents = (token, params = {}) => {
   const q = new URLSearchParams()
   if (params.upcoming) q.set("upcoming", "true")
   if (params.status) q.set("status", params.status)
+  if (params.clubId) q.set("clubId", params.clubId)
   const qs = q.toString() ? `?${q}` : ""
   return handle(fetch(`${API_BASE}/api/events${qs}`, { headers: authHeaders(token) }))
 }

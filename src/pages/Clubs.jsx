@@ -57,14 +57,14 @@ export default function Clubs() {
     setError("")
     try {
       if (club.isMember) {
-        await leaveClub(token, club.id)
+        const res = await leaveClub(token, club.id)
         setClubs((prev) => prev.map((c) => (
-          c.id === club.id ? { ...c, isMember: false, memberCount: Math.max(0, c.memberCount - 1) } : c
+          c.id === club.id ? { ...c, isMember: false, memberCount: res.memberCount } : c
         )))
       } else {
-        await joinClub(token, club.id)
+        const res = await joinClub(token, club.id)
         setClubs((prev) => prev.map((c) => (
-          c.id === club.id ? { ...c, isMember: true, memberCount: c.memberCount + 1 } : c
+          c.id === club.id ? { ...c, isMember: true, memberCount: res.memberCount } : c
         )))
       }
     } catch (err) {
@@ -107,7 +107,12 @@ export default function Clubs() {
   ) : (
     <div className="club-list-grid">
       {filteredClubs.map((club) => (
-        <div key={club.id} className="club-list-card">
+        <div
+          key={club.id}
+          className="club-list-card"
+          onClick={() => navigate(`/clubs/${club.id}`)}
+          style={{ cursor: "pointer" }}
+        >
           <div className="club-list-avatar" style={{ background: getTileColor(club.id) }}>
             {getInitials(club.name)}
           </div>
@@ -119,7 +124,7 @@ export default function Clubs() {
           <button
             className={`club-list-join-btn ${club.isMember ? "club-list-join-btn--joined" : ""}`}
             disabled={busyId === club.id}
-            onClick={() => handleToggleMembership(club)}
+            onClick={(e) => { e.stopPropagation(); handleToggleMembership(club) }}
           >
             {busyId === club.id ? "..." : club.isMember ? "Leave" : "Join"}
           </button>

@@ -1,0 +1,269 @@
+.clubdetail-page {
+  max-width: 560px;
+}
+
+.clubdetail-banner {
+  height: 120px;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.clubdetail-banner-shape {
+  position: absolute;
+  bottom: -30px;
+  left: -30px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(45deg);
+}
+
+.clubdetail-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.clubdetail-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.clubdetail-header-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clubdetail-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111638;
+  margin: 0;
+}
+
+.clubdetail-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #747688;
+}
+
+.clubdetail-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #747688;
+  margin: 0 0 20px 0;
+}
+
+.clubdetail-error {
+  margin: 0 0 16px 0;
+  padding: 12px 16px;
+  background: #fff0f0;
+  border: 1px solid #ffd0d0;
+  border-radius: 12px;
+  color: #c0392b;
+  font-size: 13px;
+}
+
+.clubdetail-section {
+  margin-bottom: 28px;
+}
+
+.clubdetail-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.clubdetail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111638;
+  margin: 0;
+}
+
+.clubdetail-new-btn {
+  background: #111638;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clubdetail-new-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.clubdetail-hint {
+  font-size: 12px;
+  color: #9da0b5;
+  margin: 0 0 10px 0;
+}
+
+.clubdetail-empty-text {
+  font-size: 13px;
+  color: #9da0b5;
+  margin: 0;
+}
+
+/* Forms */
+.clubdetail-post-form,
+.clubdetail-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f6f7fb;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.clubdetail-post-textarea,
+.clubdetail-input {
+  width: 100%;
+  border: 1px solid #e2e5f1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #111638;
+  background: #ffffff;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.clubdetail-form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.clubdetail-input-label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #747688;
+}
+
+.clubdetail-form-error {
+  font-size: 12px;
+  color: #c0392b;
+}
+
+/* Feed / news cards */
+.clubdetail-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clubdetail-feed-card {
+  display: flex;
+  gap: 10px;
+  background: #f6f7fb;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.clubdetail-feed-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.clubdetail-feed-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clubdetail-feed-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #9da0b5;
+}
+
+.clubdetail-feed-author {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111638;
+  flex: 1;
+}
+
+.clubdetail-feed-time {
+  font-size: 11px;
+  color: #9da0b5;
+  white-space: nowrap;
+}
+
+.clubdetail-feed-content {
+  font-size: 13px;
+  color: #3a3d52;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Event cards */
+.clubdetail-event-card {
+  background: #f6f7fb;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.clubdetail-event-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clubdetail-event-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111638;
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .clubdetail-page {
+    max-width: 640px;
+  }
+}

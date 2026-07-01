@@ -14,20 +14,18 @@ async function handle(promise) {
   return json
 }
 
-export const listClubs = (token) =>
-  handle(fetch(`${API_BASE}/api/clubs`, { headers: authHeaders(token) }))
+export const listPosts = (token, clubId) =>
+  handle(fetch(`${API_BASE}/api/posts?clubId=${clubId}`, { headers: authHeaders(token) }))
 
-export const getClub = (token, id) =>
-  handle(fetch(`${API_BASE}/api/clubs/${id}`, { headers: authHeaders(token) }))
-
-export const joinClub = (token, id) =>
-  handle(fetch(`${API_BASE}/api/clubs/${id}/join`, {
+export const createPost = (token, { clubId, content }) =>
+  handle(fetch(`${API_BASE}/api/posts`, {
     method: "POST",
     headers: authHeaders(token),
+    body: JSON.stringify({ clubId, content }),
   }))
 
-export const leaveClub = (token, id) =>
-  handle(fetch(`${API_BASE}/api/clubs/${id}/join`, {
+export const deletePost = (token, id) =>
+  handle(fetch(`${API_BASE}/api/posts/${id}`, {
     method: "DELETE",
     headers: authHeaders(token),
   }))
