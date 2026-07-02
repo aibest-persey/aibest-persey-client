@@ -4,13 +4,15 @@ import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
 import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
-import { getClub, joinClub, leaveClub } from "../services/clubService.js"
+import { getClub, joinClub, leaveClub, updateClub } from "../services/clubService.js"
 import { listPosts, createPost } from "../services/postService.js"
 import { listEvents, createEvent } from "../services/eventService.js"
 import { listNews } from "../services/newsService.js"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
 import { canPostInClub, canManageClub as canManageClubRole, canCreateClubEvent } from "../utils/permissions.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
+import ImageUploadField from "../components/ImageUploadField.jsx"
+import { resolveImageUrl } from "../services/uploadService.js"
 import {
   Bell, Users, MessageSquare, Calendar, Megaphone, MapPin, Clock,
   User, SlidersHorizontal, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
@@ -44,7 +46,7 @@ function formatEventDateTime(isoStr) {
   } catch { return { date: "--", time: "" } }
 }
 
-const EMPTY_EVENT_FORM = { title: "", description: "", location: "", start: "", end: "", capacity: "", kind: "event" }
+const EMPTY_EVENT_FORM = { title: "", description: "", location: "", start: "", end: "", capacity: "", kind: "event", coverImage: null }
 
 export default function ClubDetail() {
   const { id } = useParams()
@@ -78,6 +80,11 @@ export default function ClubDetail() {
   const [eventBusy, setEventBusy] = useState(false)
   const [eventError, setEventError] = useState("")
   const [feedLoadError, setFeedLoadError] = useState("")
+
+  const [showEditClubForm, setShowEditClubForm] = useState(false)
+  const [editClubForm, setEditClubForm] = useState({ name: "", description: "", logoUrl: null, bannerUrl: null })
+  const [editClubBusy, setEditClubBusy] = useState(false)
+  const [editClubError, setEditClubError] = useState("")
 
   const loadAll = useCallback(() => {
     if (!token || !id) return
@@ -153,6 +160,7 @@ export default function ClubDetail() {
         end: eventForm.end ? new Date(eventForm.end).toISOString() : undefined,
         capacity: eventForm.capacity ? Number(eventForm.capacity) : undefined,
         kind: eventForm.kind,
+        coverImage: eventForm.coverImage || undefined,
         ownerScope: "club",
         clubId: id,
       })
@@ -163,6 +171,33 @@ export default function ClubDetail() {
       setEventError(getErrorMessage(err, "Failed to create event."))
     } finally {
       setEventBusy(false)
+    }
+  }
+
+  const startEditClub = () => {
+    setEditClubForm({ name: club.name, description: club.description ?? "", logoUrl: club.logoUrl ?? null, bannerUrl: club.bannerUrl ?? null })
+    setEditClubError("")
+    setShowEditClubForm(true)
+  }
+
+  const handleSaveClubEdit = async (e) => {
+    e.preventDefault()
+    if (!editClubForm.name.trim() || editClubBusy) return
+    setEditClubBusy(true)
+    setEditClubError("")
+    try {
+      const updated = await updateClub(token, id, {
+        name: editClubForm.name.trim(),
+        description: editClubForm.description.trim() || null,
+        logoUrl: editClubForm.logoUrl,
+        bannerUrl: editClubForm.bannerUrl,
+      })
+      setClub((c) => ({ ...c, ...updated }))
+      setShowEditClubForm(false)
+    } catch (err) {
+      setEditClubError(getErrorMessage(err, "Failed to update club."))
+    } finally {
+      setEditClubBusy(false)
     }
   }
 
@@ -255,18 +290,31 @@ export default function ClubDetail() {
 
   const topBlock = !club ? null : (
     <>
-      <div className="clubdetail-banner" style={{ background: getGradient(club.id) }}>
-        <div className="clubdetail-banner-shape" />
+      <div
+        className="clubdetail-banner"
+        style={club.bannerUrl
+          ? { backgroundImage: `url(${resolveImageUrl(club.bannerUrl)})`, backgroundSize: "cover", backgroundPosition: "center" }
+          : { background: getGradient(club.id) }}
+      >
+        {!club.bannerUrl && <div className="clubdetail-banner-shape" />}
       </div>
 
       <div className="clubdetail-header-row">
-        <div className="clubdetail-avatar" style={{ background: getTileColor(club.id) }}>
-          {getInitials(club.name)}
+        <div
+          className="clubdetail-avatar"
+          style={club.logoUrl
+            ? { backgroundImage: `url(${resolveImageUrl(club.logoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" }
+            : { background: getTileColor(club.id) }}
+        >
+          {!club.logoUrl && getInitials(club.name)}
         </div>
         <div className="clubdetail-header-info">
           <h2 className="clubdetail-name">{club.name}</h2>
           <span className="clubdetail-meta"><Users size={13} /> {club.memberCount} member{club.memberCount === 1 ? "" : "s"}</span>
         </div>
+        {canManageClub && (
+          <button type="button" className="clubdetail-edit-btn" onClick={startEditClub}>Edit</button>
+        )}
         <button
           className={`club-list-join-btn ${club.isMember ? "club-list-join-btn--joined" : ""}`}
           disabled={membershipBusy}
@@ -278,6 +326,38 @@ export default function ClubDetail() {
 
       {club.description && <p className="clubdetail-desc">{club.description}</p>}
       {error && <div className="clubdetail-error">{error}</div>}
+
+      {showEditClubForm && (
+        <form className="clubdetail-event-form" onSubmit={handleSaveClubEdit}>
+          <div style={{ display: "flex", gap: 16 }}>
+            <ImageUploadField shape="circle" label="Logo" value={editClubForm.logoUrl} onChange={(url) => setEditClubForm((f) => ({ ...f, logoUrl: url }))} />
+            <div style={{ flex: 1 }}>
+              <ImageUploadField shape="banner" label="Banner" value={editClubForm.bannerUrl} onChange={(url) => setEditClubForm((f) => ({ ...f, bannerUrl: url }))} />
+            </div>
+          </div>
+          <input
+            className="clubdetail-input"
+            placeholder="Club name"
+            value={editClubForm.name}
+            onChange={(e) => setEditClubForm((f) => ({ ...f, name: e.target.value }))}
+            required
+          />
+          <textarea
+            className="clubdetail-post-textarea"
+            placeholder="Description (optional)"
+            rows={2}
+            value={editClubForm.description}
+            onChange={(e) => setEditClubForm((f) => ({ ...f, description: e.target.value }))}
+          />
+          {editClubError && <div className="clubdetail-form-error">{editClubError}</div>}
+          <div className="clubdetail-form-row">
+            <button type="button" className="clubdetail-new-btn" style={{ background: "#e2e5f1", color: "#747688" }} onClick={() => setShowEditClubForm(false)}>Cancel</button>
+            <button type="submit" className="clubdetail-new-btn" disabled={editClubBusy}>
+              {editClubBusy ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </form>
+      )}
     </>
   )
 
@@ -355,6 +435,12 @@ export default function ClubDetail() {
 
         {showEventForm && (
           <form className="clubdetail-event-form" onSubmit={handleCreateEvent}>
+            <ImageUploadField
+              shape="banner"
+              label="Event banner (optional)"
+              value={eventForm.coverImage}
+              onChange={(url) => setEventForm((f) => ({ ...f, coverImage: url }))}
+            />
             <select
               className="clubdetail-input"
               value={eventForm.kind}

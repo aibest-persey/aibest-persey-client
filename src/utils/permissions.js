@@ -23,10 +23,22 @@ export function canAccessOrganiserDashboard(user) {
   return isOrganiser(user)
 }
 
+// Shared by club and organisation membership roles — both use the same
+// "owner" | "manager" | "member" enum server-side.
+function isOwnerOrManager(myRole) {
+  return myRole === "owner" || myRole === "manager"
+}
+
 // club is a club-membership role ("owner" | "manager" | "member" | null),
 // distinct from the account-wide user.role — see ClubDetail.jsx's getClub().
 export function canManageClub(clubMyRole) {
-  return clubMyRole === "owner" || clubMyRole === "manager"
+  return isOwnerOrManager(clubMyRole)
+}
+
+// org is an organisation-membership role, same shape as clubMyRole above —
+// see OrganiserDashboard.jsx's listOrganisations()/myRole field.
+export function canManageOrganisation(orgMyRole) {
+  return isOwnerOrManager(orgMyRole)
 }
 
 export function canPostInClub(clubMyRole) {

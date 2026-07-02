@@ -7,6 +7,7 @@ import PhoneFrame from "../components/PhoneFrame.jsx"
 import { listClubs, createClub } from "../services/clubService.js"
 import { listOrganisations } from "../services/organisationService.js"
 import { getTileColor } from "../utils/colorTiles.js"
+import { resolveImageUrl } from "../services/uploadService.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
 import {
   Bell, Search, Plus,
@@ -176,8 +177,13 @@ export default function Clubs() {
           )}
           {filteredClubs.map((club) => (
             <button key={club.id} className="club-tile" onClick={() => navigate(`/clubs/${club.id}`)}>
-              <div className="club-tile-avatar" style={{ background: getTileColor(club.id) }}>
-                {getInitials(club.name)}
+              <div
+                className="club-tile-avatar"
+                style={club.logoUrl
+                  ? { backgroundImage: `url(${resolveImageUrl(club.logoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" }
+                  : { background: getTileColor(club.id) }}
+              >
+                {!club.logoUrl && getInitials(club.name)}
               </div>
               <span className="club-tile-name">{club.name}</span>
               {club.description && <span className="club-tile-desc">{club.description}</span>}

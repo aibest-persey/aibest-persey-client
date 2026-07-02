@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
 import { updateUserProfile } from "../services/authService.js"
+import { uploadImage, resolveImageUrl } from "../services/uploadService.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Profile.css"
 
@@ -58,6 +59,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
   })
 
   const [toastMessage, setToastMessage] = useState("")
+  const [avatarUploading, setAvatarUploading] = useState(false)
 
   const fileInputRef = useRef(null)
 
@@ -163,14 +165,18 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
     setIsEditing(false)
   }
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setEditForm((prev) => ({ ...prev, avatar: reader.result }))
-      }
-      reader.readAsDataURL(file)
+    e.target.value = ""
+    if (!file || !token) return
+    setAvatarUploading(true)
+    try {
+      const { url } = await uploadImage(token, file)
+      setEditForm((prev) => ({ ...prev, avatar: url }))
+    } catch (err) {
+      showToast(err.message ?? "Photo upload failed.")
+    } finally {
+      setAvatarUploading(false)
     }
   }
 
@@ -251,19 +257,19 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                 >
                   {isEditing ? (
                     editForm.avatar ? (
-                      <img src={editForm.avatar} alt="Profile Preview" className="profile-avatar-img" />
+                      <img src={resolveImageUrl(editForm.avatar)} alt="Profile Preview" className="profile-avatar-img" />
                     ) : (
                       <AvatarIcon />
                     )
                   ) : activeProfile.avatar ? (
-                    <img src={activeProfile.avatar} alt="Profile" className="profile-avatar-img" />
+                    <img src={resolveImageUrl(activeProfile.avatar)} alt="Profile" className="profile-avatar-img" />
                   ) : (
                     <AvatarIcon />
                   )}
                   {isEditing && (
                     <div className="profile-avatar-overlay">
                       <Camera size={22} color="#ffffff" />
-                      <span className="profile-avatar-overlay-text">Edit Photo</span>
+                      <span className="profile-avatar-overlay-text">{avatarUploading ? "Uploading..." : "Edit Photo"}</span>
                     </div>
                   )}
                 </div>
@@ -456,12 +462,12 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
             >
               {isEditing ? (
                 editForm.avatar ? (
-                  <img src={editForm.avatar} alt="Profile Preview" className="profile-avatar-img" />
+                  <img src={resolveImageUrl(editForm.avatar)} alt="Profile Preview" className="profile-avatar-img" />
                 ) : (
                   <AvatarIcon />
                 )
               ) : activeProfile.avatar ? (
-                <img src={activeProfile.avatar} alt="Profile" className="profile-avatar-img" />
+                <img src={resolveImageUrl(activeProfile.avatar)} alt="Profile" className="profile-avatar-img" />
               ) : (
                 <AvatarIcon />
               )}

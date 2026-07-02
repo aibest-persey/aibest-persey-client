@@ -13,6 +13,13 @@ export const createOrganisation = (token, data) =>
     body: JSON.stringify(data),
   }))
 
+export const updateOrganisation = (token, id, data) =>
+  handle(fetch(`${API_BASE}/api/organisations/${id}`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  }))
+
 export const requestToJoinOrganisation = (token, orgId) =>
   handle(fetch(`${API_BASE}/api/organisations/${orgId}/join-requests`, {
     method: "POST",

@@ -15,10 +15,12 @@ import TextField from "../components/TextField.jsx"
 import PrimaryButton from "../components/PrimaryButton.jsx"
 import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../services/roleRequestService.js"
 import {
-  listOrganisations, createOrganisation, listOrgJoinRequests, approveJoinRequest, rejectJoinRequest,
+  listOrganisations, createOrganisation, updateOrganisation, listOrgJoinRequests, approveJoinRequest, rejectJoinRequest,
 } from "../services/organisationService.js"
-import { canAccessOrganiserDashboard } from "../utils/permissions.js"
+import { canAccessOrganiserDashboard, canManageOrganisation } from "../utils/permissions.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
+import ImageUploadField from "../components/ImageUploadField.jsx"
+import { resolveImageUrl } from "../services/uploadService.js"
 import "./OrganiserDashboard.css"
 
 export default function OrganiserDashboard() {
@@ -45,13 +47,16 @@ export default function OrganiserDashboard() {
   const [orgFieldErrors, setOrgFieldErrors] = useState({})
   const [orgCreateLoading, setOrgCreateLoading] = useState(false)
   const [orgMsg, setOrgMsg] = useState("")
+  const [editingOrgId, setEditingOrgId] = useState(null)
+  const [editOrgForm, setEditOrgForm] = useState({ name: "", description: "", logoUrl: null, bannerUrl: null })
+  const [editOrgLoading, setEditOrgLoading] = useState(false)
 
   // Per-card action state
   const [actionLoadingId, setActionLoadingId] = useState(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   // Event creation form
-  const [form, setForm] = useState({ title: "", description: "", agenda: "", location: "", date: "", maxCapacity: "" })
+  const [form, setForm] = useState({ title: "", description: "", agenda: "", location: "", start: "", end: "", maxCapacity: "", coverImage: null })
   const [fieldErrors, setFieldErrors] = useState({})
   const [createLoading, setCreateLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
@@ -140,6 +145,34 @@ export default function OrganiserDashboard() {
     }
   }
 
+  const startEditOrg = (org) => {
+    setEditingOrgId(org.id)
+    setEditOrgForm({ name: org.name, description: org.description ?? "", logoUrl: org.logoUrl ?? null, bannerUrl: org.bannerUrl ?? null })
+    setOrgMsg("")
+  }
+
+  const handleSaveOrgEdit = async (e) => {
+    e.preventDefault()
+    if (!editOrgForm.name.trim()) { setOrgMsg("Name is required"); return }
+    setEditOrgLoading(true)
+    setOrgMsg("")
+    try {
+      await updateOrganisation(token, editingOrgId, {
+        name: editOrgForm.name.trim(),
+        description: editOrgForm.description.trim() || null,
+        logoUrl: editOrgForm.logoUrl,
+        bannerUrl: editOrgForm.bannerUrl,
+      })
+      setOrgMsg("Organisation updated.")
+      setEditingOrgId(null)
+      loadOrganisations()
+    } catch (err) {
+      setOrgMsg(getErrorMessage(err))
+    } finally {
+      setEditOrgLoading(false)
+    }
+  }
+
   const handleApproveJoin = async (orgId, reqId) => {
     setOrgActionId(reqId)
     try {
@@ -174,7 +207,11 @@ export default function OrganiserDashboard() {
     const errors = {}
     if (!form.title.trim()) errors.title = "Title is required"
     if (!form.location.trim()) errors.location = "Location is required"
-    if (!form.date) errors.date = "Date and time are required"
+    if (!form.start) errors.start = "Start date and time are required"
+    if (!form.end) errors.end = "End date and time are required"
+    if (form.start && form.end && new Date(form.end) <= new Date(form.start)) {
+      errors.end = "End must be after start"
+    }
     if (form.maxCapacity && (isNaN(+form.maxCapacity) || +form.maxCapacity < 1))
       errors.maxCapacity = "Must be a positive number"
     return errors
@@ -193,11 +230,13 @@ export default function OrganiserDashboard() {
         description: form.description.trim() || undefined,
         agenda: form.agenda.trim() || undefined,
         location: form.location.trim(),
-        date: new Date(form.date).toISOString(),
+        start: new Date(form.start).toISOString(),
+        end: new Date(form.end).toISOString(),
         maxCapacity: form.maxCapacity ? parseInt(form.maxCapacity, 10) : undefined,
+        coverImage: form.coverImage || undefined,
       })
       setSuccessMsg("Event created!")
-      setForm({ title: "", description: "", agenda: "", location: "", date: "", maxCapacity: "" })
+      setForm({ title: "", description: "", agenda: "", location: "", start: "", end: "", maxCapacity: "", coverImage: null })
       loadEvents()
       setTimeout(() => { setIsModalOpen(false); setSuccessMsg("") }, 1400)
     } catch (err) {
@@ -337,14 +376,47 @@ export default function OrganiserDashboard() {
               {myOrgs.map((org) => (
                 <div key={org.id} style={{ marginBottom: 16 }}>
                   <div className="org-req-card" style={{ marginBottom: (orgJoinRequests[org.id]?.length ?? 0) > 0 ? 8 : 0 }}>
-                    <div className="org-req-avatar" style={{ background: "#5669ff" }}>
-                      {org.name.charAt(0).toUpperCase()}
+                    <div
+                      className="org-req-avatar"
+                      style={org.logoUrl ? { backgroundImage: `url(${resolveImageUrl(org.logoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: "#5669ff" }}
+                    >
+                      {!org.logoUrl && org.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="org-req-body">
                       <div className="org-req-name">{org.name}</div>
                       <span className={`org-req-status org-req-status--${org.status === "verified" ? "approved" : "pending"}`}>{org.status}</span>
                     </div>
+                    {canManageOrganisation(org.myRole) && (
+                      <button type="button" className="org-req-edit-btn" onClick={() => startEditOrg(org)}>Edit</button>
+                    )}
                   </div>
+
+                  {editingOrgId === org.id && (
+                    <form onSubmit={handleSaveOrgEdit} className="org-modal-form" style={{ margin: "8px 0 16px 0", padding: 14, background: "#f6f7fb", borderRadius: 14 }}>
+                      <div style={{ display: "flex", gap: 16 }}>
+                        <ImageUploadField shape="circle" label="Logo" value={editOrgForm.logoUrl} onChange={(url) => setEditOrgForm((f) => ({ ...f, logoUrl: url }))} />
+                        <div style={{ flex: 1 }}>
+                          <ImageUploadField shape="banner" label="Banner" value={editOrgForm.bannerUrl} onChange={(url) => setEditOrgForm((f) => ({ ...f, bannerUrl: url }))} />
+                        </div>
+                      </div>
+                      <TextField icon={Building2} name="name" placeholder="Organisation name" value={editOrgForm.name}
+                        onChange={(e) => setEditOrgForm((f) => ({ ...f, name: e.target.value }))} />
+                      <div className="org-form-field">
+                        <textarea
+                          className="org-textarea"
+                          placeholder="Description (optional)"
+                          rows={2}
+                          value={editOrgForm.description}
+                          onChange={(e) => setEditOrgForm((f) => ({ ...f, description: e.target.value }))}
+                        />
+                      </div>
+                      <div className="org-form-action" style={{ display: "flex", gap: 10 }}>
+                        <button type="button" className="org-action-btn org-action-btn--secondary" onClick={() => setEditingOrgId(null)}>Cancel</button>
+                        <PrimaryButton type="submit" loading={editOrgLoading}>Save</PrimaryButton>
+                      </div>
+                    </form>
+                  )}
+
                   {(orgJoinRequests[org.id] ?? []).map((r) => (
                     <div key={r.id} className="org-req-card" style={{ marginLeft: 20 }}>
                       <div className="org-req-avatar" style={{ background: r.student?.color || "#5669ff" }}>
@@ -522,6 +594,13 @@ export default function OrganiserDashboard() {
                   <div className="org-banner org-banner--error" role="alert">{error}</div>
                 )}
 
+                <ImageUploadField
+                  shape="banner"
+                  label="Event banner (optional)"
+                  value={form.coverImage}
+                  onChange={(url) => setForm((f) => ({ ...f, coverImage: url }))}
+                />
+
                 <TextField icon={FileText} name="title" placeholder="Event Title" value={form.title} onChange={updateForm} error={fieldErrors.title} />
 
                 <div className="org-form-field">
@@ -548,18 +627,35 @@ export default function OrganiserDashboard() {
 
                 <TextField icon={MapPin} name="location" placeholder="Location / Venue" value={form.location} onChange={updateForm} error={fieldErrors.location} />
 
-                <div className="org-form-field">
-                  <div className="org-datetime-input-wrapper">
-                    <Calendar className="org-datetime-icon" size={20} />
-                    <input
-                      type="datetime-local"
-                      name="date"
-                      className={`org-datetime-input ${fieldErrors.date ? "org-datetime-input--error" : ""}`}
-                      value={form.date}
-                      onChange={updateForm}
-                    />
+                <div className="org-form-row">
+                  <div className="org-form-field">
+                    <div className="org-datetime-input-wrapper">
+                      <Calendar className="org-datetime-icon" size={20} />
+                      <input
+                        type="datetime-local"
+                        name="start"
+                        aria-label="Start date and time"
+                        className={`org-datetime-input ${fieldErrors.start ? "org-datetime-input--error" : ""}`}
+                        value={form.start}
+                        onChange={updateForm}
+                      />
+                    </div>
+                    {fieldErrors.start && <span className="field__error" style={{ marginTop: 4, display: "block" }}>{fieldErrors.start}</span>}
                   </div>
-                  {fieldErrors.date && <span className="field__error" style={{ marginTop: 4, display: "block" }}>{fieldErrors.date}</span>}
+                  <div className="org-form-field">
+                    <div className="org-datetime-input-wrapper">
+                      <Calendar className="org-datetime-icon" size={20} />
+                      <input
+                        type="datetime-local"
+                        name="end"
+                        aria-label="End date and time"
+                        className={`org-datetime-input ${fieldErrors.end ? "org-datetime-input--error" : ""}`}
+                        value={form.end}
+                        onChange={updateForm}
+                      />
+                    </div>
+                    {fieldErrors.end && <span className="field__error" style={{ marginTop: 4, display: "block" }}>{fieldErrors.end}</span>}
+                  </div>
                 </div>
 
                 <TextField icon={Users} name="maxCapacity" placeholder="Max Capacity (optional)" value={form.maxCapacity} onChange={updateForm} error={fieldErrors.maxCapacity} />

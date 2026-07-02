@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
+import { resolveImageUrl } from "../services/uploadService.js"
 import "./Home.css"
 
 function getInitials(name) {
@@ -239,10 +240,12 @@ export default function Home() {
             key={club.id}
             className="m2-club-avatar"
             title={club.name}
-            style={{ background: getTileColor(club.id) }}
+            style={club.logoUrl
+              ? { backgroundImage: `url(${resolveImageUrl(club.logoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" }
+              : { background: getTileColor(club.id) }}
             onClick={() => navigate("/clubs")}
           >
-            {getInitials(club.name)}
+            {!club.logoUrl && getInitials(club.name)}
           </button>
         ))}
       </div>

@@ -325,6 +325,16 @@
   width: 100%;
 }
 
+.org-form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.org-form-row .org-form-field {
+  flex: 1;
+  min-width: 0;
+}
+
 .org-textarea {
   width: 100%;
   border: 1.5px solid #e2e5f1;
@@ -691,3 +701,16 @@
 }
 .org-req-btn--approve { background: #e6f9f0; color: #1a9e5c; }
 .org-req-btn--reject  { background: #fff0f0; color: #f0635a; }
+
+.org-req-edit-btn {
+  flex-shrink: 0;
+  align-self: center;
+  background: #eef0ff;
+  color: #5669ff;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -13,6 +13,13 @@ export const createClub = (token, data) =>
     body: JSON.stringify(data),
   }))
 
+export const updateClub = (token, id, data) =>
+  handle(fetch(`${API_BASE}/api/clubs/${id}`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  }))
+
 export const joinClub = (token, id) =>
   handle(fetch(`${API_BASE}/api/clubs/${id}/join`, {
     method: "POST",

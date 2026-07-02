@@ -112,6 +112,18 @@
   cursor: pointer;
 }
 
+.clubdetail-edit-btn {
+  flex-shrink: 0;
+  background: #eef0ff;
+  color: #5669ff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .clubdetail-new-btn:disabled {
   opacity: 0.6;
   cursor: default;
