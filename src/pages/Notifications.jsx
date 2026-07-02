@@ -1,16 +1,49 @@
 import { useState } from "react"
-import { ArrowLeft, MoreVertical } from "lucide-react"
+import { ArrowLeft, MoreVertical, UserPlus, CheckCircle2, XCircle, Check, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import PhoneFrame from "../components/PhoneFrame.jsx"
+import { useAuth } from "../hooks/useAuth.js"
+import { useNotifications } from "../hooks/useNotifications.js"
+import { approveRoleRequest, rejectRoleRequest } from "../services/roleRequestService.js"
 import "./Notifications.css"
 
-// Sample notifications — keep the array empty to show the empty state
-const SAMPLE_NOTIFICATIONS = []
+const TYPE_ICON = {
+  role_request_submitted: UserPlus,
+  role_request_approved: CheckCircle2,
+  role_request_rejected: XCircle,
+}
+
+function formatTime(isoStr) {
+  try {
+    return new Date(isoStr).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+  } catch { return "" }
+}
 
 export default function Notifications({ onBack }) {
   const navigate = useNavigate()
-  const [notifications] = useState(SAMPLE_NOTIFICATIONS)
+  const { token } = useAuth()
+  const { notifications, loading, markRead } = useNotifications()
   const handleBack = onBack || (() => navigate("/home"))
+
+  const [resolvedIds, setResolvedIds] = useState(new Set())
+  const [busyId, setBusyId] = useState(null)
+  const [actionError, setActionError] = useState({})
+
+  const handleDecision = async (n, decision) => {
+    if (busyId) return
+    setBusyId(n.id)
+    setActionError((prev) => ({ ...prev, [n.id]: "" }))
+    try {
+      if (decision === "approve") await approveRoleRequest(token, n.relatedId)
+      else await rejectRoleRequest(token, n.relatedId)
+      setResolvedIds((prev) => new Set(prev).add(n.relatedId))
+      if (!n.isRead) markRead(n.id)
+    } catch (err) {
+      setActionError((prev) => ({ ...prev, [n.id]: err.message ?? "Something went wrong." }))
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   return (
     <PhoneFrame>
@@ -33,7 +66,12 @@ export default function Notifications({ onBack }) {
 
         {/* Content */}
         <div className="notif-body">
-          {notifications.length === 0 ? (
+          {loading ? (
+            <div className="home-loading">
+              <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          ) : notifications.length === 0 ? (
             <div className="notif-empty">
               {/* Animated bell illustration */}
               <div className="notif-bell-wrap">
@@ -46,16 +84,47 @@ export default function Notifications({ onBack }) {
             </div>
           ) : (
             <ul className="notif-list">
-              {notifications.map((n) => (
-                <li key={n.id} className={`notif-item ${n.unread ? "notif-item--unread" : ""}`}>
-                  <div className="notif-item-icon">{n.icon}</div>
-                  <div className="notif-item-content">
-                    <p className="notif-item-msg">{n.message}</p>
-                    <span className="notif-item-time">{n.time}</span>
-                  </div>
-                  {n.unread && <div className="notif-item-dot" />}
-                </li>
-              ))}
+              {notifications.map((n) => {
+                const Icon = TYPE_ICON[n.type] ?? UserPlus
+                const showActions = n.type === "role_request_submitted" && !resolvedIds.has(n.relatedId)
+                return (
+                  <li
+                    key={n.id}
+                    className={`notif-item ${!n.isRead ? "notif-item--unread" : ""}`}
+                    onClick={() => !n.isRead && markRead(n.id)}
+                    style={{ cursor: n.isRead ? "default" : "pointer" }}
+                  >
+                    <div className="notif-item-icon"><Icon size={18} /></div>
+                    <div className="notif-item-content">
+                      <p className="notif-item-msg">{n.body}</p>
+                      <span className="notif-item-time">{formatTime(n.createdAt)}</span>
+                      {actionError[n.id] && <span className="notif-item-error">{actionError[n.id]}</span>}
+                    </div>
+                    {showActions ? (
+                      <div className="notif-item-actions" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="notif-action-btn notif-action-btn--approve"
+                          aria-label="Approve request"
+                          disabled={busyId === n.id}
+                          onClick={() => handleDecision(n, "approve")}
+                        >
+                          <Check size={15} />
+                        </button>
+                        <button
+                          className="notif-action-btn notif-action-btn--reject"
+                          aria-label="Reject request"
+                          disabled={busyId === n.id}
+                          onClick={() => handleDecision(n, "reject")}
+                        >
+                          <X size={15} />
+                        </button>
+                      </div>
+                    ) : (
+                      !n.isRead && <div className="notif-item-dot" />
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           )}
         </div>

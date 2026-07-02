@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
 import { useHasOrganisation } from "../hooks/useHasOrganisation.js"
+import { useNotifications } from "../hooks/useNotifications.js"
 import { listEvents, registerForEvent } from "../services/eventService.js"
 import { listClubs } from "../services/clubService.js"
 import { requestToJoinOrganisation, getMyJoinRequests } from "../services/organisationService.js"
@@ -65,6 +66,7 @@ export default function Home() {
   const navigate = useNavigate()
   const isDesktop = useIsDesktop()
   const { organisations, hasOrganisation } = useHasOrganisation()
+  const { unreadCount } = useNotifications()
 
   const [profile] = useState(() => {
     const saved = localStorage.getItem("persey_user_profile")
@@ -426,7 +428,7 @@ export default function Home() {
           <h1 className="m2-org-name">&ldquo;{orgName}&rdquo;</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
             <Bell size={18} />
-            <div className="home-notification-badge" />
+            {unreadCount > 0 && <div className="home-notification-badge" />}
           </button>
         </header>
 
@@ -462,7 +464,7 @@ export default function Home() {
           <h1 className="m2-org-name">&ldquo;{orgName}&rdquo;</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
             <Bell size={18} />
-            <div className="home-notification-badge" />
+            {unreadCount > 0 && <div className="home-notification-badge" />}
           </button>
         </header>
 

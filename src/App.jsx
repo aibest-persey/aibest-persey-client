@@ -103,14 +103,14 @@ export default function App() {
 
       {/* Authenticated routes: DesktopShell on desktop, bare Outlet on mobile */}
       <Route element={<AppShell />}>
-        <Route path="/home" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Home /></ProtectedRoute>} />
-        <Route path="/clubs" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><OrgMemberRoute><Clubs /></OrgMemberRoute></ProtectedRoute>} />
-        <Route path="/clubs/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><OrgMemberRoute><ClubDetail /></OrgMemberRoute></ProtectedRoute>} />
+        <Route path="/home" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><Home /></ProtectedRoute>} />
+        <Route path="/clubs" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><OrgMemberRoute><Clubs /></OrgMemberRoute></ProtectedRoute>} />
+        <Route path="/clubs/:id" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><OrgMemberRoute><ClubDetail /></OrgMemberRoute></ProtectedRoute>} />
         <Route path="/schedule" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Schedule /></ProtectedRoute>} />
         <Route path="/events/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><EventDetails /></ProtectedRoute>} />
         <Route path="/events/:id/ticket" element={<ProtectedRoute allowedRoles={["student"]}><Ticket /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/notifications" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Notifications /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><Notifications /></ProtectedRoute>} />
         <Route path="/my-registrations" element={<ProtectedRoute allowedRoles={["student"]}><MyRegistrations /></ProtectedRoute>} />
         <Route path="/inbox" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Inbox /></ProtectedRoute>} />
         <Route

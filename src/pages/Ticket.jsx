@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { QRCodeSVG } from "qrcode.react"
 import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
+import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { getEvent, getTicket } from "../services/eventService.js"
 import { getGradient } from "../utils/colorTiles.js"
@@ -29,6 +30,7 @@ export default function Ticket() {
   const { user, token, logout } = useAuth()
   const navigate = useNavigate()
   const isDesktop = useIsDesktop()
+  const { unreadCount } = useNotifications()
 
   const [profile] = useState(() => {
     const saved = localStorage.getItem("persey_user_profile")
@@ -121,7 +123,7 @@ export default function Ticket() {
       <h1 className="m2-org-name">Ticket</h1>
       <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
         <Bell size={18} />
-        <div className="home-notification-badge" />
+        {unreadCount > 0 && <div className="home-notification-badge" />}
       </button>
     </header>
   )

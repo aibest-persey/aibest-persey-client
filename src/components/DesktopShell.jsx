@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Outlet, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useHasOrganisation } from "../hooks/useHasOrganisation.js"
+import { useNotifications } from "../hooks/useNotifications.js"
 import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck, Users, Calendar } from "lucide-react"
 import { AvatarIcon } from "../pages/Profile.jsx"
 import "./DesktopShell.css"
@@ -30,6 +31,7 @@ const ADMIN_NAV_ITEMS = [
 export default function DesktopShell() {
   const { user, logout } = useAuth()
   const { hasOrganisation } = useHasOrganisation()
+  const { unreadCount } = useNotifications()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -73,15 +75,17 @@ export default function DesktopShell() {
       <header className="dsk-top-navbar">
         <nav className="dsk-nav">
           {NAV_ITEMS
-            .filter((item) => user?.role !== "admin" || item.path === "/profile")
+            .filter((item) => user?.role !== "admin" || ["/home", "/clubs", "/profile", "/notifications"].includes(item.path))
             .filter((item) => item.path !== "/clubs" || hasOrganisation)
             .map(({ icon: Icon, label, path }) => (
             <button
               key={path}
               className={`dsk-nav-item ${isActive(path) ? "dsk-nav-item--active" : ""}`}
               onClick={() => navigate(path)}
+              style={path === "/notifications" ? { position: "relative" } : undefined}
             >
               <Icon size={18} />
+              {path === "/notifications" && unreadCount > 0 && <div className="home-notification-badge" />}
               <span>{label}</span>
             </button>
           ))}

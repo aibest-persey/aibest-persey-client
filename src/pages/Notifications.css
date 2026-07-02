@@ -222,6 +222,44 @@
   flex-shrink: 0;
 }
 
+.notif-item-error {
+  font-size: 11px;
+  color: #f0635a;
+  font-weight: 600;
+}
+
+.notif-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.notif-action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.notif-action-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.notif-action-btn--approve {
+  background: #e6f9f0;
+  color: #1a9e5c;
+}
+
+.notif-action-btn--reject {
+  background: #fff0f0;
+  color: #f0635a;
+}
+
 /* ─── Desktop Layout ─────────────────────────────────────────────── */
 
 @media (min-width: 1024px) {

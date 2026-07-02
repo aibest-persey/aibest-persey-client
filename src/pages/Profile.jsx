@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect } from "react"
-import { ArrowLeft, Camera, Globe, Bell, Settings, ChevronRight, GraduationCap, Mail, Check, X, Users, Calendar, Edit2 } from "lucide-react"
+import { useState, useRef } from "react"
+import { ArrowLeft, Camera, Globe, Bell, Settings, ChevronRight, GraduationCap, Mail, X, Edit2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
-import { submitRoleRequest, getMyRoleRequests } from "../services/roleRequestService.js"
 import { updateUserProfile } from "../services/authService.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./Profile.css"
@@ -58,20 +57,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
     email: ""
   })
 
-  const [roleRequest, setRoleRequest] = useState(null)
-  const [roleReason, setRoleReason] = useState("")
-  const [roleSubmitting, setRoleSubmitting] = useState(false)
-  const [roleMsg, setRoleMsg] = useState("")
-  
   const [toastMessage, setToastMessage] = useState("")
-
-  useEffect(() => {
-    if (user?.role === "student") {
-      getMyRoleRequests(token)
-        .then((reqs) => setRoleRequest(reqs[0] ?? null))
-        .catch(() => {})
-    }
-  }, [user, token])
 
   const fileInputRef = useRef(null)
 
@@ -199,21 +185,6 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
     setTimeout(() => {
       setToastMessage("")
     }, 3000)
-  }
-
-  const handleRoleRequest = async () => {
-    setRoleSubmitting(true)
-    setRoleMsg("")
-    try {
-      const req = await submitRoleRequest(token, roleReason.trim() || undefined)
-      setRoleRequest(req)
-      setRoleMsg("Request submitted! An admin or organiser will review it.")
-      setRoleReason("")
-    } catch (err) {
-      setRoleMsg(err.message)
-    } finally {
-      setRoleSubmitting(false)
-    }
   }
 
   const handleBack = onBack || (() => navigate("/home"))
@@ -471,40 +442,6 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                   </button>
                 </div>
               </section>
-
-              {/* Become an Organiser */}
-              {user?.role === "student" && !isEditing && (
-                <section className="profile-section profile-role-section">
-                  <h3 className="profile-section-title">Become an Organiser</h3>
-                  {roleRequest ? (
-                    <div className={`profile-role-status profile-role-status--${roleRequest.status}`}>
-                      {roleRequest.status === "pending" && "Your request is pending review."}
-                      {roleRequest.status === "approved" && "Your request was approved! Please log out and back in."}
-                      {roleRequest.status === "rejected" && "Your request was rejected. You may contact an admin."}
-                    </div>
-                  ) : (
-                    <div className="profile-role-request-box">
-                      <p className="profile-role-desc">Request to be promoted to an organiser to create and manage events.</p>
-                      <textarea
-                        className="profile-role-textarea"
-                        placeholder="Tell us why you'd like to become an organiser (optional)..."
-                        rows={2}
-                        value={roleReason}
-                        onChange={(e) => setRoleReason(e.target.value)}
-                        maxLength={500}
-                      />
-                      {roleMsg && <p className="profile-role-msg">{roleMsg}</p>}
-                      <button 
-                        className="profile-role-btn" 
-                        onClick={handleRoleRequest} 
-                        disabled={roleSubmitting}
-                      >
-                        {roleSubmitting ? "Submitting..." : "Submit Request"}
-                      </button>
-                    </div>
-                  )}
-                </section>
-              )}
             </div>
           </div>
         </div>
@@ -677,36 +614,6 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
               </button>
             </div>
           </section>
-
-          {/* Become an Organiser (students only) */}
-          {user?.role === "student" && !isEditing && (
-            <section className="profile-section profile-role-section">
-              <h3 className="profile-section-title">Become an Organiser</h3>
-              {roleRequest ? (
-                <div className={`profile-role-status profile-role-status--${roleRequest.status}`}>
-                  {roleRequest.status === "pending" && "Your request is pending review."}
-                  {roleRequest.status === "approved" && "Your request was approved! Please log out and back in."}
-                  {roleRequest.status === "rejected" && "Your request was rejected. You may contact an admin."}
-                </div>
-              ) : (
-                <div className="profile-role-request-box">
-                  <p className="profile-role-desc">Request to be promoted to an organiser to create and manage events.</p>
-                  <textarea
-                    className="profile-role-textarea"
-                    placeholder="Tell us why you'd like to become an organiser (optional)..."
-                    rows={2}
-                    value={roleReason}
-                    onChange={(e) => setRoleReason(e.target.value)}
-                    maxLength={500}
-                  />
-                  {roleMsg && <p className="profile-role-msg">{roleMsg}</p>}
-                  <button className="profile-role-btn" onClick={handleRoleRequest} disabled={roleSubmitting}>
-                    {roleSubmitting ? "Submitting..." : "Submit Request"}
-                  </button>
-                </div>
-              )}
-            </section>
-          )}
         </div>
       )}
     </div>

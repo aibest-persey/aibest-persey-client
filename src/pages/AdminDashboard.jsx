@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { listUsers, setUserRole, listAllEvents, adminCancelEvent, adminDeleteEvent } from "../services/adminService.js"
 import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../services/roleRequestService.js"
-import { Users, Calendar, ClipboardList, Trash2, Ban, Check, X } from "lucide-react"
+import { useNotifications } from "../hooks/useNotifications.js"
+import { useIsDesktop } from "../hooks/useIsDesktop.js"
+import { Users, Calendar, ClipboardList, Trash2, Ban, Check, X, Bell } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./AdminDashboard.css"
 
@@ -18,6 +20,8 @@ function Badge({ label, color }) {
 export default function AdminDashboard() {
   const { token } = useAuth()
   const navigate = useNavigate()
+  const { unreadCount } = useNotifications()
+  const isDesktop = useIsDesktop()
   const [tab, setTab] = useState("users")
 
   const [users, setUsers] = useState([])
@@ -105,6 +109,12 @@ export default function AdminDashboard() {
       <div className="adm-container">
         <header className="adm-header">
           <h1 className="adm-title">Admin Dashboard</h1>
+          {!isDesktop && (
+            <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
+              <Bell size={18} />
+              {unreadCount > 0 && <div className="home-notification-badge" />}
+            </button>
+          )}
         </header>
 
         {actionMsg && <div className="adm-flash">{actionMsg}</div>}
@@ -142,16 +152,15 @@ export default function AdminDashboard() {
                       <div className="adm-card-sub">{u.email}</div>
                       <Badge label={u.role} color={ROLE_COLORS[u.role] || "#9a9cae"} />
                     </div>
-                    {u.role !== "admin" && (
-                      <select
-                        className="adm-role-select"
-                        value={u.role}
-                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                      >
-                        <option value="student">student</option>
-                        <option value="organiser">organiser</option>
-                      </select>
-                    )}
+                    <select
+                      className="adm-role-select"
+                      value={u.role}
+                      onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                    >
+                      <option value="student">student</option>
+                      <option value="organiser">organiser</option>
+                      <option value="admin">admin</option>
+                    </select>
                   </div>
                 ))}
               </div>
