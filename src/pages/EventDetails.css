@@ -84,14 +84,64 @@
   background: rgba(255, 255, 255, 0.4);
 }
 
+.evtd-back-btn {
+  position: relative;
+}
+
+.evtd-bell-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  background-color: #00f0ff;
+  border-radius: 50%;
+  border: 1.5px solid #454ee6;
+}
+
 .evtd-banner-label {
   font-size: 16px;
   font-weight: 700;
   color: #ffffff;
 }
 
+.evtd-banner-bottomrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.evtd-capacity-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.evtd-capacity-pill--open {
+  background: rgba(41, 214, 151, 0.85);
+}
+
+.evtd-capacity-pill--filling {
+  background: rgba(245, 151, 98, 0.9);
+}
+
+.evtd-capacity-pill--full {
+  background: rgba(240, 99, 90, 0.9);
+}
+
+.evtd-capacity-pill--unlimited {
+  background: rgba(0, 0, 0, 0.35);
+}
+
 .evtd-status-badge {
-  align-self: flex-end;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 11px;

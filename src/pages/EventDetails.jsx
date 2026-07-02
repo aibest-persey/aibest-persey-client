@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
+import { useNotifications } from "../hooks/useNotifications.js"
 import { getEvent, registerForEvent, cancelRegistration } from "../services/eventService.js"
 import { sendMessage } from "../services/messageService.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
-import { ArrowLeft, Calendar, MapPin, Users, MessageSquare } from "lucide-react"
+import { ArrowLeft, Bell, Calendar, MapPin, Users, MessageSquare, Ticket } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./EventDetails.css"
 
@@ -48,6 +49,7 @@ export default function EventDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { token, user } = useAuth()
+  const { unreadCount } = useNotifications()
 
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -128,6 +130,18 @@ export default function EventDetails() {
     !event?.isRegistered &&
     !event?.isWaitlisted
 
+  // Capacity indicator state — drives both the banner pill and its color.
+  const capacityState = !event || event.maxCapacity == null
+    ? "unlimited"
+    : event.registrationCount >= event.maxCapacity
+    ? "full"
+    : event.registrationCount / event.maxCapacity >= 0.8
+    ? "filling"
+    : "open"
+  const capacityLabel = event?.maxCapacity != null
+    ? `${event.registrationCount}/${event.maxCapacity}`
+    : `${event?.registrationCount ?? 0} going`
+
   const organiserName = event?.organiser
     ? `${event.organiser.firstName ?? ""} ${event.organiser.lastName ?? ""}`.trim() ||
       event.organiser.username
@@ -148,19 +162,32 @@ export default function EventDetails() {
         ) : event ? (
           <>
             {/* Banner */}
-            <div className="evtd-banner" style={{ background: getGradient(id) }}>
+            <div
+              className="evtd-banner"
+              style={event.coverImage
+                ? { backgroundImage: `url(${event.coverImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                : { background: getGradient(id) }}
+            >
               <div className="evtd-banner-toprow">
-                <button className="evtd-back-btn" onClick={() => navigate(-1)}>
+                <button className="evtd-back-btn" aria-label="Go back" onClick={() => navigate(-1)}>
                   <ArrowLeft size={20} />
                 </button>
                 <span className="evtd-banner-label">Event Details</span>
-                <div style={{ width: 36 }} />
+                <button className="evtd-back-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
+                  <Bell size={18} />
+                  {unreadCount > 0 && <div className="evtd-bell-badge" />}
+                </button>
               </div>
-              {event.status !== "published" && (
-                <span className={`evtd-status-badge evtd-status-badge--${event.status}`}>
-                  {event.status}
+              <div className="evtd-banner-bottomrow">
+                <span className={`evtd-capacity-pill evtd-capacity-pill--${capacityState}`}>
+                  <Ticket size={13} /> {capacityLabel}
                 </span>
-              )}
+                {event.status !== "published" && (
+                  <span className={`evtd-status-badge evtd-status-badge--${event.status}`}>
+                    {event.status}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Content */}
@@ -197,7 +224,11 @@ export default function EventDetails() {
                   <div className="evtd-meta-text">
                     <span className="evtd-meta-label">
                       {event.registrationCount} attending
-                      {event.maxCapacity ? ` · ${event.maxCapacity - event.registrationCount} spots left` : ""}
+                      {event.maxCapacity == null
+                        ? " · Open registration"
+                        : capacityState === "full"
+                        ? " · Full"
+                        : ` · ${event.maxCapacity - event.registrationCount} spots left`}
                     </span>
                     {event.isWaitlisted && (
                       <span className="evtd-meta-sub evtd-meta-sub--wait">You are on the waitlist</span>
