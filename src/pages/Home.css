@@ -138,6 +138,25 @@
   cursor: pointer;
 }
 
+/* Create organisation (organiser only) */
+.m2-create-org-btn {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 999px;
+  background: #111638;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 16px 0;
+}
+
+.m2-create-org-btn:hover {
+  background: #1b224d;
+}
+
 /* Clubs rail */
 .m2-clubs-section {
   padding-bottom: 4px;
@@ -652,6 +671,10 @@
 
 .auth-screen .m2-club-add {
   color: #5669ff;
+}
+
+.auth-screen .m2-create-org-btn {
+  color: #ffffff;
 }
 
 .auth-screen .m2-see-more {

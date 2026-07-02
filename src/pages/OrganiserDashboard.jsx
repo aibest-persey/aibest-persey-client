@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import {
   listEvents,
@@ -21,9 +21,10 @@ import "./OrganiserDashboard.css"
 
 export default function OrganiserDashboard() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { token, user } = useAuth()
 
-  const [activeTab, setActiveTab] = useState("events")
+  const [activeTab, setActiveTab] = useState(location.state?.tab ?? "events")
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

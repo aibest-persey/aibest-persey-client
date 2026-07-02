@@ -217,6 +217,16 @@ export default function Home() {
     </section>
   )
 
+  const createOrgBlock = user?.role === "organiser" ? (
+    <button
+      className="m2-create-org-btn"
+      onClick={() => navigate("/organiser-dashboard", { state: { tab: "organisations" } })}
+      aria-label="Create your organisation"
+    >
+      <Plus size={22} />
+    </button>
+  ) : null
+
   const clubsRailBlock = hasOrganisation ? (
     <section className="m2-clubs-section">
       <h2 className="m2-section-title">Clubs</h2>
@@ -434,6 +444,7 @@ export default function Home() {
 
         <div className="m2-desktop-grid">
           <div className="m2-desktop-left">
+            {createOrgBlock && <div className="m2-desktop-block">{createOrgBlock}</div>}
             <div className="m2-desktop-block">{orgSearchBlock}</div>
             <div className="m2-desktop-block">{clubsRailBlock}</div>
             {heroBlock ? <div className="m2-desktop-block">{heroBlock}</div> : null}
@@ -468,6 +479,7 @@ export default function Home() {
           </button>
         </header>
 
+        {createOrgBlock}
         {orgSearchBlock}
         {clubsRailBlock}
         {heroBlock}
