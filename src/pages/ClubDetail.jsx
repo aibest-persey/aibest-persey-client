@@ -42,7 +42,7 @@ function formatEventDateTime(isoStr) {
   } catch { return { date: "--", time: "" } }
 }
 
-const EMPTY_EVENT_FORM = { title: "", description: "", location: "", start: "", end: "", capacity: "" }
+const EMPTY_EVENT_FORM = { title: "", description: "", location: "", start: "", end: "", capacity: "", kind: "event" }
 
 export default function ClubDetail() {
   const { id } = useParams()
@@ -150,6 +150,7 @@ export default function ClubDetail() {
         start: eventForm.start ? new Date(eventForm.start).toISOString() : undefined,
         end: eventForm.end ? new Date(eventForm.end).toISOString() : undefined,
         capacity: eventForm.capacity ? Number(eventForm.capacity) : undefined,
+        kind: eventForm.kind,
         ownerScope: "club",
         clubId: id,
       })
@@ -346,6 +347,14 @@ export default function ClubDetail() {
 
         {showEventForm && (
           <form className="clubdetail-event-form" onSubmit={handleCreateEvent}>
+            <select
+              className="clubdetail-input"
+              value={eventForm.kind}
+              onChange={(e) => setEventForm((f) => ({ ...f, kind: e.target.value }))}
+            >
+              <option value="event">Event</option>
+              <option value="class">Class</option>
+            </select>
             <input
               className="clubdetail-input"
               placeholder="Event title"

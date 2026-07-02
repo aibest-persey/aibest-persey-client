@@ -132,6 +132,27 @@
   flex-direction: column;
 }
 
+.sched-item-kind {
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-bottom: 3px;
+}
+
+.sched-item-kind--class {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.sched-item-kind--event {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .sched-item-title {
   font-size: 13px;
   font-weight: 700;
