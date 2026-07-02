@@ -260,10 +260,3 @@
   font-weight: 700;
   color: #111638;
 }
-
-/* Desktop */
-@media (min-width: 1024px) {
-  .clubdetail-page {
-    max-width: 640px;
-  }
-}

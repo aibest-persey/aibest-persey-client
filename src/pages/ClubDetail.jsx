@@ -232,7 +232,7 @@ export default function ClubDetail() {
     </header>
   )
 
-  const content = loading ? (
+  const loadingOrErrorBlock = loading ? (
     <div className="home-loading">
       <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -242,7 +242,9 @@ export default function ClubDetail() {
       <p className="clubs-empty-state-desc">{error}</p>
       <button className="club-list-join-btn" style={{ marginTop: 16 }} onClick={() => navigate("/clubs")}>Back to Clubs</button>
     </div>
-  ) : !club ? null : (
+  ) : null
+
+  const topBlock = !club ? null : (
     <>
       <div className="clubdetail-banner" style={{ background: getGradient(club.id) }}>
         <div className="clubdetail-banner-shape" />
@@ -267,7 +269,11 @@ export default function ClubDetail() {
 
       {club.description && <p className="clubdetail-desc">{club.description}</p>}
       {error && <div className="clubdetail-error">{error}</div>}
+    </>
+  )
 
+  const feedBlock = !club ? null : (
+    <>
       {/* Feed */}
       <section className="clubdetail-section">
         <div className="clubdetail-section-header">
@@ -318,7 +324,11 @@ export default function ClubDetail() {
           </div>
         )}
       </section>
+    </>
+  )
 
+  const eventsBlock = !club ? null : (
+    <>
       {/* Events */}
       <section className="clubdetail-section">
         <div className="clubdetail-section-header">
@@ -418,7 +428,11 @@ export default function ClubDetail() {
           </div>
         )}
       </section>
+    </>
+  )
 
+  const newsBlock = !club ? null : (
+    <>
       {/* News */}
       <section className="clubdetail-section">
         <div className="clubdetail-section-header">
@@ -446,15 +460,40 @@ export default function ClubDetail() {
     </>
   )
 
-  const body = (
-    <div className="home-container--m2 clubdetail-page">
-      {!isDesktop && sidebarDrawer}
-      {header}
-      {content}
-    </div>
+  if (isDesktop) {
+    return (
+      <div className="home-container--m2">
+        {header}
+        {loadingOrErrorBlock && <div className="m2-desktop-block">{loadingOrErrorBlock}</div>}
+        {club && (
+          <>
+            <div className="m2-desktop-block">{topBlock}</div>
+            <div className="m2-desktop-grid">
+              <div className="m2-desktop-left">
+                <div className="m2-desktop-block">{feedBlock}</div>
+              </div>
+              <div className="m2-desktop-right">
+                <div className="m2-desktop-widget">{eventsBlock}</div>
+                <div className="m2-desktop-widget">{newsBlock}</div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <PhoneFrame>
+      <div className="home-container--m2 clubdetail-page">
+        {sidebarDrawer}
+        {header}
+        {loadingOrErrorBlock}
+        {topBlock}
+        {feedBlock}
+        {eventsBlock}
+        {newsBlock}
+      </div>
+    </PhoneFrame>
   )
-
-  if (isDesktop) return body
-
-  return <PhoneFrame>{body}</PhoneFrame>
 }
