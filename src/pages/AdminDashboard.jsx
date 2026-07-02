@@ -6,6 +6,8 @@ import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../s
 import { listOrganisations } from "../services/organisationService.js"
 import { useNotifications } from "../hooks/useNotifications.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
+import { canChangeUserRole } from "../utils/permissions.js"
+import { getErrorMessage } from "../utils/errorMessage.js"
 import { Users, Calendar, ClipboardList, Trash2, Ban, Check, X, Bell, Building2 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./AdminDashboard.css"
@@ -20,7 +22,7 @@ function Badge({ label, color }) {
 }
 
 export default function AdminDashboard() {
-  const { token } = useAuth()
+  const { token, user } = useAuth()
   const navigate = useNavigate()
   const { unreadCount } = useNotifications()
   const isDesktop = useIsDesktop()
@@ -40,28 +42,28 @@ export default function AdminDashboard() {
   const loadUsers = useCallback(async () => {
     setLoading(true); setError("")
     try { setUsers(await listUsers(token)) }
-    catch (e) { setError(e.message) }
+    catch (e) { setError(getErrorMessage(e)) }
     finally { setLoading(false) }
   }, [token])
 
   const loadEvents = useCallback(async () => {
     setLoading(true); setError("")
     try { setEvents(await listAllEvents(token)) }
-    catch (e) { setError(e.message) }
+    catch (e) { setError(getErrorMessage(e)) }
     finally { setLoading(false) }
   }, [token])
 
   const loadRequests = useCallback(async () => {
     setLoading(true); setError("")
     try { setRequests(await listAllRoleRequests(token)) }
-    catch (e) { setError(e.message) }
+    catch (e) { setError(getErrorMessage(e)) }
     finally { setLoading(false) }
   }, [token])
 
   const loadOrganisations = useCallback(async () => {
     setLoading(true); setError("")
     try { setOrganisations(await listOrganisations(token)) }
-    catch (e) { setError(e.message) }
+    catch (e) { setError(getErrorMessage(e)) }
     finally { setLoading(false) }
   }, [token])
 
@@ -77,7 +79,7 @@ export default function AdminDashboard() {
       await setUserRole(token, userId, newRole)
       setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role: newRole } : u))
       flash(`Role updated to ${newRole}.`)
-    } catch (e) { flash(e.message) }
+    } catch (e) { flash(getErrorMessage(e)) }
   }
 
   const handleCancelEvent = async (id) => {
@@ -85,7 +87,7 @@ export default function AdminDashboard() {
       await adminCancelEvent(token, id)
       setEvents((prev) => prev.map((e) => e.id === id ? { ...e, status: "cancelled" } : e))
       flash("Event cancelled.")
-    } catch (e) { flash(e.message) }
+    } catch (e) { flash(getErrorMessage(e)) }
   }
 
   const handleDeleteEvent = async (id) => {
@@ -94,7 +96,7 @@ export default function AdminDashboard() {
       setEvents((prev) => prev.filter((e) => e.id !== id))
       setConfirmDelete(null)
       flash("Event deleted.")
-    } catch (e) { flash(e.message) }
+    } catch (e) { flash(getErrorMessage(e)) }
   }
 
   const handleApprove = async (id) => {
@@ -102,7 +104,7 @@ export default function AdminDashboard() {
       await approveRoleRequest(token, id)
       setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "approved" } : r))
       flash("Request approved.")
-    } catch (e) { flash(e.message) }
+    } catch (e) { flash(getErrorMessage(e)) }
   }
 
   const handleReject = async (id) => {
@@ -110,7 +112,7 @@ export default function AdminDashboard() {
       await rejectRoleRequest(token, id)
       setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "rejected" } : r))
       flash("Request rejected.")
-    } catch (e) { flash(e.message) }
+    } catch (e) { flash(getErrorMessage(e)) }
   }
 
   const handleVerifyOrganisation = async (id) => {
@@ -118,7 +120,7 @@ export default function AdminDashboard() {
       await verifyOrganisation(token, id)
       setOrganisations((prev) => prev.map((o) => o.id === id ? { ...o, status: "verified" } : o))
       flash("Organisation verified.")
-    } catch (e) { flash(e.message) }
+    } catch (e) { flash(getErrorMessage(e)) }
   }
 
   const handleDeleteOrganisation = async (id) => {
@@ -127,7 +129,7 @@ export default function AdminDashboard() {
       setOrganisations((prev) => prev.filter((o) => o.id !== id))
       setConfirmDelete(null)
       flash("Organisation deleted.")
-    } catch (e) { flash(e.message) }
+    } catch (e) { flash(getErrorMessage(e)) }
   }
 
   const pendingCount = requests.filter((r) => r.status === "pending").length
@@ -188,6 +190,8 @@ export default function AdminDashboard() {
                     <select
                       className="adm-role-select"
                       value={u.role}
+                      disabled={!canChangeUserRole(user, u.id)}
+                      title={canChangeUserRole(user, u.id) ? undefined : "You can't change your own role."}
                       onChange={(e) => handleRoleChange(u.id, e.target.value)}
                     >
                       <option value="student">student</option>

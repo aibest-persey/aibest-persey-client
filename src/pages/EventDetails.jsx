@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { getEvent, registerForEvent, cancelRegistration } from "../services/eventService.js"
 import { sendMessage } from "../services/messageService.js"
+import { getErrorMessage } from "../utils/errorMessage.js"
 import { ArrowLeft, Calendar, MapPin, Users, MessageSquare } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./EventDetails.css"
@@ -64,7 +65,7 @@ export default function EventDetails() {
     setError("")
     getEvent(token, id)
       .then(setEvent)
-      .catch((err) => setError(err.message))
+      .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false))
   }, [id, token])
 
@@ -83,7 +84,7 @@ export default function EventDetails() {
         type: "success",
       })
     } catch (err) {
-      setActionMsg({ text: err.message, type: "error" })
+      setActionMsg({ text: getErrorMessage(err), type: "error" })
     } finally {
       setActionLoading(false)
     }
@@ -97,7 +98,7 @@ export default function EventDetails() {
       await refresh()
       setActionMsg({ text: "Registration cancelled.", type: "info" })
     } catch (err) {
-      setActionMsg({ text: err.message, type: "error" })
+      setActionMsg({ text: getErrorMessage(err), type: "error" })
     } finally {
       setActionLoading(false)
     }
@@ -113,7 +114,7 @@ export default function EventDetails() {
       setMsgSubject("")
       setActionMsg({ text: "Message sent to organiser!", type: "success" })
     } catch (err) {
-      setActionMsg({ text: err.message, type: "error" })
+      setActionMsg({ text: getErrorMessage(err), type: "error" })
     } finally {
       setMsgSending(false)
     }

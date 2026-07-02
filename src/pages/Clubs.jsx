@@ -7,6 +7,7 @@ import PhoneFrame from "../components/PhoneFrame.jsx"
 import { listClubs, createClub } from "../services/clubService.js"
 import { listOrganisations } from "../services/organisationService.js"
 import { getTileColor } from "../utils/colorTiles.js"
+import { getErrorMessage } from "../utils/errorMessage.js"
 import {
   Bell, Search, Plus,
   User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
@@ -54,7 +55,7 @@ export default function Clubs() {
         setMyOrganisations(mine)
         if (mine.length === 1) setCreateForm((f) => ({ ...f, organisationId: mine[0].id }))
       })
-      .catch((err) => setError(err.message ?? "Failed to load clubs."))
+      .catch((err) => setError(getErrorMessage(err, "Failed to load clubs.")))
       .finally(() => setLoading(false))
   }, [token])
 
@@ -80,7 +81,7 @@ export default function Clubs() {
       setCreateForm((f) => ({ ...f, name: "", description: "" }))
       navigate(`/clubs/${club.id}`)
     } catch (err) {
-      setCreateError(err.message ?? "Failed to create club.")
+      setCreateError(getErrorMessage(err, "Failed to create club."))
     } finally {
       setCreateBusy(false)
     }

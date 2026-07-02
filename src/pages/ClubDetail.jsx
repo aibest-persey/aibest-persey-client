@@ -9,6 +9,8 @@ import { listPosts, createPost } from "../services/postService.js"
 import { listEvents, createEvent } from "../services/eventService.js"
 import { listNews } from "../services/newsService.js"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
+import { canPostInClub, canManageClub as canManageClubRole, canCreateClubEvent } from "../utils/permissions.js"
+import { getErrorMessage } from "../utils/errorMessage.js"
 import {
   Bell, Users, MessageSquare, Calendar, Megaphone, MapPin, Clock,
   User, SlidersHorizontal, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
@@ -114,7 +116,7 @@ export default function ClubDetail() {
         setClub((c) => ({ ...c, isMember: true, myRole: "member", memberCount: res.memberCount }))
       }
     } catch (err) {
-      setError(err.message ?? "Something went wrong.")
+      setError(getErrorMessage(err))
     } finally {
       setMembershipBusy(false)
     }
@@ -131,7 +133,7 @@ export default function ClubDetail() {
       setPostContent("")
       setShowPostForm(false)
     } catch (err) {
-      setPostError(err.message ?? "Failed to post.")
+      setPostError(getErrorMessage(err, "Failed to post."))
     } finally {
       setPostBusy(false)
     }
@@ -158,16 +160,16 @@ export default function ClubDetail() {
       setEventForm(EMPTY_EVENT_FORM)
       setShowEventForm(false)
     } catch (err) {
-      setEventError(err.message ?? "Failed to create event.")
+      setEventError(getErrorMessage(err, "Failed to create event."))
     } finally {
       setEventBusy(false)
     }
   }
 
-  const canPost = club?.myRole !== null && club?.myRole !== undefined
-  const canManageClub = club?.myRole === "owner" || club?.myRole === "manager"
-  const canCreateEvent = canManageClub && user?.role === "organiser"
-  const showEventGateHint = canManageClub && user?.role !== "organiser"
+  const canPost = canPostInClub(club?.myRole)
+  const canManageClub = canManageClubRole(club?.myRole)
+  const canCreateEvent = canCreateClubEvent(user, club?.myRole)
+  const showEventGateHint = canManageClub && !canCreateEvent
 
   const sidebarDrawer = (
     <>

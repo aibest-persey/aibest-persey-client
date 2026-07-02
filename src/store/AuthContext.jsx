@@ -44,8 +44,11 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null)
 
   const login = (newToken, newUser, remember = true) => {
+    // role is an effective-permission signal — read it from the session response
+    // body (what the backend just told us), only falling back to decoding the
+    // JWT claim if an older/partial response shape ever omits it.
     const decoded = decodeToken(newToken)
-    const userWithRole = { ...newUser, role: decoded?.role || "student" }
+    const userWithRole = { ...newUser, role: newUser.role || decoded?.role || "student" }
     saveSession(newToken, userWithRole, remember)
     setToken(newToken)
     setUser(userWithRole)
@@ -64,7 +67,7 @@ export function AuthProvider({ children }) {
     try {
       const userData = await fetchCurrentUser(token)
       const decoded = decodeToken(token)
-      const userWithRole = { ...userData, role: decoded?.role || "student" }
+      const userWithRole = { ...userData, role: userData.role || decoded?.role || "student" }
       saveSession(token, userWithRole)
       setUser(userWithRole)
     } catch (err) {

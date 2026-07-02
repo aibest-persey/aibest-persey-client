@@ -1,15 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? ""
-
-function authHeaders(token) {
-  return { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
-}
-
-async function handle(promise) {
-  const res = await promise
-  const json = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(json.message ?? "Something went wrong.")
-  return json
-}
+import { API_BASE, authHeaders, handle } from "./apiClient.js"
 
 export const sendMessage = (token, { receiverId, subject, content }) =>
   handle(fetch(`${API_BASE}/api/messages`, {

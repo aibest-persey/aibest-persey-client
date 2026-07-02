@@ -17,6 +17,8 @@ import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../s
 import {
   listOrganisations, createOrganisation, listOrgJoinRequests, approveJoinRequest, rejectJoinRequest,
 } from "../services/organisationService.js"
+import { canAccessOrganiserDashboard } from "../utils/permissions.js"
+import { getErrorMessage } from "../utils/errorMessage.js"
 import "./OrganiserDashboard.css"
 
 export default function OrganiserDashboard() {
@@ -62,7 +64,7 @@ export default function OrganiserDashboard() {
       // Show only organiser's own events
       setEvents(data.filter((e) => e.isOwner))
     } catch (err) {
-      setError(err.message)
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -73,7 +75,7 @@ export default function OrganiserDashboard() {
   const loadRoleRequests = useCallback(async () => {
     setReqLoading(true)
     try { setRoleRequests(await listAllRoleRequests(token)) }
-    catch (e) { setReqMsg(e.message) }
+    catch (e) { setReqMsg(getErrorMessage(e)) }
     finally { setReqLoading(false) }
   }, [token])
 
@@ -83,14 +85,14 @@ export default function OrganiserDashboard() {
     try {
       await approveRoleRequest(token, id)
       setRoleRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "approved" } : r))
-    } catch (e) { setReqMsg(e.message) }
+    } catch (e) { setReqMsg(getErrorMessage(e)) }
   }
 
   const handleReject = async (id) => {
     try {
       await rejectRoleRequest(token, id)
       setRoleRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "rejected" } : r))
-    } catch (e) { setReqMsg(e.message) }
+    } catch (e) { setReqMsg(getErrorMessage(e)) }
   }
 
   const loadOrganisations = useCallback(async () => {
@@ -107,7 +109,7 @@ export default function OrganiserDashboard() {
       }))
       setOrgJoinRequests(requestsByOrg)
     } catch (e) {
-      setOrgMsg(e.message)
+      setOrgMsg(getErrorMessage(e))
     } finally {
       setOrgsLoading(false)
     }
@@ -132,7 +134,7 @@ export default function OrganiserDashboard() {
       setOrgFieldErrors({})
       loadOrganisations()
     } catch (err) {
-      setOrgMsg(err.message)
+      setOrgMsg(getErrorMessage(err))
     } finally {
       setOrgCreateLoading(false)
     }
@@ -146,7 +148,7 @@ export default function OrganiserDashboard() {
         ...prev,
         [orgId]: prev[orgId].filter((r) => r.id !== reqId),
       }))
-    } catch (e) { setOrgMsg(e.message) }
+    } catch (e) { setOrgMsg(getErrorMessage(e)) }
     setOrgActionId(null)
   }
 
@@ -158,7 +160,7 @@ export default function OrganiserDashboard() {
         ...prev,
         [orgId]: prev[orgId].filter((r) => r.id !== reqId),
       }))
-    } catch (e) { setOrgMsg(e.message) }
+    } catch (e) { setOrgMsg(getErrorMessage(e)) }
     setOrgActionId(null)
   }
 
@@ -199,7 +201,7 @@ export default function OrganiserDashboard() {
       loadEvents()
       setTimeout(() => { setIsModalOpen(false); setSuccessMsg("") }, 1400)
     } catch (err) {
-      setError(err.message)
+      setError(getErrorMessage(err))
     } finally {
       setCreateLoading(false)
     }
@@ -207,26 +209,26 @@ export default function OrganiserDashboard() {
 
   const handlePublish = async (id) => {
     setActionLoadingId(id)
-    try { await publishEvent(token, id); await loadEvents() } catch (err) { setError(err.message) }
+    try { await publishEvent(token, id); await loadEvents() } catch (err) { setError(getErrorMessage(err)) }
     setActionLoadingId(null)
   }
 
   const handleUnpublish = async (id) => {
     setActionLoadingId(id)
-    try { await unpublishEvent(token, id); await loadEvents() } catch (err) { setError(err.message) }
+    try { await unpublishEvent(token, id); await loadEvents() } catch (err) { setError(getErrorMessage(err)) }
     setActionLoadingId(null)
   }
 
   const handleCancel = async (id) => {
     setActionLoadingId(id)
-    try { await cancelEvent(token, id); await loadEvents() } catch (err) { setError(err.message) }
+    try { await cancelEvent(token, id); await loadEvents() } catch (err) { setError(getErrorMessage(err)) }
     setActionLoadingId(null)
   }
 
   const handleDelete = async (id) => {
     setActionLoadingId(id)
     setConfirmDeleteId(null)
-    try { await deleteEvent(token, id); await loadEvents() } catch (err) { setError(err.message) }
+    try { await deleteEvent(token, id); await loadEvents() } catch (err) { setError(getErrorMessage(err)) }
     setActionLoadingId(null)
   }
 
@@ -249,9 +251,11 @@ export default function OrganiserDashboard() {
             <ArrowLeft size={20} />
           </button>
           <h1 className="org-title">My Events</h1>
-          <button className="org-add-btn" aria-label="Create Event" onClick={() => setIsModalOpen(true)}>
-            <Plus size={20} />
-          </button>
+          {canAccessOrganiserDashboard(user) && (
+            <button className="org-add-btn" aria-label="Create Event" onClick={() => setIsModalOpen(true)}>
+              <Plus size={20} />
+            </button>
+          )}
         </header>
 
         {/* Tab bar */}
@@ -383,10 +387,12 @@ export default function OrganiserDashboard() {
               </div>
               <h3>No Events Yet</h3>
               <p>Create your first event to invite attendees.</p>
-              <button className="org-empty-cta" onClick={() => setIsModalOpen(true)}>
-                <Plus size={16} />
-                <span>Create Event</span>
-              </button>
+              {canAccessOrganiserDashboard(user) && (
+                <button className="org-empty-cta" onClick={() => setIsModalOpen(true)}>
+                  <Plus size={16} />
+                  <span>Create Event</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="org-events-list">

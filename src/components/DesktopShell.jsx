@@ -5,6 +5,7 @@ import { useHasOrganisation } from "../hooks/useHasOrganisation.js"
 import { useNotifications } from "../hooks/useNotifications.js"
 import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck, Users, Calendar, Newspaper, Settings as SettingsIcon } from "lucide-react"
 import { AvatarIcon } from "../pages/Profile.jsx"
+import { isAdmin, isOrganiser, isStudent } from "../utils/permissions.js"
 import "./DesktopShell.css"
 
 const NAV_ITEMS = [
@@ -77,7 +78,7 @@ export default function DesktopShell() {
       <header className="dsk-top-navbar">
         <nav className="dsk-nav">
           {NAV_ITEMS
-            .filter((item) => user?.role !== "admin" || ["/home", "/clubs", "/profile", "/notifications", "/news", "/settings"].includes(item.path))
+            .filter((item) => !isAdmin(user) || ["/home", "/clubs", "/profile", "/notifications", "/news", "/settings"].includes(item.path))
             .filter((item) => item.path !== "/clubs" || hasOrganisation)
             .map(({ icon: Icon, label, path }) => (
             <button
@@ -92,7 +93,7 @@ export default function DesktopShell() {
             </button>
           ))}
 
-          {user?.role === "student" &&
+          {isStudent(user) &&
             STUDENT_NAV_ITEMS.map(({ icon: Icon, label, path }) => (
               <button
                 key={path}
@@ -104,7 +105,7 @@ export default function DesktopShell() {
               </button>
             ))}
 
-          {user?.role === "organiser" &&
+          {isOrganiser(user) &&
             ORG_NAV_ITEMS.map(({ icon: Icon, label, path }) => (
               <button
                 key={path}
@@ -116,7 +117,7 @@ export default function DesktopShell() {
               </button>
             ))}
 
-          {user?.role === "admin" &&
+          {isAdmin(user) &&
             ADMIN_NAV_ITEMS.map(({ icon: Icon, label, path }) => (
               <button
                 key={path}
