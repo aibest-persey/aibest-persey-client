@@ -20,6 +20,13 @@ export const listClubs = (token) =>
 export const getClub = (token, id) =>
   handle(fetch(`${API_BASE}/api/clubs/${id}`, { headers: authHeaders(token) }))
 
+export const createClub = (token, data) =>
+  handle(fetch(`${API_BASE}/api/clubs`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  }))
+
 export const joinClub = (token, id) =>
   handle(fetch(`${API_BASE}/api/clubs/${id}/join`, {
     method: "POST",

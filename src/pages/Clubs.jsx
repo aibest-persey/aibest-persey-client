@@ -4,10 +4,11 @@ import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
 import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
-import { listClubs, joinClub, leaveClub } from "../services/clubService.js"
+import { listClubs, createClub } from "../services/clubService.js"
+import { listOrganisations } from "../services/organisationService.js"
 import { getTileColor } from "../utils/colorTiles.js"
 import {
-  Bell, Search, Users,
+  Bell, Search, Plus,
   User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck,
 } from "lucide-react"
 import "./Clubs.css"
@@ -32,17 +33,27 @@ export default function Clubs() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [clubs, setClubs] = useState([])
+  const [myOrganisations, setMyOrganisations] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [search, setSearch] = useState("")
-  const [busyId, setBusyId] = useState(null)
+
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [createForm, setCreateForm] = useState({ name: "", description: "", organisationId: "" })
+  const [createBusy, setCreateBusy] = useState(false)
+  const [createError, setCreateError] = useState("")
 
   useEffect(() => {
     if (!token) return
     setLoading(true)
     setError("")
-    listClubs(token)
-      .then(setClubs)
+    Promise.all([listClubs(token), listOrganisations(token)])
+      .then(([clubsData, orgsData]) => {
+        setClubs(clubsData)
+        const mine = orgsData.filter((o) => o.isMember)
+        setMyOrganisations(mine)
+        if (mine.length === 1) setCreateForm((f) => ({ ...f, organisationId: mine[0].id }))
+      })
       .catch((err) => setError(err.message ?? "Failed to load clubs."))
       .finally(() => setLoading(false))
   }, [token])
@@ -53,26 +64,25 @@ export default function Clubs() {
     return c.name.toLowerCase().includes(q) || (c.description ?? "").toLowerCase().includes(q)
   })
 
-  const handleToggleMembership = async (club) => {
-    if (busyId) return
-    setBusyId(club.id)
-    setError("")
+  const handleCreateClub = async (e) => {
+    e.preventDefault()
+    if (createBusy || !createForm.name.trim() || !createForm.organisationId) return
+    setCreateBusy(true)
+    setCreateError("")
     try {
-      if (club.isMember) {
-        const res = await leaveClub(token, club.id)
-        setClubs((prev) => prev.map((c) => (
-          c.id === club.id ? { ...c, isMember: false, memberCount: res.memberCount } : c
-        )))
-      } else {
-        const res = await joinClub(token, club.id)
-        setClubs((prev) => prev.map((c) => (
-          c.id === club.id ? { ...c, isMember: true, memberCount: res.memberCount } : c
-        )))
-      }
+      const club = await createClub(token, {
+        name: createForm.name.trim(),
+        description: createForm.description.trim() || undefined,
+        organisationId: createForm.organisationId,
+      })
+      setClubs((prev) => [...prev, club])
+      setShowCreateForm(false)
+      setCreateForm((f) => ({ ...f, name: "", description: "" }))
+      navigate(`/clubs/${club.id}`)
     } catch (err) {
-      setError(err.message ?? "Something went wrong.")
+      setCreateError(err.message ?? "Failed to create club.")
     } finally {
-      setBusyId(null)
+      setCreateBusy(false)
     }
   }
 
@@ -81,7 +91,7 @@ export default function Clubs() {
       <input
         type="text"
         className="clubs-search-input-field"
-        placeholder="Search clubs..."
+        placeholder="Search Club"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -91,48 +101,90 @@ export default function Clubs() {
     </div>
   )
 
-  const listBlock = loading ? (
-    <div className="home-loading">
-      <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  ) : error ? (
-    <div className="clubs-empty-state-box"><p className="clubs-empty-state-desc">{error}</p></div>
-  ) : filteredClubs.length === 0 ? (
-    <div className="clubs-empty-state-box">
-      <div className="clubs-empty-state-icon">🎓</div>
-      <h4 className="clubs-empty-state-title">No Clubs Found</h4>
-      <p className="clubs-empty-state-desc">
-        {clubs.length === 0 ? "No clubs have been created yet." : "Try a different search."}
-      </p>
-    </div>
-  ) : (
-    <div className="club-list-grid">
-      {filteredClubs.map((club) => (
-        <div
-          key={club.id}
-          className="club-list-card"
-          onClick={() => navigate(`/clubs/${club.id}`)}
-          style={{ cursor: "pointer" }}
-        >
-          <div className="club-list-avatar" style={{ background: getTileColor(club.id) }}>
-            {getInitials(club.name)}
-          </div>
-          <div className="club-list-info">
-            <h3 className="club-list-name">{club.name}</h3>
-            {club.description && <p className="club-list-desc">{club.description}</p>}
-            <span className="club-list-meta"><Users size={12} /> {club.memberCount} member{club.memberCount === 1 ? "" : "s"}</span>
-          </div>
-          <button
-            className={`club-list-join-btn ${club.isMember ? "club-list-join-btn--joined" : ""}`}
-            disabled={busyId === club.id}
-            onClick={(e) => { e.stopPropagation(); handleToggleMembership(club) }}
+  const createFormBlock = showCreateForm && (
+    <div className="club-create-overlay" onClick={() => setShowCreateForm(false)}>
+      <form className="club-create-form" onClick={(e) => e.stopPropagation()} onSubmit={handleCreateClub}>
+        <h3 className="club-create-title">Create a club</h3>
+        {myOrganisations.length > 1 && (
+          <select
+            className="club-create-select"
+            value={createForm.organisationId}
+            onChange={(e) => setCreateForm((f) => ({ ...f, organisationId: e.target.value }))}
+            required
           >
-            {busyId === club.id ? "..." : club.isMember ? "Leave" : "Join"}
+            <option value="" disabled>Choose your organisation</option>
+            {myOrganisations.map((o) => (
+              <option key={o.id} value={o.id}>{o.name}</option>
+            ))}
+          </select>
+        )}
+        <input
+          className="club-create-input"
+          placeholder="Club name"
+          value={createForm.name}
+          onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
+          required
+        />
+        <textarea
+          className="club-create-textarea"
+          placeholder="Short description (optional)"
+          rows={3}
+          value={createForm.description}
+          onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
+        />
+        {createError && <p className="club-create-error">{createError}</p>}
+        <div className="club-create-actions">
+          <button type="button" className="club-create-cancel-btn" onClick={() => setShowCreateForm(false)}>Cancel</button>
+          <button type="submit" className="club-create-submit-btn" disabled={createBusy || !createForm.organisationId}>
+            {createBusy ? "Creating..." : "Create"}
           </button>
         </div>
-      ))}
+      </form>
     </div>
+  )
+
+  const listBlock = (
+    <section className="m2-section">
+      <div className="m2-section-header">
+        <h2 className="m2-section-title">Clubs</h2>
+        <span className="m2-see-more" style={{ cursor: "default" }}>
+          {filteredClubs.length} club{filteredClubs.length === 1 ? "" : "s"}
+        </span>
+      </div>
+
+      {loading ? (
+        <div className="home-loading">
+          <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      ) : error ? (
+        <div className="clubs-empty-state-box"><p className="clubs-empty-state-desc">{error}</p></div>
+      ) : filteredClubs.length === 0 && !myOrganisations.length ? (
+        <div className="clubs-empty-state-box">
+          <div className="clubs-empty-state-icon">🎓</div>
+          <h4 className="clubs-empty-state-title">No Clubs Found</h4>
+          <p className="clubs-empty-state-desc">No clubs have been created yet.</p>
+        </div>
+      ) : (
+        <div className="club-tile-grid">
+          {myOrganisations.length > 0 && (
+            <button className="club-tile club-tile--add" onClick={() => setShowCreateForm(true)}>
+              <div className="club-tile-avatar club-tile-avatar--add"><Plus size={26} /></div>
+              <span className="club-tile-name">Add club</span>
+            </button>
+          )}
+          {filteredClubs.map((club) => (
+            <button key={club.id} className="club-tile" onClick={() => navigate(`/clubs/${club.id}`)}>
+              <div className="club-tile-avatar" style={{ background: getTileColor(club.id) }}>
+                {getInitials(club.name)}
+              </div>
+              <span className="club-tile-name">{club.name}</span>
+              {club.description && <span className="club-tile-desc">{club.description}</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
   )
 
   const sidebarDrawer = (
@@ -193,7 +245,7 @@ export default function Clubs() {
               <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
             )}
           </button>
-          <h1 className="m2-org-name">Clubs</h1>
+          <h1 className="m2-org-name">All Clubs</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
             <Bell size={18} />
             {unreadCount > 0 && <div className="home-notification-badge" />}
@@ -202,8 +254,9 @@ export default function Clubs() {
 
         <div className="m2-desktop-block">
           {searchBlock}
-          <div style={{ marginTop: "20px" }}>{listBlock}</div>
+          {listBlock}
         </div>
+        {createFormBlock}
       </div>
     )
   }
@@ -221,15 +274,16 @@ export default function Clubs() {
               <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
             )}
           </button>
-          <h1 className="m2-org-name">Clubs</h1>
+          <h1 className="m2-org-name">All Clubs</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
             <Bell size={18} />
             {unreadCount > 0 && <div className="home-notification-badge" />}
           </button>
         </header>
 
-        <div style={{ marginBottom: "20px" }}>{searchBlock}</div>
+        {searchBlock}
         {listBlock}
+        {createFormBlock}
       </div>
     </PhoneFrame>
   )
