@@ -14,6 +14,8 @@ import AdminDashboard from "./pages/AdminDashboard.jsx"
 import Inbox from "./pages/Inbox.jsx"
 import Clubs from "./pages/Clubs.jsx"
 import Schedule from "./pages/Schedule.jsx"
+import News from "./pages/News.jsx"
+import NewsDetail from "./pages/NewsDetail.jsx"
 import ClubDetail from "./pages/ClubDetail.jsx"
 import Ticket from "./pages/Ticket.jsx"
 import Unauthorized from "./pages/Unauthorized.jsx"
@@ -107,6 +109,8 @@ export default function App() {
         <Route path="/clubs" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><OrgMemberRoute><Clubs /></OrgMemberRoute></ProtectedRoute>} />
         <Route path="/clubs/:id" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><OrgMemberRoute><ClubDetail /></OrgMemberRoute></ProtectedRoute>} />
         <Route path="/schedule" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Schedule /></ProtectedRoute>} />
+        <Route path="/news" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><News /></ProtectedRoute>} />
+        <Route path="/news/:id" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><NewsDetail /></ProtectedRoute>} />
         <Route path="/events/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><EventDetails /></ProtectedRoute>} />
         <Route path="/events/:id/ticket" element={<ProtectedRoute allowedRoles={["student"]}><Ticket /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

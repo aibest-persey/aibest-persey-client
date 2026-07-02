@@ -6,7 +6,7 @@ import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TicketModal from "../components/TicketModal.jsx"
 import { getSchedule } from "../services/scheduleService.js"
-import { Bell, ChevronLeft, ChevronRight, User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck } from "lucide-react"
+import { Bell, ChevronLeft, ChevronRight, User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper } from "lucide-react"
 import "./Schedule.css"
 
 // Sunday-first — matches the backend's getMonthCalendar grid ordering.
@@ -193,6 +193,9 @@ export default function Schedule() {
               <CalendarCheck size={20} className="sidebar-nav-icon" /><span>My Registrations</span>
             </button>
           )}
+          <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/news") }}>
+            <Newspaper size={20} className="sidebar-nav-icon" /><span>News</span>
+          </button>
           <button className="sidebar-nav-item"><Calendar size={20} className="sidebar-nav-icon" /><span>Calendar</span></button>
           <button className="sidebar-nav-item"><Bookmark size={20} className="sidebar-nav-icon" /><span>Bookmark</span></button>
           <button className="sidebar-nav-item"><Mail size={20} className="sidebar-nav-icon" /><span>Contact Us</span></button>

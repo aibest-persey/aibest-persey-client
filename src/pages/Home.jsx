@@ -10,7 +10,7 @@ import { requestToJoinOrganisation, getMyJoinRequests } from "../services/organi
 import { listNews } from "../services/newsService.js"
 import {
   Bell, SlidersHorizontal, Plus, Heart, Clock, ArrowRight, Search,
-  User, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck,
+  User, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
@@ -352,7 +352,7 @@ export default function Home() {
     <section className="m2-section">
       <div className="m2-section-header">
         <h2 className="m2-section-title">Latest News</h2>
-        <button className="m2-see-more">See all</button>
+        <button className="m2-see-more" onClick={() => navigate("/news")}>See all</button>
       </div>
       {newsItems.length === 0 ? (
         <div className="clubs-empty-state-box">
@@ -363,8 +363,11 @@ export default function Home() {
       ) : (
         <div className="m2-news-grid">
           {newsItems.slice(0, 4).map((item) => (
-            <div key={item.id} className="m2-news-card">
-              <div className="m2-news-image" style={{ background: getTileColor(item.id) }}>
+            <div key={item.id} className="m2-news-card" onClick={() => navigate(`/news/${item.id}`)} style={{ cursor: "pointer" }}>
+              <div
+                className="m2-news-image"
+                style={item.coverImage ? { backgroundImage: `url(${item.coverImage})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: getTileColor(item.id) }}
+              >
                 <span className="m2-news-tag">See more →</span>
               </div>
               <div className="m2-news-title-bar">
@@ -413,6 +416,9 @@ export default function Home() {
               <CalendarCheck size={20} className="sidebar-nav-icon" /><span>My Registrations</span>
             </button>
           )}
+          <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/news") }}>
+            <Newspaper size={20} className="sidebar-nav-icon" /><span>News</span>
+          </button>
           <button className="sidebar-nav-item"><Calendar size={20} className="sidebar-nav-icon" /><span>Calendar</span></button>
           <button className="sidebar-nav-item"><Bookmark size={20} className="sidebar-nav-icon" /><span>Bookmark</span></button>
           <button className="sidebar-nav-item"><Mail size={20} className="sidebar-nav-icon" /><span>Contact Us</span></button>

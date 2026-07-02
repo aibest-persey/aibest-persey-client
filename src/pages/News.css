@@ -1,0 +1,192 @@
+/* ==========================================================================
+   News page — browse list (scope tabs + today/other sections) and detail view.
+   Shares its page shell (.home-container--m2, .m2-header, .m2-desktop-header,
+   .m2-desktop-block, sidebar drawer, .m2-section) with Home.css/Clubs.css, and
+   the search pill / empty-state classes from Clubs.css.
+   ========================================================================== */
+
+/* Scope filter tabs (Public / My Org / My Clubs) */
+.news-scope-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.news-scope-tab {
+  background: #f0f1f8;
+  color: #747688;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.news-scope-tab--active {
+  background: #111638;
+  color: #ffffff;
+}
+
+/* Horizontal-scroll row for "All news today" */
+.news-scroll-row {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  margin: 0 -20px;
+  padding: 4px 20px 6px 20px;
+  scrollbar-width: none;
+}
+
+.news-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.news-scroll-row .news-card {
+  flex-shrink: 0;
+  width: 220px;
+}
+
+/* Static 2-col grid for "Other news" */
+.news-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 1024px) {
+  .news-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+/* Card */
+.news-card {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.news-card-image {
+  position: relative;
+  height: 170px;
+  background-size: cover;
+  background-position: center;
+  background-color: #e2e5f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.news-see-more-pill {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 10px 10px 0 0;
+  background: rgba(17, 22, 56, 0.85);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
+.news-scope-badge {
+  align-self: flex-start;
+  margin: 10px 0 0 10px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(17, 22, 56, 0.85);
+}
+
+.news-scope-badge--org {
+  background: rgba(41, 214, 151, 0.9);
+  color: #0b3b28;
+}
+
+.news-scope-badge--club {
+  background: rgba(86, 105, 255, 0.9);
+}
+
+/* When both the "See more" pill and the scope badge are present, stack them
+   at the top instead of overlapping (see-more pill is self-end, badge is
+   self-start, so they naturally sit on opposite sides of the same row). */
+.news-card-image > .news-scope-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.news-card-overlay {
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0) 100%);
+  padding: 28px 12px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.news-card-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.news-card-date {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Detail screen */
+.news-detail-banner {
+  position: relative;
+  height: 200px;
+  border-radius: 20px;
+  background-size: cover;
+  background-position: center;
+  background-color: #e2e5f1;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.news-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #747688;
+  margin-bottom: 8px;
+}
+
+.news-detail-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111638;
+  margin: 0 0 14px 0;
+}
+
+.news-detail-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #3a3d52;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}

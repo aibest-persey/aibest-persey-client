@@ -22,3 +22,6 @@ export const listNews = (token, params = {}) => {
   const qs = q.toString() ? `?${q}` : ""
   return handle(fetch(`${API_BASE}/api/news${qs}`, { headers: authHeaders(token) }))
 }
+
+export const getNews = (token, id) =>
+  handle(fetch(`${API_BASE}/api/news/${id}`, { headers: authHeaders(token) }))

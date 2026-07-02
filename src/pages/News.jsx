@@ -4,22 +4,48 @@ import { useAuth } from "../hooks/useAuth.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
 import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
-import { listClubs, createClub } from "../services/clubService.js"
+import { listNews } from "../services/newsService.js"
 import { listOrganisations } from "../services/organisationService.js"
-import { getTileColor } from "../utils/colorTiles.js"
+import { listClubs } from "../services/clubService.js"
+import { getGradient } from "../utils/colorTiles.js"
 import {
-  Bell, Search, Plus,
+  Bell, Search, ArrowRight,
   User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper,
 } from "lucide-react"
-import "./Clubs.css"
+import "./News.css"
 
-function getInitials(name) {
-  if (!name) return "?"
-  const words = name.trim().split(/\s+/)
-  return words.slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "?"
+const SCOPE_LABELS = { public: "Public", org: "My Org", club: "My Clubs" }
+
+function dedupeById(items) {
+  const seen = new Set()
+  const result = []
+  for (const item of items) {
+    if (seen.has(item.id)) continue
+    seen.add(item.id)
+    result.push(item)
+  }
+  return result
 }
 
-export default function Clubs() {
+function isToday(isoStr) {
+  const d = new Date(isoStr)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
+}
+
+function formatDate(isoStr) {
+  try {
+    return new Date(isoStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  } catch { return "" }
+}
+
+function snippetOf(content) {
+  if (!content) return ""
+  const trimmed = content.trim()
+  return trimmed.length > 110 ? `${trimmed.slice(0, 110).trim()}…` : trimmed
+}
+
+export default function News() {
   const { user, token, logout } = useAuth()
   const navigate = useNavigate()
   const isDesktop = useIsDesktop()
@@ -32,66 +58,105 @@ export default function Clubs() {
   })
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [clubs, setClubs] = useState([])
+  const [scopeTab, setScopeTab] = useState("public")
   const [myOrganisations, setMyOrganisations] = useState([])
+  const [myClubs, setMyClubs] = useState([])
+  const [newsItems, setNewsItems] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [search, setSearch] = useState("")
 
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [createForm, setCreateForm] = useState({ name: "", description: "", organisationId: "" })
-  const [createBusy, setCreateBusy] = useState(false)
-  const [createError, setCreateError] = useState("")
+  useEffect(() => {
+    if (!token) return
+    Promise.all([listOrganisations(token), listClubs(token)])
+      .then(([orgs, clubs]) => {
+        setMyOrganisations(orgs.filter((o) => o.isMember))
+        setMyClubs(clubs.filter((c) => c.isMember))
+      })
+      .catch(() => { setMyOrganisations([]); setMyClubs([]) })
+  }, [token])
 
   useEffect(() => {
     if (!token) return
     setLoading(true)
     setError("")
-    Promise.all([listClubs(token), listOrganisations(token)])
-      .then(([clubsData, orgsData]) => {
-        setClubs(clubsData)
-        const mine = orgsData.filter((o) => o.isMember)
-        setMyOrganisations(mine)
-        if (mine.length === 1) setCreateForm((f) => ({ ...f, organisationId: mine[0].id }))
-      })
-      .catch((err) => setError(err.message ?? "Failed to load clubs."))
-      .finally(() => setLoading(false))
-  }, [token])
 
-  const filteredClubs = clubs.filter((c) => {
+    if (scopeTab === "public") {
+      listNews(token, { scope: "public" })
+        .then(setNewsItems)
+        .catch((err) => setError(err.message ?? "Failed to load news."))
+        .finally(() => setLoading(false))
+      return
+    }
+
+    if (scopeTab === "org") {
+      const org = myOrganisations[0]
+      if (!org) { setNewsItems([]); setLoading(false); return }
+      listNews(token, { scope: "org", organisationId: org.id })
+        .then(setNewsItems)
+        .catch((err) => setError(err.message ?? "Failed to load news."))
+        .finally(() => setLoading(false))
+      return
+    }
+
+    // scopeTab === "club" — the API only accepts one clubId per call, so merge across every club the user belongs to.
+    if (myClubs.length === 0) { setNewsItems([]); setLoading(false); return }
+    Promise.all(myClubs.map((c) => listNews(token, { scope: "club", clubId: c.id }).catch(() => [])))
+      .then((lists) => {
+        const merged = dedupeById(lists.flat()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        setNewsItems(merged)
+      })
+      .catch((err) => setError(err.message ?? "Failed to load news."))
+      .finally(() => setLoading(false))
+  }, [token, scopeTab, myOrganisations, myClubs])
+
+  const filteredNews = newsItems.filter((n) => {
     const q = search.trim().toLowerCase()
     if (!q) return true
-    return c.name.toLowerCase().includes(q) || (c.description ?? "").toLowerCase().includes(q)
+    return n.title.toLowerCase().includes(q) || (n.content ?? "").toLowerCase().includes(q)
   })
 
-  const handleCreateClub = async (e) => {
-    e.preventDefault()
-    if (createBusy || !createForm.name.trim() || !createForm.organisationId) return
-    setCreateBusy(true)
-    setCreateError("")
-    try {
-      const club = await createClub(token, {
-        name: createForm.name.trim(),
-        description: createForm.description.trim() || undefined,
-        organisationId: createForm.organisationId,
-      })
-      setClubs((prev) => [...prev, club])
-      setShowCreateForm(false)
-      setCreateForm((f) => ({ ...f, name: "", description: "" }))
-      navigate(`/clubs/${club.id}`)
-    } catch (err) {
-      setCreateError(err.message ?? "Failed to create club.")
-    } finally {
-      setCreateBusy(false)
-    }
-  }
+  const todayNews = filteredNews.filter((n) => isToday(n.createdAt))
+  const otherNews = filteredNews.filter((n) => !isToday(n.createdAt))
+
+  const headerOrgLabel = myOrganisations[0]?.name ?? "News"
+
+  const NewsCard = ({ item }) => (
+    <button className="news-card" onClick={() => navigate(`/news/${item.id}`)}>
+      <div
+        className="news-card-image"
+        style={item.coverImage ? { backgroundImage: `url(${item.coverImage})` } : { background: getGradient(item.id) }}
+      >
+        <span className="news-see-more-pill">See more <ArrowRight size={11} /></span>
+        <span className={`news-scope-badge news-scope-badge--${item.scope}`}>{SCOPE_LABELS[item.scope] ?? item.scope}</span>
+        <div className="news-card-overlay">
+          <span className="news-card-title">{item.title}</span>
+          <span className="news-card-date">{formatDate(item.createdAt)}</span>
+        </div>
+      </div>
+    </button>
+  )
+
+  const scopeTabsBlock = (
+    <div className="news-scope-tabs">
+      {["public", "org", "club"].map((s) => (
+        <button
+          key={s}
+          className={`news-scope-tab ${scopeTab === s ? "news-scope-tab--active" : ""}`}
+          onClick={() => setScopeTab(s)}
+        >
+          {SCOPE_LABELS[s]}
+        </button>
+      ))}
+    </div>
+  )
 
   const searchBlock = (
     <div className="clubs-search-pill" style={{ maxWidth: "none" }}>
       <input
         type="text"
         className="clubs-search-input-field"
-        placeholder="Search Club"
+        placeholder={`Search in ${headerOrgLabel}`}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -101,57 +166,8 @@ export default function Clubs() {
     </div>
   )
 
-  const createFormBlock = showCreateForm && (
-    <div className="club-create-overlay" onClick={() => setShowCreateForm(false)}>
-      <form className="club-create-form" onClick={(e) => e.stopPropagation()} onSubmit={handleCreateClub}>
-        <h3 className="club-create-title">Create a club</h3>
-        {myOrganisations.length > 1 && (
-          <select
-            className="club-create-select"
-            value={createForm.organisationId}
-            onChange={(e) => setCreateForm((f) => ({ ...f, organisationId: e.target.value }))}
-            required
-          >
-            <option value="" disabled>Choose your organisation</option>
-            {myOrganisations.map((o) => (
-              <option key={o.id} value={o.id}>{o.name}</option>
-            ))}
-          </select>
-        )}
-        <input
-          className="club-create-input"
-          placeholder="Club name"
-          value={createForm.name}
-          onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
-          required
-        />
-        <textarea
-          className="club-create-textarea"
-          placeholder="Short description (optional)"
-          rows={3}
-          value={createForm.description}
-          onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
-        />
-        {createError && <p className="club-create-error">{createError}</p>}
-        <div className="club-create-actions">
-          <button type="button" className="club-create-cancel-btn" onClick={() => setShowCreateForm(false)}>Cancel</button>
-          <button type="submit" className="club-create-submit-btn" disabled={createBusy || !createForm.organisationId}>
-            {createBusy ? "Creating..." : "Create"}
-          </button>
-        </div>
-      </form>
-    </div>
-  )
-
   const listBlock = (
-    <section className="m2-section">
-      <div className="m2-section-header">
-        <h2 className="m2-section-title">Clubs</h2>
-        <span className="m2-see-more" style={{ cursor: "default" }}>
-          {filteredClubs.length} club{filteredClubs.length === 1 ? "" : "s"}
-        </span>
-      </div>
-
+    <>
       {loading ? (
         <div className="home-loading">
           <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
@@ -159,32 +175,44 @@ export default function Clubs() {
         </div>
       ) : error ? (
         <div className="clubs-empty-state-box"><p className="clubs-empty-state-desc">{error}</p></div>
-      ) : filteredClubs.length === 0 && !myOrganisations.length ? (
+      ) : filteredNews.length === 0 ? (
         <div className="clubs-empty-state-box">
-          <div className="clubs-empty-state-icon">🎓</div>
-          <h4 className="clubs-empty-state-title">No Clubs Found</h4>
-          <p className="clubs-empty-state-desc">No clubs have been created yet.</p>
+          <div className="clubs-empty-state-icon">📰</div>
+          <h4 className="clubs-empty-state-title">No News Available</h4>
+          <p className="clubs-empty-state-desc">
+            {scopeTab === "org" && myOrganisations.length === 0
+              ? "You're not part of an organisation yet."
+              : scopeTab === "club" && myClubs.length === 0
+                ? "You're not part of any club yet."
+                : "No news articles or updates have been published yet."}
+          </p>
         </div>
       ) : (
-        <div className="club-tile-grid">
-          {myOrganisations.length > 0 && (
-            <button className="club-tile club-tile--add" onClick={() => setShowCreateForm(true)}>
-              <div className="club-tile-avatar club-tile-avatar--add"><Plus size={26} /></div>
-              <span className="club-tile-name">Add club</span>
-            </button>
-          )}
-          {filteredClubs.map((club) => (
-            <button key={club.id} className="club-tile" onClick={() => navigate(`/clubs/${club.id}`)}>
-              <div className="club-tile-avatar" style={{ background: getTileColor(club.id) }}>
-                {getInitials(club.name)}
+        <>
+          {todayNews.length > 0 && (
+            <section className="m2-section">
+              <div className="m2-section-header">
+                <h2 className="m2-section-title">All news today</h2>
               </div>
-              <span className="club-tile-name">{club.name}</span>
-              {club.description && <span className="club-tile-desc">{club.description}</span>}
-            </button>
-          ))}
-        </div>
+              <div className="news-scroll-row">
+                {todayNews.map((item) => <NewsCard key={item.id} item={item} />)}
+              </div>
+            </section>
+          )}
+
+          {otherNews.length > 0 && (
+            <section className="m2-section">
+              <div className="m2-section-header">
+                <h2 className="m2-section-title">Other news</h2>
+              </div>
+              <div className="news-grid">
+                {otherNews.map((item) => <NewsCard key={item.id} item={item} />)}
+              </div>
+            </section>
+          )}
+        </>
       )}
-    </section>
+    </>
   )
 
   const sidebarDrawer = (
@@ -245,10 +273,10 @@ export default function Clubs() {
             {profile.avatar ? (
               <img src={profile.avatar} alt="" className="m2-avatar-img" />
             ) : (
-              <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
+              <span className="m2-avatar-fallback">{(profile.nickname || "?").charAt(0).toUpperCase()}</span>
             )}
           </button>
-          <h1 className="m2-org-name">All Clubs</h1>
+          <h1 className="m2-org-name">News this week &lsquo;{headerOrgLabel}&rsquo;</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
             <Bell size={18} />
             {unreadCount > 0 && <div className="home-notification-badge" />}
@@ -256,10 +284,10 @@ export default function Clubs() {
         </header>
 
         <div className="m2-desktop-block">
+          {scopeTabsBlock}
           {searchBlock}
-          {listBlock}
+          <div style={{ marginTop: 20 }}>{listBlock}</div>
         </div>
-        {createFormBlock}
       </div>
     )
   }
@@ -274,19 +302,19 @@ export default function Clubs() {
             {profile.avatar ? (
               <img src={profile.avatar} alt="" className="m2-avatar-img" />
             ) : (
-              <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
+              <span className="m2-avatar-fallback">{(profile.nickname || "?").charAt(0).toUpperCase()}</span>
             )}
           </button>
-          <h1 className="m2-org-name">All Clubs</h1>
+          <h1 className="m2-org-name">News this week &lsquo;{headerOrgLabel}&rsquo;</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>
             <Bell size={18} />
             {unreadCount > 0 && <div className="home-notification-badge" />}
           </button>
         </header>
 
+        {scopeTabsBlock}
         {searchBlock}
         {listBlock}
-        {createFormBlock}
       </div>
     </PhoneFrame>
   )
