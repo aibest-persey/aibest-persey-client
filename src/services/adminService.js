@@ -35,3 +35,15 @@ export const adminDeleteEvent = (token, id) =>
     method: "DELETE",
     headers: authHeaders(token),
   }))
+
+export const verifyOrganisation = (token, id) =>
+  handle(fetch(`${API_BASE}/api/admin/organisations/${id}/verify`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+  }))
+
+export const adminDeleteOrganisation = (token, id) =>
+  handle(fetch(`${API_BASE}/api/admin/organisations/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  }))

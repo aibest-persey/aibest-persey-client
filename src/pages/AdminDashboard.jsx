@@ -1,17 +1,19 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
-import { listUsers, setUserRole, listAllEvents, adminCancelEvent, adminDeleteEvent } from "../services/adminService.js"
+import { listUsers, setUserRole, listAllEvents, adminCancelEvent, adminDeleteEvent, verifyOrganisation, adminDeleteOrganisation } from "../services/adminService.js"
 import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../services/roleRequestService.js"
+import { listOrganisations } from "../services/organisationService.js"
 import { useNotifications } from "../hooks/useNotifications.js"
 import { useIsDesktop } from "../hooks/useIsDesktop.js"
-import { Users, Calendar, ClipboardList, Trash2, Ban, Check, X, Bell } from "lucide-react"
+import { Users, Calendar, ClipboardList, Trash2, Ban, Check, X, Bell, Building2 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./AdminDashboard.css"
 
 const ROLE_COLORS = { student: "#5669ff", organiser: "#29d697", admin: "#f59762" }
 const STATUS_COLORS = { draft: "#9a9cae", published: "#29d697", cancelled: "#f0635a" }
 const REQ_COLORS = { pending: "#f59762", approved: "#29d697", rejected: "#f0635a" }
+const ORG_COLORS = { pending: "#f59762", verified: "#29d697" }
 
 function Badge({ label, color }) {
   return <span className="adm-badge" style={{ background: color + "22", color }}>{label}</span>
@@ -27,6 +29,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([])
   const [events, setEvents] = useState([])
   const [requests, setRequests] = useState([])
+  const [organisations, setOrganisations] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [actionMsg, setActionMsg] = useState("")
@@ -55,10 +58,18 @@ export default function AdminDashboard() {
     finally { setLoading(false) }
   }, [token])
 
+  const loadOrganisations = useCallback(async () => {
+    setLoading(true); setError("")
+    try { setOrganisations(await listOrganisations(token)) }
+    catch (e) { setError(e.message) }
+    finally { setLoading(false) }
+  }, [token])
+
   useEffect(() => {
     if (tab === "users") loadUsers()
     else if (tab === "events") loadEvents()
-    else loadRequests()
+    else if (tab === "requests") loadRequests()
+    else loadOrganisations()
   }, [tab])
 
   const handleRoleChange = async (userId, newRole) => {
@@ -102,7 +113,25 @@ export default function AdminDashboard() {
     } catch (e) { flash(e.message) }
   }
 
+  const handleVerifyOrganisation = async (id) => {
+    try {
+      await verifyOrganisation(token, id)
+      setOrganisations((prev) => prev.map((o) => o.id === id ? { ...o, status: "verified" } : o))
+      flash("Organisation verified.")
+    } catch (e) { flash(e.message) }
+  }
+
+  const handleDeleteOrganisation = async (id) => {
+    try {
+      await adminDeleteOrganisation(token, id)
+      setOrganisations((prev) => prev.filter((o) => o.id !== id))
+      setConfirmDelete(null)
+      flash("Organisation deleted.")
+    } catch (e) { flash(e.message) }
+  }
+
   const pendingCount = requests.filter((r) => r.status === "pending").length
+  const pendingOrgCount = organisations.filter((o) => o.status === "pending").length
 
   return (
     <PhoneFrame>
@@ -129,6 +158,10 @@ export default function AdminDashboard() {
           <button className={`adm-tab ${tab === "requests" ? "adm-tab--active" : ""}`} onClick={() => setTab("requests")}>
             <ClipboardList size={15} /> Role Requests
             {pendingCount > 0 && <span className="adm-badge-count">{pendingCount}</span>}
+          </button>
+          <button className={`adm-tab ${tab === "organisations" ? "adm-tab--active" : ""}`} onClick={() => setTab("organisations")}>
+            <Building2 size={15} /> Organisations
+            {pendingOrgCount > 0 && <span className="adm-badge-count">{pendingOrgCount}</span>}
           </button>
         </div>
 
@@ -231,6 +264,48 @@ export default function AdminDashboard() {
                         </button>
                       </div>
                     )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ORGANISATIONS TAB */}
+            {tab === "organisations" && (
+              <div className="adm-list">
+                {organisations.length === 0 && (
+                  <div className="adm-empty">No organisations.</div>
+                )}
+                {organisations.map((o) => (
+                  <div key={o.id} className="adm-card">
+                    <div className="adm-card-avatar" style={{ background: "#5669ff" }}>
+                      {(o.name || "?").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="adm-card-body">
+                      <div className="adm-card-name">{o.name}</div>
+                      {o.description && <div className="adm-card-sub">{o.description}</div>}
+                      <Badge label={o.status} color={ORG_COLORS[o.status] || "#9a9cae"} />
+                    </div>
+                    <div className="adm-card-actions">
+                      {o.status === "pending" && (
+                        <button className="adm-action-btn adm-action-btn--approve" onClick={() => handleVerifyOrganisation(o.id)} title="Verify organisation">
+                          <Check size={15} />
+                        </button>
+                      )}
+                      {confirmDelete === o.id ? (
+                        <>
+                          <button className="adm-action-btn adm-action-btn--danger" onClick={() => handleDeleteOrganisation(o.id)} title="Confirm delete">
+                            <Check size={15} />
+                          </button>
+                          <button className="adm-action-btn" onClick={() => setConfirmDelete(null)} title="Cancel">
+                            <X size={15} />
+                          </button>
+                        </>
+                      ) : (
+                        <button className="adm-action-btn adm-action-btn--danger" onClick={() => setConfirmDelete(o.id)} title="Delete organisation">
+                          <Trash2 size={15} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
