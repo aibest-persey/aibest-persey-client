@@ -404,7 +404,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                 <div className="profile-mgmt-list">
                   <button 
                     className="profile-mgmt-item"
-                    onClick={() => showToast("Language settings coming soon!")}
+                    onClick={() => navigate("/settings")}
                   >
                     <div className="profile-mgmt-item-left">
                       <div className="profile-mgmt-icon-box">
@@ -430,7 +430,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
 
                   <button 
                     className="profile-mgmt-item"
-                    onClick={() => showToast("Account settings coming soon!")}
+                    onClick={() => navigate("/settings")}
                   >
                     <div className="profile-mgmt-item-left">
                       <div className="profile-mgmt-icon-box">
@@ -589,7 +589,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
           <section className="profile-section">
             <h3 className="profile-section-title">Account management</h3>
             <div className="profile-mgmt-list">
-              <button className="profile-mgmt-item" onClick={() => showToast("Language settings coming soon!")}>
+              <button className="profile-mgmt-item" onClick={() => navigate("/settings")}>
                 <div className="profile-mgmt-item-left">
                   <div className="profile-mgmt-icon-box"><Globe size={20} /></div>
                   <span className="profile-mgmt-label">Language</span>
@@ -605,7 +605,7 @@ export default function Profile({ profile: propProfile, onSave, onBack }) {
                 <ChevronRight size={18} className="profile-mgmt-chevron" />
               </button>
 
-              <button className="profile-mgmt-item" onClick={() => showToast("Account settings coming soon!")}>
+              <button className="profile-mgmt-item" onClick={() => navigate("/settings")}>
                 <div className="profile-mgmt-item-left">
                   <div className="profile-mgmt-icon-box"><Settings size={20} /></div>
                   <span className="profile-mgmt-label">Settings</span>

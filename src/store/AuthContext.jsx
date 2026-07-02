@@ -2,6 +2,7 @@
 import { createContext, useState, useEffect, useCallback } from "react"
 import { getToken, getUser, saveSession, clearSession } from "../utils/tokenStorage.js"
 import { fetchCurrentUser } from "../services/authService.js"
+import { setAppLocale } from "../i18n/index.js"
 
 export const AuthContext = createContext(null)
 
@@ -56,35 +57,41 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
-  useEffect(() => {
-    const syncUserSession = async () => {
-      if (!token) return
-      setLoading(true)
-      setError(null)
-      try {
-        const userData = await fetchCurrentUser(token)
-        const decoded = decodeToken(token)
-        const userWithRole = { ...userData, role: decoded?.role || "student" }
-        saveSession(token, userWithRole)
-        setUser(userWithRole)
-      } catch (err) {
-        console.error("Sync user session failed:", err)
-        setError(err.message || "Failed to retrieve user profile.")
-        if (err.status === 401 || err.status === 403) {
-          logout()
-        }
-      } finally {
-        setLoading(false)
+  const syncUserSession = useCallback(async () => {
+    if (!token) return
+    setLoading(true)
+    setError(null)
+    try {
+      const userData = await fetchCurrentUser(token)
+      const decoded = decodeToken(token)
+      const userWithRole = { ...userData, role: decoded?.role || "student" }
+      saveSession(token, userWithRole)
+      setUser(userWithRole)
+    } catch (err) {
+      console.error("Sync user session failed:", err)
+      setError(err.message || "Failed to retrieve user profile.")
+      if (err.status === 401 || err.status === 403) {
+        logout()
       }
+    } finally {
+      setLoading(false)
     }
-
-    syncUserSession()
   }, [token, logout])
+
+  useEffect(() => {
+    syncUserSession()
+  }, [syncUserSession])
+
+  // Keep the UI language in sync with whatever locale the account carries —
+  // covers initial load (cached user), login, and manual settings updates.
+  useEffect(() => {
+    if (user?.locale) setAppLocale(user.locale)
+  }, [user?.locale])
 
   const isAuthenticated = Boolean(token)
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated, loading, error }}>
+    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated, loading, error, refreshUser: syncUserSession }}>
       {children}
     </AuthContext.Provider>
   )

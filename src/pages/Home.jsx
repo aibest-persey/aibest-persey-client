@@ -10,7 +10,7 @@ import { requestToJoinOrganisation, getMyJoinRequests } from "../services/organi
 import { listNews } from "../services/newsService.js"
 import {
   Bell, SlidersHorizontal, Plus, Heart, Clock, ArrowRight, Search,
-  User, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper,
+  User, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
@@ -418,6 +418,9 @@ export default function Home() {
           )}
           <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/news") }}>
             <Newspaper size={20} className="sidebar-nav-icon" /><span>News</span>
+          </button>
+          <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/settings") }}>
+            <SettingsIcon size={20} className="sidebar-nav-icon" /><span>Settings</span>
           </button>
           <button className="sidebar-nav-item"><Calendar size={20} className="sidebar-nav-icon" /><span>Calendar</span></button>
           <button className="sidebar-nav-item"><Bookmark size={20} className="sidebar-nav-icon" /><span>Bookmark</span></button>

@@ -1,0 +1,21 @@
+{
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "sectionTitle": "Language",
+      "sectionDesc": "Choose the language used across the app.",
+      "en": "English",
+      "bg": "Bulgarian"
+    },
+    "notifications": {
+      "sectionTitle": "Notifications",
+      "toggleLabel": "In-app notifications",
+      "toggleDesc": "Get notified about role request updates and other activity inside the app."
+    },
+    "saved": "Settings saved.",
+    "saveError": "Could not save your settings. Please try again."
+  },
+  "nav": {
+    "settings": "Settings"
+  }
+}

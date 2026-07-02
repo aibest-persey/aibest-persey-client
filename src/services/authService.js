@@ -174,4 +174,30 @@ export async function updateUserProfile(token, data) {
   return json
 }
 
+/**
+ * Update the current user's language / notification preferences. Unlike
+ * updateUserProfile (organiser-only), this works for every role.
+ * @param {string} token JWT token
+ * @param {{ locale?: "en"|"bg", notificationsEnabled?: boolean }} data
+ * @returns {Promise<{ locale: string, notificationsEnabled: boolean }>}
+ */
+export async function updateMySettings(token, data) {
+  const response = await fetch(`${API_BASE}/api/users/me/settings`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  })
+
+  const json = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(json.message ?? "Failed to update settings.")
+  }
+
+  return json
+}
+
 

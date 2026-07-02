@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useHasOrganisation } from "../hooks/useHasOrganisation.js"
 import { useNotifications } from "../hooks/useNotifications.js"
-import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck, Users, Calendar, Newspaper } from "lucide-react"
+import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck, Users, Calendar, Newspaper, Settings as SettingsIcon } from "lucide-react"
 import { AvatarIcon } from "../pages/Profile.jsx"
 import "./DesktopShell.css"
 
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { icon: Bell, label: "Notifications", path: "/notifications" },
   { icon: Mail, label: "Inbox", path: "/inbox" },
   { icon: User, label: "Profile", path: "/profile" },
+  { icon: SettingsIcon, label: "Settings", path: "/settings" },
 ]
 
 const STUDENT_NAV_ITEMS = [
@@ -76,7 +77,7 @@ export default function DesktopShell() {
       <header className="dsk-top-navbar">
         <nav className="dsk-nav">
           {NAV_ITEMS
-            .filter((item) => user?.role !== "admin" || ["/home", "/clubs", "/profile", "/notifications", "/news"].includes(item.path))
+            .filter((item) => user?.role !== "admin" || ["/home", "/clubs", "/profile", "/notifications", "/news", "/settings"].includes(item.path))
             .filter((item) => item.path !== "/clubs" || hasOrganisation)
             .map(({ icon: Icon, label, path }) => (
             <button

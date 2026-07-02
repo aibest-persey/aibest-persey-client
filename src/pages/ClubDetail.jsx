@@ -11,7 +11,7 @@ import { listNews } from "../services/newsService.js"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
 import {
   Bell, Users, MessageSquare, Calendar, Megaphone, MapPin, Clock,
-  User, SlidersHorizontal, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper,
+  User, SlidersHorizontal, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
 } from "lucide-react"
 import "./ClubDetail.css"
 
@@ -207,6 +207,9 @@ export default function ClubDetail() {
           )}
           <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/news") }}>
             <Newspaper size={20} className="sidebar-nav-icon" /><span>News</span>
+          </button>
+          <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/settings") }}>
+            <SettingsIcon size={20} className="sidebar-nav-icon" /><span>Settings</span>
           </button>
           <button className="sidebar-nav-item"><Calendar size={20} className="sidebar-nav-icon" /><span>Calendar</span></button>
           <button className="sidebar-nav-item"><Bookmark size={20} className="sidebar-nav-icon" /><span>Bookmark</span></button>

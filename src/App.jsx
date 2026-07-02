@@ -16,6 +16,7 @@ import Clubs from "./pages/Clubs.jsx"
 import Schedule from "./pages/Schedule.jsx"
 import News from "./pages/News.jsx"
 import NewsDetail from "./pages/NewsDetail.jsx"
+import Settings from "./pages/Settings.jsx"
 import ClubDetail from "./pages/ClubDetail.jsx"
 import Ticket from "./pages/Ticket.jsx"
 import Unauthorized from "./pages/Unauthorized.jsx"
@@ -114,6 +115,7 @@ export default function App() {
         <Route path="/events/:id" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><EventDetails /></ProtectedRoute>} />
         <Route path="/events/:id/ticket" element={<ProtectedRoute allowedRoles={["student"]}><Ticket /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute allowedRoles={["student", "organiser", "admin"]}><Notifications /></ProtectedRoute>} />
         <Route path="/my-registrations" element={<ProtectedRoute allowedRoles={["student"]}><MyRegistrations /></ProtectedRoute>} />
         <Route path="/inbox" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Inbox /></ProtectedRoute>} />
