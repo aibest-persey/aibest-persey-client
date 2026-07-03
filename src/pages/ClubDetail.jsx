@@ -9,7 +9,7 @@ import { listPosts, createPost } from "../services/postService.js"
 import { listEvents, createEvent } from "../services/eventService.js"
 import { listNews } from "../services/newsService.js"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
-import { canPostInClub, canManageClub as canManageClubRole, canCreateClubEvent } from "../utils/permissions.js"
+import { canPostInClub, canManageClub as canManageClubRole, canCreateClubEvent, canAccessOrganiserDashboard } from "../utils/permissions.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
 import ImageUploadField from "../components/ImageUploadField.jsx"
 import { resolveImageUrl } from "../services/uploadService.js"
@@ -203,8 +203,7 @@ export default function ClubDetail() {
 
   const canPost = canPostInClub(club?.myRole)
   const canManageClub = canManageClubRole(club?.myRole)
-  const canCreateEvent = canCreateClubEvent(user, club?.myRole)
-  const showEventGateHint = canManageClub && !canCreateEvent
+  const canCreateEvent = canCreateClubEvent(club?.myRole)
 
   const sidebarDrawer = (
     <>
@@ -224,7 +223,7 @@ export default function ClubDetail() {
           <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/clubs") }}>
             <Users size={20} className="sidebar-nav-icon" /><span>Clubs</span>
           </button>
-          {user?.role === "organiser" && (
+          {canAccessOrganiserDashboard(user) && (
             <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/organiser-dashboard") }}>
               <SlidersHorizontal size={20} className="sidebar-nav-icon" /><span>Organiser Dashboard</span>
             </button>
@@ -428,10 +427,6 @@ export default function ClubDetail() {
             </button>
           )}
         </div>
-
-        {showEventGateHint && (
-          <p className="clubdetail-hint">Only organisers can create events for this club.</p>
-        )}
 
         {showEventForm && (
           <form className="clubdetail-event-form" onSubmit={handleCreateEvent}>

@@ -5,7 +5,7 @@ import { useHasOrganisation } from "../hooks/useHasOrganisation.js"
 import { useNotifications } from "../hooks/useNotifications.js"
 import { Home, Bell, User, LayoutDashboard, LogOut, CalendarCheck, Mail, ShieldCheck, Users, Calendar, Newspaper, Settings as SettingsIcon } from "lucide-react"
 import { AvatarIcon } from "../pages/Profile.jsx"
-import { isAdmin, isOrganiser, isStudent } from "../utils/permissions.js"
+import { isAdmin, isStudent, canAccessOrganiserDashboard } from "../utils/permissions.js"
 import "./DesktopShell.css"
 
 const NAV_ITEMS = [
@@ -105,7 +105,7 @@ export default function DesktopShell() {
               </button>
             ))}
 
-          {isOrganiser(user) &&
+          {canAccessOrganiserDashboard(user) &&
             ORG_NAV_ITEMS.map(({ icon: Icon, label, path }) => (
               <button
                 key={path}

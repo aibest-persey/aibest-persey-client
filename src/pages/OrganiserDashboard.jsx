@@ -17,7 +17,7 @@ import { listAllRoleRequests, approveRoleRequest, rejectRoleRequest } from "../s
 import {
   listOrganisations, createOrganisation, updateOrganisation, listOrgJoinRequests, approveJoinRequest, rejectJoinRequest,
 } from "../services/organisationService.js"
-import { canAccessOrganiserDashboard, canManageOrganisation } from "../utils/permissions.js"
+import { isOrganiser, canManageOrganisation, canManageOrgMembers } from "../utils/permissions.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
 import ImageUploadField from "../components/ImageUploadField.jsx"
 import { resolveImageUrl } from "../services/uploadService.js"
@@ -28,7 +28,10 @@ export default function OrganiserDashboard() {
   const location = useLocation()
   const { token, user } = useAuth()
 
-  const [activeTab, setActiveTab] = useState(location.state?.tab ?? "events")
+  // Non-organisers only reach this page via effective org-management rights
+  // (canAccessOrganiserDashboard) — "My Events" would default to an empty tab
+  // for them, so land on "organisations" instead.
+  const [activeTab, setActiveTab] = useState(location.state?.tab ?? (isOrganiser(user) ? "events" : "organisations"))
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -107,8 +110,12 @@ export default function OrganiserDashboard() {
       const orgs = await listOrganisations(token)
       const mine = orgs.filter((o) => o.isMember)
       setMyOrgs(mine)
+      // Only fetch join requests for orgs the user can actually act on — avoids a
+      // guaranteed-403 request per org for plain members (backend gates this by
+      // canManageOrgMembers too; this just skips the round trip).
       const requestsByOrg = {}
       await Promise.all(mine.map(async (org) => {
+        if (!canManageOrgMembers(user, org.id, org.myRole)) { requestsByOrg[org.id] = []; return }
         try { requestsByOrg[org.id] = await listOrgJoinRequests(token, org.id) }
         catch { requestsByOrg[org.id] = [] }
       }))
@@ -118,7 +125,7 @@ export default function OrganiserDashboard() {
     } finally {
       setOrgsLoading(false)
     }
-  }, [token])
+  }, [token, user])
 
   useEffect(() => { if (activeTab === "organisations") loadOrganisations() }, [activeTab])
 
@@ -290,7 +297,11 @@ export default function OrganiserDashboard() {
             <ArrowLeft size={20} />
           </button>
           <h1 className="org-title">My Events</h1>
-          {canAccessOrganiserDashboard(user) && (
+          {/* This form has no scope/visibility picker — it always creates a public
+              event, which is platform-role-organiser-only (can()'s "event:create:public").
+              This page itself is reachable more broadly (see canAccessOrganiserDashboard),
+              but this specific button must stay isOrganiser()-only. */}
+          {isOrganiser(user) && (
             <button className="org-add-btn" aria-label="Create Event" onClick={() => setIsModalOpen(true)}>
               <Plus size={20} />
             </button>
@@ -439,7 +450,7 @@ export default function OrganiserDashboard() {
 
           {activeTab === "events" && <>
           <div className="org-welcome">
-            <p className="org-welcome-sub">Logged in as {user?.username} · Organiser</p>
+            <p className="org-welcome-sub">Logged in as {user?.username}</p>
             <h2 className="org-welcome-title">Manage Your Events</h2>
           </div>
 
@@ -459,7 +470,7 @@ export default function OrganiserDashboard() {
               </div>
               <h3>No Events Yet</h3>
               <p>Create your first event to invite attendees.</p>
-              {canAccessOrganiserDashboard(user) && (
+              {isOrganiser(user) && (
                 <button className="org-empty-cta" onClick={() => setIsModalOpen(true)}>
                   <Plus size={16} />
                   <span>Create Event</span>

@@ -24,11 +24,18 @@ import DesktopShell from "./components/DesktopShell.jsx"
 import { useAuth } from "./hooks/useAuth.js"
 import { useIsDesktop } from "./hooks/useIsDesktop.js"
 import { useHasOrganisation } from "./hooks/useHasOrganisation.js"
+import { canAccessOrganiserDashboard } from "./utils/permissions.js"
 
-function ProtectedRoute({ children, allowedRoles }) {
+// allowedRoles gates by platform role (used where the matrix genuinely is
+// platform-role-only, e.g. admin-only surfaces). permissionCheck is for routes
+// whose real access rule is a scoped/effective permission instead — see
+// canAccessOrganiserDashboard, which also admits org owners/managers/teachers
+// who aren't platform-role "organiser".
+function ProtectedRoute({ children, allowedRoles, permissionCheck }) {
   const { isAuthenticated, user } = useAuth()
   if (!isAuthenticated) return <Navigate to="/sign-in" replace />
   if (allowedRoles && (!user || !allowedRoles.includes(user.role))) return <Navigate to="/unauthorized" replace />
+  if (permissionCheck && !permissionCheck(user)) return <Navigate to="/unauthorized" replace />
   return children
 }
 
@@ -121,7 +128,7 @@ export default function App() {
         <Route path="/inbox" element={<ProtectedRoute allowedRoles={["student", "organiser"]}><Inbox /></ProtectedRoute>} />
         <Route
           path="/organiser-dashboard"
-          element={<ProtectedRoute allowedRoles={["organiser"]}><OrganiserDashboard /></ProtectedRoute>}
+          element={<ProtectedRoute permissionCheck={canAccessOrganiserDashboard}><OrganiserDashboard /></ProtectedRoute>}
         />
         <Route
           path="/admin"
