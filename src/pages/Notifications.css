@@ -6,7 +6,7 @@
   background-color: #f5f6fa;
   min-height: 100%;
   color: #120d26;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 /* ─── Header ─────────────────────────────────────────────────────── */
@@ -126,7 +126,7 @@
   position: absolute;
   bottom: 18px;
   right: -4px;
-  background: #5669ff;
+  background: #1d4e89;
   color: #ffffff;
   font-size: 13px;
   font-weight: 700;
@@ -136,7 +136,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(86, 105, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(20, 30, 50, 0.4);
   border: 2px solid #ffffff;
 }
 
@@ -163,7 +163,7 @@
   align-items: center;
   gap: 14px;
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 14px 16px;
   box-shadow: 0 2px 8px rgba(80, 80, 120, 0.04);
   border: 1px solid #f0f1f6;
@@ -218,13 +218,13 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #5669ff;
+  background: #1d4e89;
   flex-shrink: 0;
 }
 
 .notif-item-error {
   font-size: 11px;
-  color: #f0635a;
+  color: #a4342a;
   font-weight: 600;
 }
 
@@ -257,7 +257,7 @@
 
 .notif-action-btn--reject {
   background: #fff0f0;
-  color: #f0635a;
+  color: #a4342a;
 }
 
 /* ─── Desktop Layout ─────────────────────────────────────────────── */

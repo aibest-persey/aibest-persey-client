@@ -67,7 +67,7 @@
   padding: 0;
   cursor: pointer;
   text-align: left;
-  border-radius: 18px;
+  border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
@@ -111,12 +111,12 @@
 }
 
 .news-scope-badge--org {
-  background: rgba(41, 214, 151, 0.9);
+  background: rgba(47, 107, 79, 0.9);
   color: #0b3b28;
 }
 
 .news-scope-badge--club {
-  background: rgba(86, 105, 255, 0.9);
+  background: rgba(20, 30, 50, 0.9);
 }
 
 /* When both the "See more" pill and the scope badge are present, stack them
@@ -158,7 +158,7 @@
 .news-detail-banner {
   position: relative;
   height: 200px;
-  border-radius: 20px;
+  border-radius: 10px;
   background-size: cover;
   background-position: center;
   background-color: #e2e5f1;

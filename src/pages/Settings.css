@@ -41,7 +41,7 @@
   justify-content: space-between;
   gap: 16px;
   background: #f6f7fb;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 14px 16px;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .settings-switch--on {
-  background: #29d697;
+  background: #2f6b4f;
   justify-content: flex-end;
 }
 

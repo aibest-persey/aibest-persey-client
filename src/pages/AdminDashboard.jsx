@@ -12,10 +12,10 @@ import { Users, Calendar, ClipboardList, Trash2, Ban, Check, X, Bell, Building2 
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import "./AdminDashboard.css"
 
-const ROLE_COLORS = { student: "#5669ff", organiser: "#29d697", admin: "#f59762" }
-const STATUS_COLORS = { draft: "#9a9cae", published: "#29d697", cancelled: "#f0635a" }
-const REQ_COLORS = { pending: "#f59762", approved: "#29d697", rejected: "#f0635a" }
-const ORG_COLORS = { pending: "#f59762", verified: "#29d697" }
+const ROLE_COLORS = { student: "#1d4e89", organiser: "#2f6b4f", admin: "#b8863b" }
+const STATUS_COLORS = { draft: "#9a9cae", published: "#2f6b4f", cancelled: "#a4342a" }
+const REQ_COLORS = { pending: "#b8863b", approved: "#2f6b4f", rejected: "#a4342a" }
+const ORG_COLORS = { pending: "#b8863b", verified: "#2f6b4f" }
 
 function Badge({ label, color }) {
   return <span className="adm-badge" style={{ background: color + "22", color }}>{label}</span>
@@ -179,7 +179,7 @@ export default function AdminDashboard() {
               <div className="adm-list">
                 {users.map((u) => (
                   <div key={u.id} className="adm-card">
-                    <div className="adm-card-avatar" style={{ background: u.color || "#5669ff" }}>
+                    <div className="adm-card-avatar" style={{ background: u.color || "#1d4e89" }}>
                       {(u.username || "?").charAt(0).toUpperCase()}
                     </div>
                     <div className="adm-card-body">
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
                 )}
                 {requests.map((r) => (
                   <div key={r.id} className="adm-card adm-card--request">
-                    <div className="adm-card-avatar" style={{ background: r.student?.color || "#5669ff" }}>
+                    <div className="adm-card-avatar" style={{ background: r.student?.color || "#1d4e89" }}>
                       {(r.student?.username || "?").charAt(0).toUpperCase()}
                     </div>
                     <div className="adm-card-body">
@@ -281,7 +281,7 @@ export default function AdminDashboard() {
                 )}
                 {organisations.map((o) => (
                   <div key={o.id} className="adm-card">
-                    <div className="adm-card-avatar" style={{ background: "#5669ff" }}>
+                    <div className="adm-card-avatar" style={{ background: "#1d4e89" }}>
                       {(o.name || "?").charAt(0).toUpperCase()}
                     </div>
                     <div className="adm-card-body">

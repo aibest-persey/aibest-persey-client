@@ -48,7 +48,7 @@
   padding: 8px 16px;
   border: none;
   background: #f0f1f8;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
   color: #747688;
@@ -58,12 +58,12 @@
 }
 
 .adm-tab--active {
-  background: #5669ff;
+  background: #1d4e89;
   color: #fff;
 }
 
 .adm-badge-count {
-  background: #f0635a;
+  background: #a4342a;
   color: #fff;
   font-size: 10px;
   font-weight: 800;
@@ -84,7 +84,7 @@
   width: 28px;
   height: 28px;
   border: 3px solid #e2e5f1;
-  border-top-color: #5669ff;
+  border-top-color: #1d4e89;
   border-radius: 50%;
   animation: adm-spin 0.8s linear infinite;
 }
@@ -127,7 +127,7 @@
   gap: 12px;
   padding: 14px 16px;
   background: #fff;
-  border-radius: 14px;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(18, 13, 38, 0.05);
 }
 
@@ -179,7 +179,7 @@
   font-size: 11px;
   font-weight: 700;
   padding: 2px 10px;
-  border-radius: 20px;
+  border-radius: 10px;
   margin-top: 4px;
 }
 
@@ -210,7 +210,7 @@
 
 .adm-action-btn--danger {
   background: #fff0f0;
-  color: #f0635a;
+  color: #a4342a;
 }
 
 .adm-action-btn--approve {

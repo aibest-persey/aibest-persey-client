@@ -96,7 +96,7 @@ export default function Inbox() {
                   className={`inbox-item ${!msg.isRead && tab === "inbox" ? "inbox-item--unread" : ""} ${isOpen ? "inbox-item--open" : ""}`}
                   onClick={() => handleExpand(msg)}
                 >
-                  <div className="inbox-item-avatar" style={{ background: other?.color || "#5669ff" }}>
+                  <div className="inbox-item-avatar" style={{ background: other?.color || "#1d4e89" }}>
                     {(other?.username || "?").charAt(0).toUpperCase()}
                   </div>
                   <div className="inbox-item-body">

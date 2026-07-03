@@ -11,7 +11,7 @@
   background-color: #f0f1f8;
   background-size: cover;
   background-position: center;
-  color: #5669ff;
+  color: #1d4e89;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,7 +28,7 @@
 .img-upload--banner .img-upload-preview {
   width: 100%;
   height: 120px;
-  border-radius: 16px;
+  border-radius: 8px;
 }
 
 .img-upload-spinner {
@@ -68,7 +68,7 @@
 
 .img-upload-error {
   font-size: 11px;
-  color: #f0635a;
+  color: #a4342a;
   text-align: center;
   max-width: 160px;
 }

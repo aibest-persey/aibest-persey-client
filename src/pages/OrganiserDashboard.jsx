@@ -337,7 +337,7 @@ export default function OrganiserDashboard() {
               )}
               {roleRequests.map((r) => (
                 <div key={r.id} className="org-req-card">
-                  <div className="org-req-avatar" style={{ background: r.student?.color || "#5669ff" }}>
+                  <div className="org-req-avatar" style={{ background: r.student?.color || "#1d4e89" }}>
                     {(r.student?.username || "?").charAt(0).toUpperCase()}
                   </div>
                   <div className="org-req-body">
@@ -389,7 +389,7 @@ export default function OrganiserDashboard() {
                   <div className="org-req-card" style={{ marginBottom: (orgJoinRequests[org.id]?.length ?? 0) > 0 ? 8 : 0 }}>
                     <div
                       className="org-req-avatar"
-                      style={org.logoUrl ? { backgroundImage: `url(${resolveImageUrl(org.logoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: "#5669ff" }}
+                      style={org.logoUrl ? { backgroundImage: `url(${resolveImageUrl(org.logoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: "#1d4e89" }}
                     >
                       {!org.logoUrl && org.name.charAt(0).toUpperCase()}
                     </div>
@@ -430,7 +430,7 @@ export default function OrganiserDashboard() {
 
                   {(orgJoinRequests[org.id] ?? []).map((r) => (
                     <div key={r.id} className="org-req-card" style={{ marginLeft: 20 }}>
-                      <div className="org-req-avatar" style={{ background: r.student?.color || "#5669ff" }}>
+                      <div className="org-req-avatar" style={{ background: r.student?.color || "#1d4e89" }}>
                         {(r.student?.username || "?").charAt(0).toUpperCase()}
                       </div>
                       <div className="org-req-body">

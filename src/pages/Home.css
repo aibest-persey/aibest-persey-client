@@ -6,7 +6,7 @@
   background-color: transparent;
   min-height: 100%;
   color: #120d26;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Inter", sans-serif;
   position: relative; /* anchors the absolute sidebar inside the phone */
   padding: 24px 20px 80px 20px;
   box-sizing: border-box;
@@ -18,9 +18,9 @@
   right: 9px;
   width: 7px;
   height: 7px;
-  background-color: #00f0ff;
+  background-color: #7a1f2b;
   border-radius: 50%;
-  border: 1.5px solid #454ee6;
+  border: 1.5px solid #1d4e89;
 }
 
 /* Loading / error states */
@@ -75,7 +75,7 @@
 .m2-avatar-fallback {
   font-size: 14px;
   font-weight: 700;
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 .m2-org-name {
@@ -197,7 +197,7 @@
 .m2-club-add {
   background: #ebf0ff;
   border: 2.5px solid #a4b4fc;
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 /* Hero card */
@@ -206,7 +206,7 @@
 }
 
 .m2-hero-card {
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 20px;
   color: #ffffff;
   cursor: pointer;
@@ -241,7 +241,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #ff4d4f;
+  background: #a4342a;
 }
 
 .m2-hero-timer {
@@ -301,7 +301,7 @@
 .m2-week-card {
   flex-shrink: 0;
   width: 260px;
-  border-radius: 18px;
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
@@ -385,7 +385,7 @@
 .m2-week-datetime {
   font-size: 11px;
   font-weight: 600;
-  color: #fee140;
+  color: #b08d57;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -401,7 +401,7 @@
 .m2-news-card {
   background-color: #ffffff;
   border: 1px solid #ebedf5;
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
@@ -559,11 +559,11 @@
 
 .sidebar-nav-item:hover {
   background: #f6f7ff;
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 .sidebar-nav-item:hover .sidebar-nav-icon {
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 .sidebar-nav-icon {
@@ -573,22 +573,22 @@
 }
 
 .sidebar-nav-item--signout {
-  color: #f0635a;
+  color: #a4342a;
   margin-top: 8px;
   border-bottom: none;
 }
 
 .sidebar-nav-item--signout .sidebar-nav-icon {
-  color: #f0635a;
+  color: #a4342a;
 }
 
 .sidebar-nav-item--signout:hover {
   background: #fff2f1;
-  color: #d94f47;
+  color: #7c281f;
 }
 
 .sidebar-nav-item--signout:hover .sidebar-nav-icon {
-  color: #d94f47;
+  color: #7c281f;
 }
 
 /* ─── Desktop layout (mirrors Clubs.css's card/grid pattern) ───────── */
@@ -605,7 +605,7 @@
   justify-content: space-between;
   background-color: #ffffff;
   border: 1px solid #ebedf5;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 20px 28px;
   margin-bottom: 28px;
   box-shadow: 0 6px 20px rgba(18, 13, 38, 0.02);
@@ -641,7 +641,7 @@
 .m2-desktop-widget {
   background-color: #ffffff;
   border: 1px solid #ebedf5;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 24px;
   box-shadow: 0 6px 20px rgba(18, 13, 38, 0.02);
 }
@@ -680,7 +680,7 @@
 }
 
 .auth-screen .m2-club-add {
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 .auth-screen .m2-create-org-btn {

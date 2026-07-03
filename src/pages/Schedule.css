@@ -89,7 +89,7 @@
 .sched-list-date {
   font-size: 13px;
   font-weight: 700;
-  color: #5669ff;
+  color: #1d4e89;
   margin: 0 0 14px 0;
 }
 
@@ -104,7 +104,7 @@
   align-items: center;
   gap: 12px;
   background: #ebedf5;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 12px 14px;
 }
 

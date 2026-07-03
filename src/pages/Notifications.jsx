@@ -1,5 +1,8 @@
 import { useState } from "react"
-import { ArrowLeft, MoreVertical, UserPlus, CheckCircle2, XCircle, Check, X } from "lucide-react"
+import {
+  ArrowLeft, MoreVertical, UserPlus, CheckCircle2, XCircle, Check, X,
+  Calendar, Newspaper, ShieldCheck, UserCog, Ticket, Clock, ArrowUpCircle, CalendarX,
+} from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { useAuth } from "../hooks/useAuth.js"
@@ -11,6 +14,15 @@ const TYPE_ICON = {
   role_request_submitted: UserPlus,
   role_request_approved: CheckCircle2,
   role_request_rejected: XCircle,
+  event_published: Calendar,
+  news_posted: Newspaper,
+  organisation_verified: ShieldCheck,
+  role_changed: UserCog,
+  registration_confirmed: Ticket,
+  registration_waitlisted: Clock,
+  registration_promoted: ArrowUpCircle,
+  registration_cancelled: XCircle,
+  event_cancelled: CalendarX,
 }
 
 function formatTime(isoStr) {
@@ -68,7 +80,7 @@ export default function Notifications({ onBack }) {
         <div className="notif-body">
           {loading ? (
             <div className="home-loading">
-              <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#5669ff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+              <div style={{ width: 28, height: 28, border: "3px solid #e2e5f1", borderTopColor: "#1d4e89", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
           ) : notifications.length === 0 ? (

@@ -4,7 +4,7 @@
 
 .ticket-banner {
   height: 170px;
-  border-radius: 20px;
+  border-radius: 10px;
   position: relative;
   overflow: hidden;
   margin-bottom: 16px;
@@ -32,7 +32,7 @@
   height: 38px;
   border-radius: 50%;
   background: #ebedf5;
-  color: #5669ff;
+  color: #1d4e89;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,7 +122,7 @@
   padding: 16px;
   background: #ffffff;
   border: 1px solid #ebedf5;
-  border-radius: 16px;
+  border-radius: 8px;
   width: fit-content;
   margin: 0 auto;
 }

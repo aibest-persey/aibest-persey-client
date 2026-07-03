@@ -30,7 +30,7 @@
   justify-content: center;
   padding: 16px;
   background: #ededf2;
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -126,7 +126,7 @@
 }
 
 .field:focus-within {
-  border-color: #5669ff;
+  border-color: #1d4e89;
 }
 
 .field__icon {
@@ -197,7 +197,7 @@
 }
 
 .toggle--on {
-  background: #5669ff;
+  background: #1d4e89;
 }
 
 .toggle__knob {
@@ -225,8 +225,8 @@
   width: 100%;
   height: 56px;
   border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #5669ff 0%, #6e7fff 100%);
+  border-radius: 6px;
+  background: #1d4e89;
   color: #ffffff;
   font-family: inherit;
   font-size: 15px;
@@ -234,7 +234,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(86, 105, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(20, 30, 50, 0.18);
   transition: transform 0.1s ease, box-shadow 0.15s ease;
 }
 
@@ -322,12 +322,12 @@
   text-align: center;
   font-size: 14px;
   font-weight: 500;
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 .auth-link {
   font-weight: 600;
-  color: #5669ff;
+  color: #1d4e89;
   text-decoration: none;
 }
 
@@ -421,11 +421,11 @@
 
 .auth-desktop-card {
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 12px;
   width: 100%;
   max-width: 460px;
   padding: 40px 40px 32px 40px;
-  box-shadow: 0 20px 60px rgba(18, 13, 38, 0.1), 0 4px 20px rgba(86, 105, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(18, 13, 38, 0.1), 0 4px 20px rgba(20, 30, 50, 0.08);
 }
 
 .auth-desktop-brand {
@@ -438,7 +438,7 @@
 .auth-brand-dot {
   width: 38px;
   height: 38px;
-  background: linear-gradient(135deg, #5669ff 0%, #3d56f0 100%);
+  background: linear-gradient(135deg, #1d4e89 0%, #123159 100%);
   color: #fff;
   font-size: 18px;
   font-weight: 800;
@@ -446,7 +446,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(86, 105, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(20, 30, 50, 0.3);
 }
 
 .auth-brand-text {
@@ -468,14 +468,14 @@
 .auth-welcome {
   font-size: 16px;
   font-weight: 600;
-  color: #26215c;
+  color: #142a4d;
   margin: 0;
 }
 
 .auth-title-v2 {
   font-size: 30px;
   font-weight: 800;
-  color: #26215c;
+  color: #142a4d;
   letter-spacing: -0.02em;
   margin: 2px 0 28px 0;
 }
@@ -525,7 +525,7 @@
 }
 
 .field-v2:focus-within {
-  border-color: #26215c;
+  border-color: #142a4d;
 }
 
 .field-v2--error {
@@ -586,7 +586,7 @@
 }
 
 .auth-link-v2--strong {
-  color: #26215c;
+  color: #142a4d;
   font-weight: 700;
 }
 
@@ -597,7 +597,7 @@
 }
 
 .auth-screen .auth-link-v2--strong {
-  color: #26215c;
+  color: #142a4d;
 }
 
 .auth-footer-v2 {
@@ -617,8 +617,8 @@
   width: 100%;
   height: 54px;
   border: none;
-  border-radius: 14px;
-  background: #1c1750;
+  border-radius: 8px;
+  background: #142a4d;
   color: #ffffff;
   font-family: inherit;
   font-size: 16px;
@@ -686,14 +686,14 @@
   font-weight: 500;
   color: #747688;
   background: #f4f4f8;
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 6px 14px;
 }
 
 .auth-banner--info {
   background: #eef0ff;
   border: 1px solid #c7ccff;
-  color: #26215c;
+  color: #142a4d;
 }
 
 .auth-desktop-card {

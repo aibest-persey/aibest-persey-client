@@ -18,7 +18,7 @@
   width: 32px;
   height: 32px;
   border: 3.5px solid #e2e5f1;
-  border-top-color: #5669ff;
+  border-top-color: #1d4e89;
   border-radius: 50%;
   animation: evtd-spin 0.8s linear infinite;
 }
@@ -42,7 +42,7 @@
 .evtd-back-link {
   background: none;
   border: none;
-  color: #5669ff;
+  color: #1d4e89;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -94,9 +94,9 @@
   right: 6px;
   width: 7px;
   height: 7px;
-  background-color: #00f0ff;
+  background-color: #7a1f2b;
   border-radius: 50%;
-  border: 1.5px solid #454ee6;
+  border: 1.5px solid #1d4e89;
 }
 
 .evtd-banner-label {
@@ -117,7 +117,7 @@
   align-items: center;
   gap: 5px;
   padding: 5px 12px;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 12px;
   font-weight: 700;
   color: #ffffff;
@@ -126,15 +126,15 @@
 }
 
 .evtd-capacity-pill--open {
-  background: rgba(41, 214, 151, 0.85);
+  background: rgba(47, 107, 79, 0.85);
 }
 
 .evtd-capacity-pill--filling {
-  background: rgba(245, 151, 98, 0.9);
+  background: rgba(184, 134, 59, 0.9);
 }
 
 .evtd-capacity-pill--full {
-  background: rgba(240, 99, 90, 0.9);
+  background: rgba(164, 52, 42, 0.9);
 }
 
 .evtd-capacity-pill--unlimited {
@@ -143,7 +143,7 @@
 
 .evtd-status-badge {
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -156,14 +156,14 @@
 }
 
 .evtd-status-badge--cancelled {
-  background: rgba(240, 99, 90, 0.85);
+  background: rgba(164, 52, 42, 0.85);
   color: #fff;
 }
 
 /* Content card */
 .evtd-content {
   background: #ffffff;
-  border-radius: 28px 28px 0 0;
+  border-radius: 12px 12px 0 0;
   margin-top: -20px;
   flex: 1;
   padding: 24px 20px 32px 20px;
@@ -205,17 +205,17 @@
 
 .evtd-meta-icon--blue {
   background: #eef0ff;
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 .evtd-meta-icon--orange {
   background: #fff3ec;
-  color: #f59762;
+  color: #b8863b;
 }
 
 .evtd-meta-icon--green {
   background: #edfcf2;
-  color: #29d697;
+  color: #2f6b4f;
 }
 
 .evtd-meta-text {
@@ -236,12 +236,12 @@
 }
 
 .evtd-meta-sub--wait {
-  color: #f59762;
+  color: #b8863b;
   font-weight: 600;
 }
 
 .evtd-meta-sub--confirmed {
-  color: #29d697;
+  color: #2f6b4f;
   font-weight: 600;
 }
 
@@ -252,7 +252,7 @@
   gap: 12px;
   padding: 14px 16px;
   background: #f8f9fc;
-  border-radius: 16px;
+  border-radius: 8px;
 }
 
 .evtd-organiser-avatar {
@@ -289,11 +289,11 @@
 .evtd-follow-btn {
   background: #eef0ff;
   border: none;
-  color: #5669ff;
+  color: #1d4e89;
   font-size: 13px;
   font-weight: 700;
   padding: 8px 18px;
-  border-radius: 20px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -309,10 +309,10 @@
   padding: 7px 14px;
   background: #eef0ff;
   border: none;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
-  color: #5669ff;
+  color: #1d4e89;
   cursor: pointer;
 }
 
@@ -322,7 +322,7 @@
   margin: 0 20px 16px;
   padding: 16px;
   background: #f6f7fb;
-  border-radius: 14px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -337,7 +337,7 @@
   background: #fff;
 }
 
-.evtd-msg-input:focus { border-color: #5669ff; }
+.evtd-msg-input:focus { border-color: #1d4e89; }
 
 .evtd-msg-textarea {
   padding: 10px 14px;
@@ -350,7 +350,7 @@
   background: #fff;
 }
 
-.evtd-msg-textarea:focus { border-color: #5669ff; }
+.evtd-msg-textarea:focus { border-color: #1d4e89; }
 
 .evtd-msg-form-actions {
   display: flex;
@@ -371,7 +371,7 @@
 
 .evtd-msg-send {
   padding: 8px 20px;
-  background: #5669ff;
+  background: #1d4e89;
   border: none;
   border-radius: 10px;
   font-size: 13px;
@@ -413,13 +413,13 @@
 
 .evtd-msg--error {
   background: #fff5f5;
-  color: #f0635a;
+  color: #a4342a;
   border: 1px solid #ffe3e3;
 }
 
 .evtd-msg--info {
   background: #f0f4ff;
-  color: #5669ff;
+  color: #1d4e89;
   border: 1px solid #dde1ff;
 }
 
@@ -432,20 +432,20 @@
 .evtd-register-btn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #5669ff 0%, #3d56f0 100%);
+  background: #1d4e89;
   color: #ffffff;
   border: none;
-  border-radius: 16px;
+  border-radius: 6px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(86, 105, 255, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(20, 30, 50, 0.2);
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .evtd-register-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(86, 105, 255, 0.4);
+  background: #123159;
+  box-shadow: 0 3px 10px rgba(20, 30, 50, 0.28);
 }
 
 .evtd-register-btn:disabled {
@@ -454,12 +454,13 @@
 }
 
 .evtd-register-btn--cancel {
-  background: linear-gradient(135deg, #f0635a 0%, #d94f47 100%);
-  box-shadow: 0 8px 24px rgba(240, 99, 90, 0.3);
+  background: #a4342a;
+  box-shadow: 0 2px 8px rgba(164, 52, 42, 0.2);
 }
 
 .evtd-register-btn--cancel:hover:not(:disabled) {
-  box-shadow: 0 12px 28px rgba(240, 99, 90, 0.4);
+  background: #7c281f;
+  box-shadow: 0 3px 10px rgba(164, 52, 42, 0.28);
 }
 
 /* Cancelled notice */
@@ -467,8 +468,8 @@
   padding: 16px;
   background: #fff5f5;
   border: 1px solid #ffe3e3;
-  border-radius: 16px;
-  color: #f0635a;
+  border-radius: 8px;
+  color: #a4342a;
   font-size: 14px;
   font-weight: 600;
   text-align: center;
@@ -491,7 +492,7 @@
   .evtd-content {
     max-width: 820px;
     margin: -20px auto 0 auto;
-    border-radius: 28px;
+    border-radius: 12px;
     padding: 32px 40px 48px 40px;
   }
 

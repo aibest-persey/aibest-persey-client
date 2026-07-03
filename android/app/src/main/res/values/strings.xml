@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Bellboard</string>
+    <string name="title_activity_main">Bellboard</string>
+    <string name="package_name">org.aibest.persey</string>
+    <string name="custom_url_scheme">org.aibest.persey</string>
+</resources>

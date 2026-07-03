@@ -42,7 +42,7 @@
 }
 
 .org-add-btn {
-  background: linear-gradient(135deg, #5669ff 0%, #3d56f0 100%);
+  background: #1d4e89;
   border: none;
   color: #ffffff;
   cursor: pointer;
@@ -51,13 +51,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(86, 105, 255, 0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 6px rgba(20, 30, 50, 0.18);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .org-add-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 16px rgba(86, 105, 255, 0.35);
+  background: #123159;
+  box-shadow: 0 3px 8px rgba(20, 30, 50, 0.22);
 }
 
 /* Body and Welcome Section */
@@ -103,7 +103,7 @@
   width: 32px;
   height: 32px;
   border: 3.5px solid #e2e5f1;
-  border-top-color: #5669ff;
+  border-top-color: #1d4e89;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -156,20 +156,20 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(90deg, #5669ff 0%, #3d56f0 100%);
+  background: #1d4e89;
   color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 15px rgba(86, 105, 255, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(20, 30, 50, 0.16);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .org-empty-cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(86, 105, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(20, 30, 50, 0.3);
 }
 
 /* Event List & Cards */
@@ -181,7 +181,7 @@
 
 .org-event-card {
   background-color: #ffffff;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 16px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
   border: 1px solid #f0f2f7;
@@ -230,7 +230,7 @@
 }
 
 .org-meta-icon {
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 @keyframes slideIn {
@@ -261,7 +261,7 @@
 
 .org-modal-content {
   background-color: #ffffff;
-  border-radius: 24px 24px 0 0;
+  border-radius: 12px 12px 0 0;
   width: 100%;
   max-height: 85%;
   padding: 24px;
@@ -311,7 +311,7 @@
 
 .org-modal-close:hover {
   background-color: #ffe3e3;
-  color: #f0635a;
+  color: #a4342a;
 }
 
 /* Modal Form styling */
@@ -350,12 +350,12 @@
 }
 
 .org-textarea:focus {
-  border-color: #5669ff;
-  box-shadow: 0 0 0 3px rgba(86, 105, 255, 0.12);
+  border-color: #1d4e89;
+  box-shadow: 0 0 0 3px rgba(20, 30, 50, 0.12);
 }
 
 .org-textarea--error {
-  border-color: #f0635a;
+  border-color: #a4342a;
 }
 
 /* Datetime Custom input */
@@ -371,8 +371,8 @@
 }
 
 .org-datetime-input-wrapper:focus-within {
-  border-color: #5669ff;
-  box-shadow: 0 0 0 3px rgba(86, 105, 255, 0.12);
+  border-color: #1d4e89;
+  box-shadow: 0 0 0 3px rgba(20, 30, 50, 0.12);
 }
 
 .org-datetime-icon {
@@ -394,7 +394,7 @@
 }
 
 .org-datetime-input--error {
-  border-color: #f0635a;
+  border-color: #a4342a;
 }
 
 .org-form-action {
@@ -426,14 +426,14 @@
 }
 
 .org-event-card-title-btn:hover {
-  color: #5669ff;
+  color: #1d4e89;
 }
 
 /* Status badges */
 .org-status-badge {
   flex-shrink: 0;
   padding: 3px 10px;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -452,7 +452,7 @@
 
 .org-status-badge--cancelled {
   background: #fff5f5;
-  color: #f0635a;
+  color: #a4342a;
 }
 
 /* Action button row */
@@ -505,7 +505,7 @@
 
 .org-action-btn--danger {
   background: #fff5f5;
-  color: #f0635a;
+  color: #a4342a;
 }
 
 .org-action-btn--danger:hover:not(:disabled) {
@@ -518,7 +518,7 @@
 }
 
 .org-action-btn--ghost:hover:not(:disabled) {
-  color: #f0635a;
+  color: #a4342a;
 }
 
 /* Delete confirm row */
@@ -552,7 +552,7 @@
 
 .org-banner--error {
   background-color: #fff5f5;
-  color: #f0635a;
+  color: #a4342a;
   border: 1px solid #ffe3e3;
 }
 
@@ -598,7 +598,7 @@
   }
 
   .org-modal-content {
-    border-radius: 24px;
+    border-radius: 12px;
     max-width: 560px;
     max-height: 80vh;
     animation: fadeIn 0.25s ease-out;
@@ -621,17 +621,17 @@
   padding: 8px 16px;
   border: none;
   background: #f0f1f8;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
   color: #747688;
   cursor: pointer;
 }
 
-.org-tab--active { background: #5669ff; color: #fff; }
+.org-tab--active { background: #1d4e89; color: #fff; }
 
 .org-tab-badge {
-  background: #f0635a;
+  background: #a4342a;
   color: #fff;
   font-size: 10px;
   font-weight: 800;
@@ -653,7 +653,7 @@
   gap: 12px;
   padding: 14px 16px;
   background: #fff;
-  border-radius: 14px;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(18, 13, 38, 0.05);
 }
 
@@ -680,12 +680,12 @@
   font-size: 11px;
   font-weight: 700;
   padding: 2px 10px;
-  border-radius: 20px;
+  border-radius: 10px;
   margin-top: 4px;
 }
 .org-req-status--pending  { background: #fff7e6; color: #d97706; }
 .org-req-status--approved { background: #e6f9f0; color: #1a9e5c; }
-.org-req-status--rejected { background: #fff0f0; color: #f0635a; }
+.org-req-status--rejected { background: #fff0f0; color: #a4342a; }
 
 .org-req-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
@@ -700,13 +700,13 @@
   cursor: pointer;
 }
 .org-req-btn--approve { background: #e6f9f0; color: #1a9e5c; }
-.org-req-btn--reject  { background: #fff0f0; color: #f0635a; }
+.org-req-btn--reject  { background: #fff0f0; color: #a4342a; }
 
 .org-req-edit-btn {
   flex-shrink: 0;
   align-self: center;
   background: #eef0ff;
-  color: #5669ff;
+  color: #1d4e89;
   border: none;
   border-radius: 999px;
   padding: 6px 14px;

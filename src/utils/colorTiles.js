@@ -1,13 +1,13 @@
 const GRADIENTS = [
-  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-  "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-  "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
-  "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-  "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+  "linear-gradient(135deg, #1d4e89 0%, #123159 100%)",
+  "linear-gradient(135deg, #7a1f2b 0%, #4d1219 100%)",
+  "linear-gradient(135deg, #3f6b4d 0%, #22402c 100%)",
+  "linear-gradient(135deg, #5b4e7a 0%, #362c4d 100%)",
+  "linear-gradient(135deg, #8a6d3b 0%, #5c4a26 100%)",
+  "linear-gradient(135deg, #3a4a5c 0%, #23303d 100%)",
 ]
 
-const TILE_COLORS = ["#5669FF", "#F0635A", "#F59762", "#29D697", "#46CDFB", "#7F77DD", "#1D9E75"]
+const TILE_COLORS = ["#1d4e89", "#7a1f2b", "#3f6b4d", "#8a6d3b", "#3a4a5c", "#5b4e7a", "#4a4e69"]
 
 function hashId(id) {
   if (!id) return 0

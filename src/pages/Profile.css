@@ -6,7 +6,7 @@
   background-color: #ffffff;
   min-height: 100%;
   color: #120d26;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Inter", sans-serif;
   padding: 16px 20px 32px 20px;
   box-sizing: border-box;
 }
@@ -102,13 +102,13 @@
 }
 
 .profile-edit-circle-btn--cancel {
-  background-color: #f0635a;
-  box-shadow: 0 4px 12px rgba(240, 99, 90, 0.2);
+  background-color: #a4342a;
+  box-shadow: 0 4px 12px rgba(164, 52, 42, 0.2);
 }
 
 .profile-edit-circle-btn--cancel:hover {
   background-color: #d85249;
-  box-shadow: 0 6px 16px rgba(240, 99, 90, 0.3);
+  box-shadow: 0 6px 16px rgba(164, 52, 42, 0.3);
 }
 
 /* ─── Avatar ──────────────────────────────────────────────────────── */
@@ -219,7 +219,7 @@
   align-items: center;
   gap: 6px;
   background-color: #dce0e8;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 6px 14px;
   margin: 0 auto;
 }
@@ -493,7 +493,7 @@
     align-items: center;
     justify-content: space-between;
     background-color: #ffffff;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 32px 40px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   }
@@ -586,7 +586,7 @@
 
   .profile-desktop-grid .profile-section {
     background-color: #ffffff;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 32px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     margin-bottom: 0;
@@ -609,7 +609,7 @@
 }
 
 .profile-input-error {
-  color: #f0635a;
+  color: #a4342a;
   font-size: 12px;
   font-weight: 600;
   margin-top: 4px;
