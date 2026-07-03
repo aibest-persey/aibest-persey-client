@@ -8,13 +8,12 @@ import { listNews } from "../services/newsService.js"
 import { listOrganisations } from "../services/organisationService.js"
 import { listClubs } from "../services/clubService.js"
 import { getGradient } from "../utils/colorTiles.js"
+import { SCOPE_LABELS } from "../utils/newsScope.js"
 import {
   Bell, Search, ArrowRight,
   User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
 } from "lucide-react"
 import "./News.css"
-
-const SCOPE_LABELS = { public: "Public", org: "My Org", club: "My Clubs" }
 
 function dedupeById(items) {
   const seen = new Set()

@@ -6,9 +6,11 @@ import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { listClubs, createClub } from "../services/clubService.js"
 import { listOrganisations } from "../services/organisationService.js"
+import { listNews } from "../services/newsService.js"
 import { getTileColor } from "../utils/colorTiles.js"
 import { resolveImageUrl } from "../services/uploadService.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
+import { SCOPE_LABELS } from "../utils/newsScope.js"
 import {
   Bell, Search, Plus,
   User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
@@ -39,6 +41,7 @@ export default function Clubs() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [search, setSearch] = useState("")
+  const [newsItems, setNewsItems] = useState([])
 
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [createForm, setCreateForm] = useState({ name: "", description: "", organisationId: "" })
@@ -58,6 +61,11 @@ export default function Clubs() {
       })
       .catch((err) => setError(getErrorMessage(err, "Failed to load clubs.")))
       .finally(() => setLoading(false))
+  }, [token])
+
+  useEffect(() => {
+    if (!token) return
+    listNews(token, { scope: "public" }).then(setNewsItems).catch(() => setNewsItems([]))
   }, [token])
 
   const filteredClubs = clubs.filter((c) => {
@@ -194,6 +202,39 @@ export default function Clubs() {
     </section>
   )
 
+  const newsBlock = (
+    <section className="m2-section">
+      <div className="m2-section-header">
+        <h2 className="m2-section-title">Latest News</h2>
+        <button className="m2-see-more" onClick={() => navigate("/news")}>See all</button>
+      </div>
+      {newsItems.length === 0 ? (
+        <div className="clubs-empty-state-box">
+          <div className="clubs-empty-state-icon">📰</div>
+          <h4 className="clubs-empty-state-title">No News Available</h4>
+          <p className="clubs-empty-state-desc">No news articles or updates have been published yet.</p>
+        </div>
+      ) : (
+        <div className="m2-news-grid">
+          {newsItems.slice(0, 4).map((item) => (
+            <div key={item.id} className="m2-news-card" onClick={() => navigate(`/news/${item.id}`)} style={{ cursor: "pointer" }}>
+              <div
+                className="m2-news-image"
+                style={item.coverImage ? { backgroundImage: `url(${item.coverImage})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: getTileColor(item.id) }}
+              >
+                <span className={`news-scope-badge news-scope-badge--${item.scope}`}>{SCOPE_LABELS[item.scope] ?? item.scope}</span>
+                <span className="m2-news-tag">See more →</span>
+              </div>
+              <div className="m2-news-title-bar">
+                <p className="m2-news-title">{item.title}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+
   const sidebarDrawer = (
     <>
       <div className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`} onClick={() => setSidebarOpen(false)} />
@@ -268,6 +309,7 @@ export default function Clubs() {
         <div className="m2-desktop-block">
           {searchBlock}
           {listBlock}
+          {newsBlock}
         </div>
         {createFormBlock}
       </div>
@@ -296,6 +338,7 @@ export default function Clubs() {
 
         {searchBlock}
         {listBlock}
+        {newsBlock}
         {createFormBlock}
       </div>
     </PhoneFrame>

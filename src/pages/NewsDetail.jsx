@@ -6,13 +6,12 @@ import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { getNews } from "../services/newsService.js"
 import { getGradient } from "../utils/colorTiles.js"
+import { SCOPE_LABELS } from "../utils/newsScope.js"
 import {
   Bell, ArrowLeft, Calendar,
   User, SlidersHorizontal, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
 } from "lucide-react"
 import "./News.css"
-
-const SCOPE_LABELS = { public: "Public", org: "My Org", club: "My Clubs" }
 
 function formatDate(isoStr) {
   try {

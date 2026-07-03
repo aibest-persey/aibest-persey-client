@@ -15,6 +15,7 @@ import {
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { getGradient, getTileColor } from "../utils/colorTiles.js"
 import { resolveImageUrl } from "../services/uploadService.js"
+import { SCOPE_LABELS } from "../utils/newsScope.js"
 import "./Home.css"
 
 function getInitials(name) {
@@ -371,6 +372,7 @@ export default function Home() {
                 className="m2-news-image"
                 style={item.coverImage ? { backgroundImage: `url(${item.coverImage})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: getTileColor(item.id) }}
               >
+                <span className={`news-scope-badge news-scope-badge--${item.scope}`}>{SCOPE_LABELS[item.scope] ?? item.scope}</span>
                 <span className="m2-news-tag">See more →</span>
               </div>
               <div className="m2-news-title-bar">

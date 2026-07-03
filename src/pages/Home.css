@@ -424,6 +424,16 @@
   border-radius: 10px;
 }
 
+/* .news-scope-badge is News.css's badge (shared across Home/Clubs/News) — pull it
+   out of .m2-news-image's flex flow so it sits opposite the "See more" tag instead
+   of competing for the same flex-end slot. */
+.m2-news-image .news-scope-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  margin: 0;
+}
+
 .m2-news-title-bar {
   padding: 10px 12px;
 }
