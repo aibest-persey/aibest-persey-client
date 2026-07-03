@@ -7,7 +7,7 @@ import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import { getEvent, getTicket } from "../services/eventService.js"
 import { getGradient } from "../utils/colorTiles.js"
-import { Bell, MapPin, Clock, User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck } from "lucide-react"
+import { Bell, MapPin, Clock, Menu, ChevronRight, User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck } from "lucide-react"
 import "./Ticket.css"
 
 function getInitials(name) {
@@ -69,7 +69,11 @@ export default function Ticket() {
     <>
       <div className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`} onClick={() => setSidebarOpen(false)} />
       <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
-        <div className="sidebar-profile">
+        <button
+          type="button"
+          className="sidebar-profile sidebar-profile--link"
+          onClick={() => { setSidebarOpen(false); navigate("/profile") }}
+        >
           <div className="sidebar-avatar">
             {profile.avatar ? (
               <img src={profile.avatar} alt="Profile" className="sidebar-avatar-img" />
@@ -78,7 +82,8 @@ export default function Ticket() {
             )}
           </div>
           <span className="sidebar-username">{profile.nickname}</span>
-        </div>
+          <span className="sidebar-profile-link"><span>View profile</span><ChevronRight size={14} /></span>
+        </button>
         <nav className="sidebar-nav">
           <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/schedule") }}>
             <Calendar size={20} className="sidebar-nav-icon" /><span>Schedule</span>
@@ -114,10 +119,14 @@ export default function Ticket() {
   const header = (
     <header className={isDesktop ? "m2-desktop-header" : "m2-header"}>
       <button className="m2-avatar-btn" aria-label={isDesktop ? "My profile" : "Open menu"} onClick={() => (isDesktop ? navigate("/profile") : setSidebarOpen(true))}>
-        {profile.avatar ? (
-          <img src={profile.avatar} alt="" className="m2-avatar-img" />
+        {isDesktop ? (
+          profile.avatar ? (
+            <img src={profile.avatar} alt="" className="m2-avatar-img" />
+          ) : (
+            <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
+          )
         ) : (
-          <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
+          <Menu size={20} />
         )}
       </button>
       <h1 className="m2-org-name">Ticket</h1>

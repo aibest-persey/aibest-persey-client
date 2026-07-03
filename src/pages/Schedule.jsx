@@ -6,7 +6,7 @@ import { useNotifications } from "../hooks/useNotifications.js"
 import PhoneFrame from "../components/PhoneFrame.jsx"
 import TicketModal from "../components/TicketModal.jsx"
 import { getSchedule } from "../services/scheduleService.js"
-import { Bell, ChevronLeft, ChevronRight, User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon } from "lucide-react"
+import { Bell, ChevronLeft, ChevronRight, Menu, User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon } from "lucide-react"
 import "./Schedule.css"
 
 // Sunday-first — matches the backend's getMonthCalendar grid ordering.
@@ -161,7 +161,11 @@ export default function Schedule() {
     <>
       <div className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`} onClick={() => setSidebarOpen(false)} />
       <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
-        <div className="sidebar-profile">
+        <button
+          type="button"
+          className="sidebar-profile sidebar-profile--link"
+          onClick={() => { setSidebarOpen(false); navigate("/profile") }}
+        >
           <div className="sidebar-avatar">
             {profile.avatar ? (
               <img src={profile.avatar} alt="Profile" className="sidebar-avatar-img" />
@@ -170,7 +174,8 @@ export default function Schedule() {
             )}
           </div>
           <span className="sidebar-username">{profile.nickname}</span>
-        </div>
+          <span className="sidebar-profile-link"><span>View profile</span><ChevronRight size={14} /></span>
+        </button>
         <nav className="sidebar-nav">
           <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/home") }}>
             <User size={20} className="sidebar-nav-icon" /><span>Home</span>
@@ -245,11 +250,7 @@ export default function Schedule() {
 
         <header className="m2-header">
           <button className="m2-avatar-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
-            {profile.avatar ? (
-              <img src={profile.avatar} alt="" className="m2-avatar-img" />
-            ) : (
-              <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
-            )}
+            <Menu size={20} />
           </button>
           <h1 className="m2-org-name">Schedule</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>

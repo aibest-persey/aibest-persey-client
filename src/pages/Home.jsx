@@ -9,7 +9,7 @@ import { listClubs } from "../services/clubService.js"
 import { requestToJoinOrganisation, getMyJoinRequests } from "../services/organisationService.js"
 import { listNews } from "../services/newsService.js"
 import {
-  Bell, SlidersHorizontal, Plus, Heart, Clock, ArrowRight, Search,
+  Bell, SlidersHorizontal, Plus, Heart, Clock, ArrowRight, Search, Menu, ChevronRight,
   User, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
 } from "lucide-react"
 import PhoneFrame from "../components/PhoneFrame.jsx"
@@ -389,7 +389,11 @@ export default function Home() {
     <>
       <div className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`} onClick={() => setSidebarOpen(false)} />
       <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
-        <div className="sidebar-profile">
+        <button
+          type="button"
+          className="sidebar-profile sidebar-profile--link"
+          onClick={() => { setSidebarOpen(false); navigate("/profile") }}
+        >
           <div className="sidebar-avatar">
             {profile.avatar ? (
               <img src={profile.avatar} alt="Profile" className="sidebar-avatar-img" />
@@ -398,11 +402,9 @@ export default function Home() {
             )}
           </div>
           <span className="sidebar-username">{profile.nickname}</span>
-        </div>
+          <span className="sidebar-profile-link"><span>View profile</span><ChevronRight size={14} /></span>
+        </button>
         <nav className="sidebar-nav">
-          <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/profile") }}>
-            <User size={20} className="sidebar-nav-icon" /><span>My Profile</span>
-          </button>
           {user?.role === "organiser" && (
             <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/organiser-dashboard") }}>
               <SlidersHorizontal size={20} className="sidebar-nav-icon" /><span>Organiser Dashboard</span>
@@ -480,11 +482,7 @@ export default function Home() {
         {/* Header: avatar opens sidebar, org name, notifications */}
         <header className="m2-header">
           <button className="m2-avatar-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
-            {profile.avatar ? (
-              <img src={profile.avatar} alt="" className="m2-avatar-img" />
-            ) : (
-              <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
-            )}
+            <Menu size={20} />
           </button>
           <h1 className="m2-org-name">&ldquo;{orgName}&rdquo;</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>

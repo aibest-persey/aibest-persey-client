@@ -12,7 +12,7 @@ import { resolveImageUrl } from "../services/uploadService.js"
 import { getErrorMessage } from "../utils/errorMessage.js"
 import { SCOPE_LABELS } from "../utils/newsScope.js"
 import {
-  Bell, Search, Plus,
+  Bell, Search, Plus, Menu, ChevronRight,
   User, SlidersHorizontal, Calendar, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
 } from "lucide-react"
 import "./Clubs.css"
@@ -239,7 +239,11 @@ export default function Clubs() {
     <>
       <div className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`} onClick={() => setSidebarOpen(false)} />
       <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
-        <div className="sidebar-profile">
+        <button
+          type="button"
+          className="sidebar-profile sidebar-profile--link"
+          onClick={() => { setSidebarOpen(false); navigate("/profile") }}
+        >
           <div className="sidebar-avatar">
             {profile.avatar ? (
               <img src={profile.avatar} alt="Profile" className="sidebar-avatar-img" />
@@ -248,7 +252,8 @@ export default function Clubs() {
             )}
           </div>
           <span className="sidebar-username">{profile.nickname}</span>
-        </div>
+          <span className="sidebar-profile-link"><span>View profile</span><ChevronRight size={14} /></span>
+        </button>
         <nav className="sidebar-nav">
           <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/home") }}>
             <User size={20} className="sidebar-nav-icon" /><span>Home</span>
@@ -323,11 +328,7 @@ export default function Clubs() {
 
         <header className="m2-header">
           <button className="m2-avatar-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
-            {profile.avatar ? (
-              <img src={profile.avatar} alt="" className="m2-avatar-img" />
-            ) : (
-              <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
-            )}
+            <Menu size={20} />
           </button>
           <h1 className="m2-org-name">All Clubs</h1>
           <button className="m2-bell-btn" aria-label="Notifications" onClick={() => navigate("/notifications")}>

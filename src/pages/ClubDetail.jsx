@@ -14,7 +14,7 @@ import { getErrorMessage } from "../utils/errorMessage.js"
 import ImageUploadField from "../components/ImageUploadField.jsx"
 import { resolveImageUrl } from "../services/uploadService.js"
 import {
-  Bell, Users, MessageSquare, Calendar, Megaphone, MapPin, Clock,
+  Bell, Users, MessageSquare, Calendar, Megaphone, MapPin, Clock, Menu, ChevronRight,
   User, SlidersHorizontal, Bookmark, Mail, LogOut, CalendarCheck, ShieldCheck, Newspaper, Settings as SettingsIcon,
 } from "lucide-react"
 import "./ClubDetail.css"
@@ -209,7 +209,11 @@ export default function ClubDetail() {
     <>
       <div className={`sidebar-overlay ${sidebarOpen ? "sidebar-overlay--visible" : ""}`} onClick={() => setSidebarOpen(false)} />
       <aside className={`sidebar-drawer ${sidebarOpen ? "sidebar-drawer--open" : ""}`}>
-        <div className="sidebar-profile">
+        <button
+          type="button"
+          className="sidebar-profile sidebar-profile--link"
+          onClick={() => { setSidebarOpen(false); navigate("/profile") }}
+        >
           <div className="sidebar-avatar">
             {profile.avatar ? (
               <img src={profile.avatar} alt="Profile" className="sidebar-avatar-img" />
@@ -218,7 +222,8 @@ export default function ClubDetail() {
             )}
           </div>
           <span className="sidebar-username">{profile.nickname}</span>
-        </div>
+          <span className="sidebar-profile-link"><span>View profile</span><ChevronRight size={14} /></span>
+        </button>
         <nav className="sidebar-nav">
           <button className="sidebar-nav-item" onClick={() => { setSidebarOpen(false); navigate("/clubs") }}>
             <Users size={20} className="sidebar-nav-icon" /><span>Clubs</span>
@@ -261,10 +266,14 @@ export default function ClubDetail() {
   const header = (
     <header className={isDesktop ? "m2-desktop-header" : "m2-header"}>
       <button className="m2-avatar-btn" aria-label={isDesktop ? "My profile" : "Open menu"} onClick={() => (isDesktop ? navigate("/profile") : setSidebarOpen(true))}>
-        {profile.avatar ? (
-          <img src={profile.avatar} alt="" className="m2-avatar-img" />
+        {isDesktop ? (
+          profile.avatar ? (
+            <img src={profile.avatar} alt="" className="m2-avatar-img" />
+          ) : (
+            <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
+          )
         ) : (
-          <span className="m2-avatar-fallback">{getInitials(profile.nickname)}</span>
+          <Menu size={20} />
         )}
       </button>
       <h1 className="m2-org-name">Club</h1>
